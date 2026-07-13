@@ -51,16 +51,16 @@ export const Route = createFileRoute("/ideas/$slug")({
 });
 
 function IdeaPage() {
-  const page = Route.useLoaderData();
+  const page = Route.useLoaderData() as IdeaPageType;
   const items = page.category.items(page.audience, page.style);
   const tools = resolveToolsForIdea(page);
 
   // Related idea pages: same category, sibling audiences/styles
   const related = allIdeaSlugs()
-    .filter((s) => s.startsWith(page.category.key) && s !== page.slug)
+    .filter((s: string) => s.startsWith(page.category.key) && s !== page.slug)
     .slice(0, 6)
-    .map((s) => getIdeaPage(s)!)
-    .filter(Boolean);
+    .map((s: string) => getIdeaPage(s))
+    .filter((p): p is IdeaPageType => p !== null);
 
   return (
     <PageShell>
