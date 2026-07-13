@@ -40,9 +40,9 @@ export const Route = createFileRoute("/for/$slug")({
 });
 
 function AudiencePageView() {
-  const page = Route.useLoaderData();
+  const page = Route.useLoaderData() as AudiencePage;
   const tools = resolveToolsForAudience(page);
-  const ideas = page.ideaSlugs.map((s: string) => getIdeaPage(s)).filter((x) => x !== null);
+  const ideas = page.ideaSlugs.map((s: string) => getIdeaPage(s)).filter((x: IdeaPage | null): x is IdeaPage => x !== null);
 
   return (
     <PageShell>
