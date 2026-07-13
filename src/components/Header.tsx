@@ -1,16 +1,17 @@
 import { Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { Menu, Search, X, Moon, Sun, User as UserIcon, LogOut, LayoutDashboard } from "lucide-react";
-import { NAV_LINKS, SITE } from "@/lib/site";
+import { NAV_LINKS } from "@/lib/site";
 import { useAuth } from "@/hooks/use-auth";
+import { useSearch } from "@/components/SearchProvider";
 
 export function Header() {
   const [open, setOpen] = useState(false);
-  const [searchOpen, setSearchOpen] = useState(false);
   const [light, setLight] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const { user, isAdmin, signOut, loading } = useAuth();
+  const search = useSearch();
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 8);
@@ -59,11 +60,14 @@ export function Header() {
 
         <div className="flex items-center gap-1">
           <button
-            aria-label="Search"
-            onClick={() => setSearchOpen((v) => !v)}
-            className="p-2 rounded-md hover:bg-muted transition-colors"
+            aria-label="Search (Ctrl+K)"
+            onClick={() => search.open()}
+            className="p-2 rounded-md hover:bg-muted transition-colors inline-flex items-center gap-2"
           >
             <Search className="h-5 w-5" />
+            <kbd className="hidden lg:inline-flex items-center px-1.5 py-0.5 text-[10px] font-mono rounded border border-border bg-background/60 text-muted-foreground">
+              ⌘K
+            </kbd>
           </button>
           <button
             aria-label="Toggle theme"
@@ -144,23 +148,6 @@ export function Header() {
         </div>
       </div>
 
-      {searchOpen && (
-        <div className="border-t border-border bg-background/95 backdrop-blur-xl">
-          <div className="mx-auto max-w-3xl px-4 py-4">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <input
-                autoFocus
-                placeholder={`Search ${SITE.name}…`}
-                className="w-full h-11 pl-10 pr-4 rounded-lg bg-input border border-border focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30 text-sm"
-              />
-            </div>
-            <p className="mt-2 text-xs text-muted-foreground">
-              Search tools, articles, categories & FAQs.
-            </p>
-          </div>
-        </div>
-      )}
 
       {open && (
         <div className="md:hidden border-t border-border bg-background/95 backdrop-blur-xl">

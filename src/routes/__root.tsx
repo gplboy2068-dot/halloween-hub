@@ -10,6 +10,7 @@ import {
 import { useEffect, type ReactNode } from "react";
 import { Toaster } from "sonner";
 import { AuthProvider } from "@/hooks/use-auth";
+import { SearchProvider } from "@/components/SearchProvider";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
@@ -126,8 +127,10 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
-        <Outlet />
-        <Toaster richColors position="top-right" theme="dark" />
+        <SearchProvider>
+          <Outlet />
+          <Toaster richColors position="top-right" theme="dark" />
+        </SearchProvider>
       </AuthProvider>
     </QueryClientProvider>
   );
