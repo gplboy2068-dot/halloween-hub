@@ -39,6 +39,8 @@ import { Route as AdminLogsRouteImport } from './routes/admin.logs'
 import { Route as AdminLinkingRouteImport } from './routes/admin.linking'
 import { Route as AdminAnalyticsRouteImport } from './routes/admin.analytics'
 import { Route as AdminEntityRouteImport } from './routes/admin.$entity'
+import { Route as BlogTagSlugRouteImport } from './routes/blog.tag.$slug'
+import { Route as BlogCategorySlugRouteImport } from './routes/blog.category.$slug'
 import { Route as AdminEntityIdRouteImport } from './routes/admin.$entity.$id'
 
 const TermsRoute = TermsRouteImport.update({
@@ -191,6 +193,16 @@ const AdminEntityRoute = AdminEntityRouteImport.update({
   path: '/$entity',
   getParentRoute: () => AdminRoute,
 } as any)
+const BlogTagSlugRoute = BlogTagSlugRouteImport.update({
+  id: '/blog/tag/$slug',
+  path: '/blog/tag/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BlogCategorySlugRoute = BlogCategorySlugRouteImport.update({
+  id: '/blog/category/$slug',
+  path: '/blog/category/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AdminEntityIdRoute = AdminEntityIdRouteImport.update({
   id: '/$id',
   path: '/$id',
@@ -229,6 +241,8 @@ export interface FileRoutesByFullPath {
   '/ideas/': typeof IdeasIndexRoute
   '/tools/': typeof ToolsIndexRoute
   '/admin/$entity/$id': typeof AdminEntityIdRoute
+  '/blog/category/$slug': typeof BlogCategorySlugRoute
+  '/blog/tag/$slug': typeof BlogTagSlugRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -261,6 +275,8 @@ export interface FileRoutesByTo {
   '/ideas': typeof IdeasIndexRoute
   '/tools': typeof ToolsIndexRoute
   '/admin/$entity/$id': typeof AdminEntityIdRoute
+  '/blog/category/$slug': typeof BlogCategorySlugRoute
+  '/blog/tag/$slug': typeof BlogTagSlugRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -295,6 +311,8 @@ export interface FileRoutesById {
   '/ideas/': typeof IdeasIndexRoute
   '/tools/': typeof ToolsIndexRoute
   '/admin/$entity/$id': typeof AdminEntityIdRoute
+  '/blog/category/$slug': typeof BlogCategorySlugRoute
+  '/blog/tag/$slug': typeof BlogTagSlugRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -330,6 +348,8 @@ export interface FileRouteTypes {
     | '/ideas/'
     | '/tools/'
     | '/admin/$entity/$id'
+    | '/blog/category/$slug'
+    | '/blog/tag/$slug'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -362,6 +382,8 @@ export interface FileRouteTypes {
     | '/ideas'
     | '/tools'
     | '/admin/$entity/$id'
+    | '/blog/category/$slug'
+    | '/blog/tag/$slug'
   id:
     | '__root__'
     | '/'
@@ -395,6 +417,8 @@ export interface FileRouteTypes {
     | '/ideas/'
     | '/tools/'
     | '/admin/$entity/$id'
+    | '/blog/category/$slug'
+    | '/blog/tag/$slug'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -419,6 +443,8 @@ export interface RootRouteChildren {
   ForIndexRoute: typeof ForIndexRoute
   IdeasIndexRoute: typeof IdeasIndexRoute
   ToolsIndexRoute: typeof ToolsIndexRoute
+  BlogCategorySlugRoute: typeof BlogCategorySlugRoute
+  BlogTagSlugRoute: typeof BlogTagSlugRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -633,6 +659,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminEntityRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/blog/tag/$slug': {
+      id: '/blog/tag/$slug'
+      path: '/blog/tag/$slug'
+      fullPath: '/blog/tag/$slug'
+      preLoaderRoute: typeof BlogTagSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/blog/category/$slug': {
+      id: '/blog/category/$slug'
+      path: '/blog/category/$slug'
+      fullPath: '/blog/category/$slug'
+      preLoaderRoute: typeof BlogCategorySlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/admin/$entity/$id': {
       id: '/admin/$entity/$id'
       path: '/$id'
@@ -703,6 +743,8 @@ const rootRouteChildren: RootRouteChildren = {
   ForIndexRoute: ForIndexRoute,
   IdeasIndexRoute: IdeasIndexRoute,
   ToolsIndexRoute: ToolsIndexRoute,
+  BlogCategorySlugRoute: BlogCategorySlugRoute,
+  BlogTagSlugRoute: BlogTagSlugRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
