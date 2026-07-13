@@ -20,11 +20,17 @@ const audienceArticlesQuery = (slug: string, title: string, description: string,
 
 
 export const Route = createFileRoute("/for/$slug")({
-  loader: ({ params }) => {
+  loader: async ({ params, context }) => {
     const page = getAudiencePage(params.slug);
     if (!page) throw notFound();
+    await context.queryClient
+      .ensureQueryData(
+        audienceArticlesQuery(page.slug, page.hero, page.intro, page.audience),
+      )
+      .catch(() => []);
     return page;
   },
+
   head: ({ loaderData, params }) => {
     if (!loaderData) return { meta: [{ title: "Not found" }, { name: "robots", content: "noindex" }] };
     const title = `${loaderData.hero} — Ideas, Tools & Inspiration 2026`;
