@@ -44,8 +44,23 @@ export const Route = createFileRoute("/for/$slug")({
         { property: "og:url", content: `/for/${params.slug}` },
       ],
       links: [{ rel: "canonical", href: `/for/${params.slug}` }],
+      scripts: [
+        {
+          type: "application/ld+json",
+          children: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "BreadcrumbList",
+            itemListElement: [
+              { "@type": "ListItem", position: 1, name: "Home", item: "/" },
+              { "@type": "ListItem", position: 2, name: "For You", item: "/for" },
+              { "@type": "ListItem", position: 3, name: loaderData.hero, item: `/for/${params.slug}` },
+            ],
+          }),
+        },
+      ],
     };
   },
+
   component: AudiencePageView,
   notFoundComponent: () => (
     <PageShell>
