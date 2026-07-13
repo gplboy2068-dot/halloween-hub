@@ -1,177 +1,22 @@
 /**
  * CMS server functions — admin-scoped CRUD over Supabase.
  * All handlers require an authenticated user with the `admin` role.
+ * Helpers live in ./cms-helpers.server.ts to satisfy TanStack Start's server-fn splitter.
  */
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import type { EntityKind } from "./cms-shared";
-import { ENTITY_KINDS } from "./cms-shared";
+import { ENTITY_KINDS, type EntityKind } from "./cms-shared";
+import {
+  assertAdmin,
+  categoryNameMap,
+  defaultsFor,
+  normalizeRow,
+  orderCol,
+  toDbPatch,
+} from "./cms-helpers.server";
 
 const kindSchema = z.enum(ENTITY_KINDS);
-
-async function assertAdmin(ctx: { supabase: any; userId: string }) {
-  const { data, error } = await ctx.supabase.rpc("has_role", {
-    _user_id: ctx.userId,
-    _role: "admin",
-  });
-  if (error) throw new Error(error.message);
-  if (!data) throw new Error("Forbidden: admin role required");
-}
-
-// -------------------- normalisation ---------------------------------
-
-type CategoryRow = { id: string; name: string; slug: string };
-
-function categoryNameMap(rows: CategoryRow[] | null | undefined) {
-  const m = new Map<string, string>();
-  (rows ?? []).forEach((c) => m.set(c.id, c.name));
-  return m;
-}
-
-function normalizeRow(entity: EntityKind, row: any, catMap: Map<string, string>): any {
-  const base = {
-    id: row.id,
-    createdAt: row.created_at,
-    updatedAt: row.updated_at ?? row.created_at,
-  };
-  switch (entity) {
-    case "tools":
-      return {
-        ...base,
-        slug: row.slug,
-        title: row.title,
-        description: row.description ?? "",
-        emoji: row.icon ?? "🎃",
-        category: row.category_id ? catMap.get(row.category_id) ?? "" : "",
-        categoryId: row.category_id,
-        featured: !!row.featured,
-        popular: !!row.popular,
-        isNew: !!row.is_new,
-        seoTitle: row.meta_title ?? "",
-        seoDescription: row.meta_description ?? "",
-        status: row.status,
-        publishedAt: row.published_at,
-      };
-    case "articles":
-      return {
-        ...base,
-        slug: row.slug,
-        title: row.title,
-        excerpt: row.excerpt ?? "",
-        content: row.content ?? "",
-        category: row.category_id ? catMap.get(row.category_id) ?? "" : "",
-        categoryId: row.category_id,
-        readingTime: row.read_time_min ?? 0,
-        tags: [],
-        status: row.status,
-        publishedAt: row.published_at,
-      };
-    case "categories":
-      return {
-        ...base,
-        slug: row.slug,
-        name: row.name,
-        emoji: row.icon ?? "🎃",
-        description: row.description ?? "",
-        status: "published" as const,
-      };
-    case "tags":
-      return {
-        ...base,
-        slug: row.slug,
-        name: row.name,
-        description: row.description ?? "",
-        count: 0,
-        status: "published" as const,
-      };
-    case "faqs":
-      return {
-        ...base,
-        question: row.question,
-        answer: row.answer,
-        category: row.category_id ? catMap.get(row.category_id) ?? "" : "",
-        categoryId: row.category_id,
-        status: row.status,
-      };
-    case "redirects":
-      return {
-        ...base,
-        from: row.source_path,
-        to: row.target_path,
-        code: row.status_code,
-        status: "published" as const,
-      };
-  }
-}
-
-/** Map camelCase UI values → snake_case DB column names for writes. */
-function toDbPatch(entity: EntityKind, values: Record<string, any>): Record<string, any> {
-  const v = values;
-  const status = v.status === "scheduled" ? "draft" : v.status;
-  switch (entity) {
-    case "tools":
-      return omitUndef({
-        slug: v.slug,
-        title: v.title,
-        description: v.description,
-        icon: v.emoji,
-        category_id: v.categoryId ?? undefined,
-        featured: v.featured,
-        popular: v.popular,
-        is_new: v.isNew,
-        meta_title: v.seoTitle,
-        meta_description: v.seoDescription,
-        status,
-        published_at: status === "published" ? new Date().toISOString() : undefined,
-      });
-    case "articles":
-      return omitUndef({
-        slug: v.slug,
-        title: v.title,
-        excerpt: v.excerpt,
-        content: v.content,
-        category_id: v.categoryId ?? undefined,
-        read_time_min: v.readingTime,
-        status,
-        published_at: status === "published" ? new Date().toISOString() : undefined,
-      });
-    case "categories":
-      return omitUndef({
-        slug: v.slug,
-        name: v.name,
-        description: v.description,
-        icon: v.emoji,
-      });
-    case "tags":
-      return omitUndef({ slug: v.slug, name: v.name, description: v.description });
-    case "faqs":
-      return omitUndef({
-        question: v.question,
-        answer: v.answer,
-        category_id: v.categoryId ?? undefined,
-        status,
-      });
-    case "redirects":
-      return omitUndef({
-        source_path: v.from,
-        target_path: v.to,
-        status_code: v.code ? Number(v.code) : undefined,
-      });
-  }
-}
-
-function omitUndef<T extends Record<string, any>>(o: T): T {
-  Object.keys(o).forEach((k) => (o[k] === undefined ? delete o[k] : null));
-  return o;
-}
-
-function orderCol(entity: EntityKind) {
-  if (entity === "redirects" || entity === "categories" || entity === "tags") return "created_at";
-  return "updated_at";
-}
-
-// -------------------- list -----------------------------------------
 
 export const listEntities = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
@@ -188,15 +33,11 @@ export const listEntities = createServerFn({ method: "POST" })
     if (error) throw new Error(error.message);
     let catMap = new Map<string, string>();
     if (entity === "tools" || entity === "articles" || entity === "faqs") {
-      const { data: cats } = await context.supabase
-        .from("categories")
-        .select("id, name, slug");
-      catMap = categoryNameMap(cats as CategoryRow[]);
+      const { data: cats } = await context.supabase.from("categories").select("id, name, slug");
+      catMap = categoryNameMap(cats as any);
     }
-    return (rows ?? []).map((r) => normalizeRow(entity, r, catMap));
+    return (rows ?? []).map((r: any) => normalizeRow(entity, r, catMap));
   });
-
-// -------------------- get single -----------------------------------
 
 export const getEntity = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
@@ -215,32 +56,10 @@ export const getEntity = createServerFn({ method: "POST" })
     let catMap = new Map<string, string>();
     if (data.entity === "tools" || data.entity === "articles" || data.entity === "faqs") {
       const { data: cats } = await context.supabase.from("categories").select("id, name, slug");
-      catMap = categoryNameMap(cats as CategoryRow[]);
+      catMap = categoryNameMap(cats as any);
     }
     return normalizeRow(data.entity, row, catMap);
   });
-
-// -------------------- create ---------------------------------------
-
-const uidSlug = () =>
-  "draft-" + Math.random().toString(36).slice(2, 8) + "-" + Date.now().toString(36);
-
-function defaultsFor(entity: EntityKind): Record<string, any> {
-  switch (entity) {
-    case "tools":
-      return { slug: uidSlug(), title: "Untitled tool", status: "draft", icon: "🎃" };
-    case "articles":
-      return { slug: uidSlug(), title: "Untitled article", status: "draft" };
-    case "categories":
-      return { slug: uidSlug(), name: "New category" };
-    case "tags":
-      return { slug: uidSlug(), name: "new-tag" };
-    case "faqs":
-      return { question: "New question", answer: "Answer…", status: "draft" };
-    case "redirects":
-      return { source_path: "/from", target_path: "/to", status_code: 301 };
-  }
-}
 
 export const createEntity = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
@@ -266,8 +85,6 @@ export const createEntity = createServerFn({ method: "POST" })
     });
     return { id: row.id as string };
   });
-
-// -------------------- update ---------------------------------------
 
 export const updateEntity = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
@@ -299,14 +116,10 @@ export const updateEntity = createServerFn({ method: "POST" })
     return { ok: true };
   });
 
-// -------------------- delete ---------------------------------------
-
 export const deleteEntities = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: { entity: EntityKind; ids: string[] }) =>
-    z
-      .object({ entity: kindSchema, ids: z.array(z.string().uuid()).min(1) })
-      .parse(input),
+    z.object({ entity: kindSchema, ids: z.array(z.string().uuid()).min(1) }).parse(input),
   )
   .handler(async ({ data, context }) => {
     await assertAdmin(context);
@@ -326,8 +139,6 @@ export const deleteEntities = createServerFn({ method: "POST" })
     return { ok: true };
   });
 
-// -------------------- bulk status ----------------------------------
-
 export const bulkUpdateStatus = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator(
@@ -342,7 +153,6 @@ export const bulkUpdateStatus = createServerFn({ method: "POST" })
   )
   .handler(async ({ data, context }) => {
     await assertAdmin(context);
-    // Only some tables have a status column.
     if (!["tools", "articles", "faqs"].includes(data.entity)) {
       return { ok: true, skipped: true };
     }
@@ -355,8 +165,6 @@ export const bulkUpdateStatus = createServerFn({ method: "POST" })
     if (error) throw new Error(error.message);
     return { ok: true };
   });
-
-// -------------------- admin stats ----------------------------------
 
 export const getAdminStats = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
@@ -382,8 +190,6 @@ export const getAdminStats = createServerFn({ method: "GET" })
     };
   });
 
-// -------------------- recent activity ------------------------------
-
 export const getRecentActivity = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
@@ -403,10 +209,7 @@ export const getRecentActivity = createServerFn({ method: "GET" })
     }));
   });
 
-// -------------------- settings -------------------------------------
-
 export const getSiteSettings = createServerFn({ method: "GET" }).handler(async () => {
-  // Public read via Data API (RLS: settings readable by everyone).
   const { createClient } = await import("@supabase/supabase-js");
   const key = process.env.SUPABASE_PUBLISHABLE_KEY!;
   const supabase = createClient(process.env.SUPABASE_URL!, key, {
@@ -445,7 +248,7 @@ export const saveSiteSettings = createServerFn({ method: "POST" })
     if (rows.length === 0) return { ok: true };
     const { error } = await context.supabase
       .from("site_settings")
-      .upsert(rows, { onConflict: "key" });
+      .upsert(rows as never, { onConflict: "key" });
     if (error) throw new Error(error.message);
     return { ok: true };
   });
