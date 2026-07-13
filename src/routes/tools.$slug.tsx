@@ -24,11 +24,15 @@ const relatedArticlesQuery = (slug: string, title: string, description: string, 
 
 
 export const Route = createFileRoute("/tools/$slug")({
-  loader: ({ params }) => {
+  loader: async ({ params, context }) => {
     const tool = TOOLS.find((t) => t.slug === params.slug);
     if (!tool) throw notFound();
+    await context.queryClient
+      .ensureQueryData(relatedArticlesQuery(tool.slug, tool.title, tool.description, tool.category))
+      .catch(() => []); // never block the tool page on DB
     return tool;
   },
+
   head: ({ loaderData, params }) => {
     if (!loaderData) return { meta: [{ title: "Not found" }, { name: "robots", content: "noindex" }] };
     const title = `${loaderData.title} — Free Halloween Tool`;
