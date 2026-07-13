@@ -19,7 +19,7 @@ export const Route = createFileRoute("/admin/$entity/$id")({
 
 function EditEntity() {
   const { entity, id } = Route.useParams();
-  const cfg = Route.useLoaderData();
+  const cfg = Route.useLoaderData() as EntityConfig;
   const item = useEntity<BaseEntity & Record<string, unknown>>(entity, id);
   const navigate = useNavigate();
 
