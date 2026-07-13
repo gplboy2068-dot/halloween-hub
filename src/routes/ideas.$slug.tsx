@@ -1,15 +1,40 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
+import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
 import { PageShell } from "@/components/PageShell";
 import { ToolCard } from "@/components/ToolCard";
 import { getIdeaPage, resolveToolsForIdea, IDEA_CATEGORIES, allIdeaSlugs } from "@/lib/pseo";
 import type { IdeaPage as IdeaPageType } from "@/lib/pseo";
+import { getRelatedAudiences, articleToRelated } from "@/lib/related";
+import { getRelatedArticlesForContext } from "@/lib/related.functions";
+import { RelatedSection } from "@/components/RelatedGrid";
+
+const ideaRelatedArticlesQuery = (slug: string, title: string, description: string, kw: string[]) =>
+  queryOptions({
+    queryKey: ["related-articles", "idea", slug],
+    queryFn: () =>
+      getRelatedArticlesForContext({
+        data: { title, description, keywords: kw, limit: 3 },
+      }),
+    staleTime: 5 * 60 * 1000,
+  });
+
 
 export const Route = createFileRoute("/ideas/$slug")({
-  loader: ({ params }) => {
+  loader: async ({ params, context }) => {
     const page = getIdeaPage(params.slug);
     if (!page) throw notFound();
+    await context.queryClient
+      .ensureQueryData(
+        ideaRelatedArticlesQuery(page.slug, page.title, page.description, [
+          page.category.noun,
+          page.audience,
+          page.style,
+        ]),
+      )
+      .catch(() => []);
     return page;
   },
+
   head: ({ loaderData, params }) => {
     if (!loaderData) return { meta: [{ title: "Not found" }, { name: "robots", content: "noindex" }] };
     return {
@@ -61,6 +86,23 @@ function IdeaPage() {
     .slice(0, 6)
     .map((s: string) => getIdeaPage(s))
     .filter((p): p is IdeaPageType => p !== null);
+
+  const relCtx = {
+    title: page.title,
+    description: page.description,
+    keywords: [page.category.noun, page.audience, page.style],
+    excludeHref: `/ideas/${page.slug}`,
+  };
+  const relatedAudiences = getRelatedAudiences(relCtx, 3);
+  const { data: relArticlesRaw } = useSuspenseQuery(
+    ideaRelatedArticlesQuery(page.slug, page.title, page.description, [
+      page.category.noun,
+      page.audience,
+      page.style,
+    ]),
+  );
+  const relatedArticles = (relArticlesRaw ?? []).map(articleToRelated);
+
 
   return (
     <PageShell>
@@ -143,6 +185,18 @@ function IdeaPage() {
             </div>
           </section>
         )}
+
+        <RelatedSection
+          heading="Read next on the blog"
+          items={relatedArticles}
+        />
+
+        <RelatedSection
+          heading="Halloween for…"
+          items={relatedAudiences}
+        />
+
+
 
         <section className="mt-14 text-center">
           <h2 className="font-display text-xl font-bold mb-4">Explore other categories</h2>

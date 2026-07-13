@@ -1,15 +1,36 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
+import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
 import { PageShell } from "@/components/PageShell";
 import { ToolCard } from "@/components/ToolCard";
 import { getAudiencePage, resolveToolsForAudience, AUDIENCE_PAGES, getIdeaPage } from "@/lib/pseo";
 import type { AudiencePage, IdeaPage } from "@/lib/pseo";
+import { articleToRelated } from "@/lib/related";
+import { getRelatedArticlesForContext } from "@/lib/related.functions";
+import { RelatedSection } from "@/components/RelatedGrid";
+
+const audienceArticlesQuery = (slug: string, title: string, description: string, audience: string) =>
+  queryOptions({
+    queryKey: ["related-articles", "audience", slug],
+    queryFn: () =>
+      getRelatedArticlesForContext({
+        data: { title, description, keywords: [audience], limit: 3 },
+      }),
+    staleTime: 5 * 60 * 1000,
+  });
+
 
 export const Route = createFileRoute("/for/$slug")({
-  loader: ({ params }) => {
+  loader: async ({ params, context }) => {
     const page = getAudiencePage(params.slug);
     if (!page) throw notFound();
+    await context.queryClient
+      .ensureQueryData(
+        audienceArticlesQuery(page.slug, page.hero, page.intro, page.audience),
+      )
+      .catch(() => []);
     return page;
   },
+
   head: ({ loaderData, params }) => {
     if (!loaderData) return { meta: [{ title: "Not found" }, { name: "robots", content: "noindex" }] };
     const title = `${loaderData.hero} — Ideas, Tools & Inspiration 2026`;
@@ -43,6 +64,11 @@ function AudiencePageView() {
   const page = Route.useLoaderData() as AudiencePage;
   const tools = resolveToolsForAudience(page);
   const ideas = page.ideaSlugs.map((s: string) => getIdeaPage(s)).filter((x: IdeaPage | null): x is IdeaPage => x !== null);
+  const { data: articlesRaw } = useSuspenseQuery(
+    audienceArticlesQuery(page.slug, page.hero, page.intro, page.audience),
+  );
+  const relatedArticles = (articlesRaw ?? []).map(articleToRelated);
+
 
   return (
     <PageShell>
@@ -103,6 +129,13 @@ function AudiencePageView() {
             </div>
           </section>
         )}
+
+        <RelatedSection
+          heading="Read next on the blog"
+          items={relatedArticles}
+        />
+
+
 
         <section className="mt-14 text-center">
           <h2 className="font-display text-xl font-bold mb-4">Halloween for everyone</h2>

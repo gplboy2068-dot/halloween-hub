@@ -1,15 +1,38 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
+import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
 import { PageShell } from "@/components/PageShell";
 import { ToolCard } from "@/components/ToolCard";
 import { TOOLS } from "@/lib/site";
 import { getToolComponent } from "@/tools/registry";
+import {
+  getRelatedIdeas,
+  getRelatedAudiences,
+  articleToRelated,
+} from "@/lib/related";
+import { getRelatedArticlesForContext } from "@/lib/related.functions";
+import { RelatedSection, RelatedMixSection } from "@/components/RelatedGrid";
+
+const relatedArticlesQuery = (slug: string, title: string, description: string, category: string) =>
+  queryOptions({
+    queryKey: ["related-articles", "tool", slug],
+    queryFn: () =>
+      getRelatedArticlesForContext({
+        data: { title, description, keywords: [category], excludeSlug: slug, limit: 3 },
+      }),
+    staleTime: 5 * 60 * 1000,
+  });
+
 
 export const Route = createFileRoute("/tools/$slug")({
-  loader: ({ params }) => {
+  loader: async ({ params, context }) => {
     const tool = TOOLS.find((t) => t.slug === params.slug);
     if (!tool) throw notFound();
+    await context.queryClient
+      .ensureQueryData(relatedArticlesQuery(tool.slug, tool.title, tool.description, tool.category))
+      .catch(() => []); // never block the tool page on DB
     return tool;
   },
+
   head: ({ loaderData, params }) => {
     if (!loaderData) return { meta: [{ title: "Not found" }, { name: "robots", content: "noindex" }] };
     const title = `${loaderData.title} — Free Halloween Tool`;
@@ -55,6 +78,20 @@ export const Route = createFileRoute("/tools/$slug")({
 function ToolPage() {
   const tool = Route.useLoaderData();
   const related = TOOLS.filter((t) => t.slug !== tool.slug && t.category === tool.category).slice(0, 8);
+  const ctx = {
+    title: tool.title,
+    description: tool.description,
+    category: tool.category,
+    keywords: [tool.category],
+    excludeHref: `/tools/${tool.slug}`,
+  };
+  const relatedIdeas = getRelatedIdeas(ctx, 6);
+  const relatedAudiences = getRelatedAudiences(ctx, 3);
+  const { data: relatedArticlesData } = useSuspenseQuery(
+    relatedArticlesQuery(tool.slug, tool.title, tool.description, tool.category),
+  );
+  const relatedArticles = (relatedArticlesData ?? []).map(articleToRelated);
+
 
   return (
     <PageShell>
@@ -99,7 +136,7 @@ function ToolPage() {
           </p>
         </section>
 
-        {/* Related */}
+        {/* Related tools */}
         {related.length > 0 && (
           <section className="mt-14">
             <h2 className="font-display text-2xl font-bold mb-6">Related tools</h2>
@@ -108,7 +145,27 @@ function ToolPage() {
             </div>
           </section>
         )}
+
+        {/* Related ideas */}
+        <RelatedSection
+          heading="Idea pages that pair with this tool"
+          subheading="Curated ideas for the same audience — combine with the tool above."
+          items={relatedIdeas}
+        />
+
+        {/* Related articles */}
+        <RelatedSection
+          heading="Read next on the blog"
+          items={relatedArticles}
+        />
+
+        {/* Related audience hubs */}
+        <RelatedSection
+          heading="Halloween for…"
+          items={relatedAudiences}
+        />
       </article>
     </PageShell>
   );
 }
+
