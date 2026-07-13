@@ -2,6 +2,7 @@ import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { PageShell } from "@/components/PageShell";
 import { ToolCard } from "@/components/ToolCard";
 import { TOOLS } from "@/lib/site";
+import { getToolComponent } from "@/tools/registry";
 
 export const Route = createFileRoute("/tools/$slug")({
   loader: ({ params }) => {
@@ -73,14 +74,20 @@ function ToolPage() {
           <p className="mt-4 text-lg text-muted-foreground max-w-2xl mx-auto">{tool.description}</p>
         </header>
 
-        {/* Tool interface placeholder */}
-        <div className="mt-10 rounded-3xl border border-border bg-card p-8 sm:p-12 text-center bg-gradient-hero">
-          <p className="text-sm uppercase tracking-widest text-primary font-semibold">Coming in Phase 6</p>
-          <h2 className="mt-2 font-display text-2xl font-bold">Interactive tool interface</h2>
-          <p className="mt-3 text-muted-foreground max-w-md mx-auto">
-            The live {tool.title.toLowerCase()} experience will be built in Phase 6 with the reusable tool engine.
-          </p>
-        </div>
+        {/* Tool interface */}
+        {(() => {
+          const ToolComponent = getToolComponent(tool.slug);
+          if (ToolComponent) return <ToolComponent />;
+          return (
+            <div className="mt-10 rounded-3xl border border-border bg-card p-8 sm:p-12 text-center bg-gradient-hero">
+              <p className="text-sm uppercase tracking-widest text-primary font-semibold">Coming soon</p>
+              <h2 className="mt-2 font-display text-2xl font-bold">This tool is brewing</h2>
+              <p className="mt-3 text-muted-foreground max-w-md mx-auto">
+                The {tool.title.toLowerCase()} is in production. Check back soon — or explore related tools below.
+              </p>
+            </div>
+          );
+        })()}
 
         {/* About */}
         <section className="mt-12">
