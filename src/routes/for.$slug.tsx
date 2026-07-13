@@ -89,7 +89,7 @@ function AudiencePageView() {
           <section className="mt-14">
             <h2 className="font-display text-2xl font-bold mb-6">Idea pages you'll love</h2>
             <div className="grid gap-3 sm:grid-cols-2">
-              {ideas.map((idea) => (
+              {ideas.map((idea: IdeaPage) => (
                 <Link
                   key={idea!.slug}
                   to="/ideas/$slug"
