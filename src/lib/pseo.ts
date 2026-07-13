@@ -159,7 +159,7 @@ export const IDEA_CATEGORIES: IdeaCategory[] = [
     emoji: "🎃",
     intro: (aud, style) =>
       `Ditch the triangle-eyes routine. These ${style} pumpkin carving ideas for ${aud} range from beginner-friendly (10 minutes with a Sharpie and a knife) to advanced multi-layer stencils. Each idea includes what tools you'll need, difficulty level, and how long it lasts before turning.`,
-    items: (_aud, style) => [
+    items: (aud, style) => [
       `${cap(style)} classic jack-o'-lantern — nail the fundamentals`,
       `Bat silhouettes flying across the pumpkin's face`,
       `Haunted-house cutout with a candle inside`,
