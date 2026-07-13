@@ -2,6 +2,7 @@ import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { PageShell } from "@/components/PageShell";
 import { ToolCard } from "@/components/ToolCard";
 import { getAudiencePage, resolveToolsForAudience, AUDIENCE_PAGES, getIdeaPage } from "@/lib/pseo";
+import type { AudiencePage, IdeaPage } from "@/lib/pseo";
 
 export const Route = createFileRoute("/for/$slug")({
   loader: ({ params }) => {

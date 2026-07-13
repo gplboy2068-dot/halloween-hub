@@ -26,6 +26,7 @@ import { Route as BlogIndexRouteImport } from './routes/blog.index'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as ToolsSlugRouteImport } from './routes/tools.$slug'
 import { Route as IdeasSlugRouteImport } from './routes/ideas.$slug'
+import { Route as ForSlugRouteImport } from './routes/for.$slug'
 import { Route as CategoriesSlugRouteImport } from './routes/categories.$slug'
 import { Route as BlogSlugRouteImport } from './routes/blog.$slug'
 import { Route as AdminSettingsRouteImport } from './routes/admin.settings'
@@ -123,6 +124,11 @@ const IdeasSlugRoute = IdeasSlugRouteImport.update({
   path: '/ideas/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ForSlugRoute = ForSlugRouteImport.update({
+  id: '/for/$slug',
+  path: '/for/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const CategoriesSlugRoute = CategoriesSlugRouteImport.update({
   id: '/categories/$slug',
   path: '/categories/$slug',
@@ -201,6 +207,7 @@ export interface FileRoutesByFullPath {
   '/admin/settings': typeof AdminSettingsRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/categories/$slug': typeof CategoriesSlugRoute
+  '/for/$slug': typeof ForSlugRoute
   '/ideas/$slug': typeof IdeasSlugRoute
   '/tools/$slug': typeof ToolsSlugRoute
   '/admin/': typeof AdminIndexRoute
@@ -230,6 +237,7 @@ export interface FileRoutesByTo {
   '/admin/settings': typeof AdminSettingsRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/categories/$slug': typeof CategoriesSlugRoute
+  '/for/$slug': typeof ForSlugRoute
   '/ideas/$slug': typeof IdeasSlugRoute
   '/tools/$slug': typeof ToolsSlugRoute
   '/admin': typeof AdminIndexRoute
@@ -261,6 +269,7 @@ export interface FileRoutesById {
   '/admin/settings': typeof AdminSettingsRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/categories/$slug': typeof CategoriesSlugRoute
+  '/for/$slug': typeof ForSlugRoute
   '/ideas/$slug': typeof IdeasSlugRoute
   '/tools/$slug': typeof ToolsSlugRoute
   '/admin/': typeof AdminIndexRoute
@@ -293,6 +302,7 @@ export interface FileRouteTypes {
     | '/admin/settings'
     | '/blog/$slug'
     | '/categories/$slug'
+    | '/for/$slug'
     | '/ideas/$slug'
     | '/tools/$slug'
     | '/admin/'
@@ -322,6 +332,7 @@ export interface FileRouteTypes {
     | '/admin/settings'
     | '/blog/$slug'
     | '/categories/$slug'
+    | '/for/$slug'
     | '/ideas/$slug'
     | '/tools/$slug'
     | '/admin'
@@ -352,6 +363,7 @@ export interface FileRouteTypes {
     | '/admin/settings'
     | '/blog/$slug'
     | '/categories/$slug'
+    | '/for/$slug'
     | '/ideas/$slug'
     | '/tools/$slug'
     | '/admin/'
@@ -375,6 +387,7 @@ export interface RootRouteChildren {
   TermsRoute: typeof TermsRoute
   BlogSlugRoute: typeof BlogSlugRoute
   CategoriesSlugRoute: typeof CategoriesSlugRoute
+  ForSlugRoute: typeof ForSlugRoute
   IdeasSlugRoute: typeof IdeasSlugRoute
   ToolsSlugRoute: typeof ToolsSlugRoute
   BlogIndexRoute: typeof BlogIndexRoute
@@ -501,6 +514,13 @@ declare module '@tanstack/react-router' {
       path: '/ideas/$slug'
       fullPath: '/ideas/$slug'
       preLoaderRoute: typeof IdeasSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/for/$slug': {
+      id: '/for/$slug'
+      path: '/for/$slug'
+      fullPath: '/for/$slug'
+      preLoaderRoute: typeof ForSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/categories/$slug': {
@@ -635,6 +655,7 @@ const rootRouteChildren: RootRouteChildren = {
   TermsRoute: TermsRoute,
   BlogSlugRoute: BlogSlugRoute,
   CategoriesSlugRoute: CategoriesSlugRoute,
+  ForSlugRoute: ForSlugRoute,
   IdeasSlugRoute: IdeasSlugRoute,
   ToolsSlugRoute: ToolsSlugRoute,
   BlogIndexRoute: BlogIndexRoute,
