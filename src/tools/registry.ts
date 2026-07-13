@@ -1,40 +1,65 @@
 import type { ComponentType } from "react";
+import { PartyPlanner, MemeGenerator, PumpkinFaceGenerator } from "./interactive";
 import {
-  NameGenerator,
-  CaptionGenerator,
-  QuoteGenerator,
-  WishGenerator,
-  MessageGenerator,
-  HashtagGenerator,
+  AICostumeGenerator,
+  AIScaryStoryGenerator,
+  AICaptionGenerator,
+  AIMessageGenerator,
+  AIWishGenerator,
+  AIQuoteGenerator,
   AIPromptGenerator,
-  PartyNameGenerator,
-  CostumeGenerator,
-  ScaryStoryGenerator,
-} from "./text-generators";
-import {
-  PumpkinFaceGenerator,
-  PumpkinTemplateGenerator,
-  PumpkinCarvingGenerator,
-  MemeGenerator,
-  PartyPlanner,
-} from "./interactive";
+  AIHashtagGenerator,
+  AIPartyNameGenerator,
+  AIPumpkinCarvingGenerator,
+  AIWallpaperGenerator,
+  AIStickerGenerator,
+  AIProfilePictureGenerator,
+  AIAvatarGenerator,
+  AIColoringPagesGenerator,
+  AIMemeImageGenerator,
+  AILogoMaker,
+  AIPosterMaker,
+  AICardMaker,
+  AIInvitationMaker,
+  AIBannerMaker,
+  AIFlyerMaker,
+  AIPumpkinTemplateAI,
+} from "./ai-tools";
+import { NameGenerator } from "./text-generators";
 
 export const TOOL_REGISTRY: Record<string, ComponentType> = {
-  "name-generator": NameGenerator,
-  "caption-generator": CaptionGenerator,
-  "quote-generator": QuoteGenerator,
-  "wish-generator": WishGenerator,
-  "message-generator": MessageGenerator,
-  "hashtag-generator": HashtagGenerator,
+  // AI-powered text tools
+  "costume-generator": AICostumeGenerator,
+  "scary-story-generator": AIScaryStoryGenerator,
+  "caption-generator": AICaptionGenerator,
+  "message-generator": AIMessageGenerator,
+  "wish-generator": AIWishGenerator,
+  "quote-generator": AIQuoteGenerator,
   "ai-prompt-generator": AIPromptGenerator,
-  "party-name-generator": PartyNameGenerator,
-  "costume-generator": CostumeGenerator,
-  "scary-story-generator": ScaryStoryGenerator,
-  "pumpkin-face-generator": PumpkinFaceGenerator,
-  "pumpkin-template-generator": PumpkinTemplateGenerator,
-  "pumpkin-carving-generator": PumpkinCarvingGenerator,
-  "meme-generator": MemeGenerator,
+  "hashtag-generator": AIHashtagGenerator,
+  "party-name-generator": AIPartyNameGenerator,
+
+  // Client-side (no API cost)
+  "name-generator": NameGenerator,
   "party-planner": PartyPlanner,
+
+  // AI image tools
+  "pumpkin-carving-generator": AIPumpkinCarvingGenerator,
+  "pumpkin-template-generator": AIPumpkinTemplateAI,
+  "pumpkin-face-generator": PumpkinFaceGenerator, // interactive SVG editor kept
+  "wallpaper-generator": AIWallpaperGenerator,
+  "sticker-generator": AIStickerGenerator,
+  "profile-picture-generator": AIProfilePictureGenerator,
+  "avatar-generator": AIAvatarGenerator,
+  "coloring-pages-generator": AIColoringPagesGenerator,
+  "meme-generator": MemeGenerator, // canvas editor kept
+  "ai-meme-image-generator": AIMemeImageGenerator,
+  "logo-maker": AILogoMaker,
+  "poster-maker": AIPosterMaker,
+  "halloween-card-maker": AICardMaker,
+  "invitation-maker": AIInvitationMaker,
+  "banner-maker": AIBannerMaker,
+  "flyer-maker": AIFlyerMaker,
 };
 
 export function getToolComponent(slug: string): ComponentType | null {
