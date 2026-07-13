@@ -219,6 +219,10 @@ function ArticlePage() {
           </div>
         )}
 
+        {article.toc && article.toc.length > 0 && (
+          <TableOfContents toc={article.toc} />
+        )}
+
         {article.contentHtml ? (
           <div
             className="prose prose-invert prose-headings:font-display prose-a:text-primary hover:prose-a:text-primary-glow prose-img:rounded-xl mt-10 max-w-none"
@@ -229,6 +233,7 @@ function ArticlePage() {
             Full article coming soon — subscribe below to be notified when it publishes.
           </div>
         )}
+
 
         {article.tags.length > 0 && (
           <div className="mt-12 pt-8 border-t border-border">
