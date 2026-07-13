@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { AdminShell } from "@/components/admin/AdminShell";
-import { useEntityList, type LogEntity } from "@/lib/admin-store";
+import { useRecentActivity } from "@/lib/admin-store";
 import { AlertCircle, AlertTriangle, Info } from "lucide-react";
 
 export const Route = createFileRoute("/admin/logs")({
@@ -8,8 +8,11 @@ export const Route = createFileRoute("/admin/logs")({
 });
 
 function Logs() {
-  const logs = useEntityList<LogEntity>("logs");
-  const icon = (l: LogEntity["level"]) => l === "error" ? <AlertCircle className="h-4 w-4 text-destructive" /> : l === "warn" ? <AlertTriangle className="h-4 w-4 text-amber-400" /> : <Info className="h-4 w-4 text-muted-foreground" />;
+  const logs = useRecentActivity();
+  const icon = (l: string) =>
+    l === "error" ? <AlertCircle className="h-4 w-4 text-destructive" />
+    : l === "warn" ? <AlertTriangle className="h-4 w-4 text-amber-400" />
+    : <Info className="h-4 w-4 text-muted-foreground" />;
   return (
     <AdminShell title="Audit Logs">
       <div className="rounded-2xl border border-border bg-card overflow-hidden">
@@ -23,6 +26,9 @@ function Logs() {
             </tr>
           </thead>
           <tbody>
+            {logs.length === 0 && (
+              <tr><td colSpan={4} className="px-4 py-16 text-center text-sm text-muted-foreground">No activity yet.</td></tr>
+            )}
             {logs.map((l) => (
               <tr key={l.id} className="border-t border-border">
                 <td className="px-4 py-3 text-muted-foreground text-xs">{new Date(l.createdAt).toLocaleString()}</td>

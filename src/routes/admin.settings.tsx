@@ -1,8 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { AdminShell } from "@/components/admin/AdminShell";
-import { useKV } from "@/lib/admin-store";
-import { Save } from "lucide-react";
-import { useState } from "react";
+import { useSaveSettings, useSiteSettings } from "@/lib/admin-store";
+import { Save, Loader2 } from "lucide-react";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
 
 type Settings = {
   siteName: string;
@@ -29,37 +30,46 @@ export const Route = createFileRoute("/admin/settings")({
 });
 
 function SettingsPage() {
-  const [saved, setSaved] = useKV<Settings>("site-settings", DEFAULTS);
+  const saved = useSiteSettings<Settings>(DEFAULTS);
+  const save = useSaveSettings();
   const [form, setForm] = useState<Settings>(saved);
-  const [ok, setOk] = useState(false);
+  useEffect(() => setForm(saved), [saved]);
+
+  async function submit(e: React.FormEvent) {
+    e.preventDefault();
+    try {
+      await save.mutateAsync(form);
+      toast.success("Settings saved");
+    } catch (err: any) {
+      toast.error(err?.message ?? "Failed to save");
+    }
+  }
 
   return (
     <AdminShell title="Settings">
-      <form
-        onSubmit={(e) => { e.preventDefault(); setSaved(form); setOk(true); setTimeout(() => setOk(false), 2000); }}
-        className="max-w-3xl space-y-6"
-      >
+      <form onSubmit={submit} className="max-w-3xl space-y-6">
         <Section title="Site identity">
           <Input label="Site name" value={form.siteName} onChange={(v) => setForm({ ...form, siteName: v })} />
           <Input label="Tagline" value={form.tagline} onChange={(v) => setForm({ ...form, tagline: v })} />
           <Input label="Meta description" value={form.description} onChange={(v) => setForm({ ...form, description: v })} textarea />
         </Section>
-
         <Section title="Social">
           <Input label="Twitter handle" value={form.twitter} onChange={(v) => setForm({ ...form, twitter: v })} />
           <Input label="Support email" value={form.supportEmail} onChange={(v) => setForm({ ...form, supportEmail: v })} />
         </Section>
-
         <Section title="Monetization (optional)">
           <Input label="Google AdSense ID" value={form.adsenseId} onChange={(v) => setForm({ ...form, adsenseId: v })} placeholder="ca-pub-XXXXXXXXXX" />
           <Input label="Google Analytics ID" value={form.gaId} onChange={(v) => setForm({ ...form, gaId: v })} placeholder="G-XXXXXXXXXX" />
         </Section>
-
         <div className="flex items-center gap-3">
-          <button type="submit" className="inline-flex items-center gap-2 h-10 px-5 rounded-lg bg-primary text-primary-foreground font-semibold hover:bg-primary-glow glow-primary">
-            <Save className="h-4 w-4" /> Save settings
+          <button
+            type="submit"
+            disabled={save.isPending}
+            className="inline-flex items-center gap-2 h-10 px-5 rounded-lg bg-primary text-primary-foreground font-semibold hover:bg-primary-glow disabled:opacity-50 glow-primary"
+          >
+            {save.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
+            Save settings
           </button>
-          {ok && <span className="text-sm text-emerald-400">Saved</span>}
         </div>
       </form>
     </AdminShell>

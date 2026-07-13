@@ -1,245 +1,168 @@
 /**
- * Admin store — localStorage-backed CRUD for the CMS.
- * Phase 3 will swap this for Supabase. All hooks use the same shape,
- * so route/UI code won't change.
+ * Admin store — TanStack Query wrapper around Supabase-backed CMS server fns.
+ * Same hook names as before, but data is fetched from Lovable Cloud.
  */
-import { useCallback, useEffect, useState, useSyncExternalStore } from "react";
-import { TOOLS, ARTICLES, CATEGORIES } from "./site";
+import { useMemo } from "react";
+import {
+  useQuery,
+  useMutation,
+  useQueryClient,
+} from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
+import {
+  listEntities,
+  getEntity,
+  createEntity as createEntityFn,
+  updateEntity as updateEntityFn,
+  deleteEntities as deleteEntitiesFn,
+  bulkUpdateStatus,
+  getAdminStats,
+  getRecentActivity,
+  getSiteSettings,
+  saveSiteSettings,
+} from "./cms.functions";
+import type { EntityKind, BaseEntity } from "./cms-shared";
+export * from "./cms-shared";
 
-export type Status = "draft" | "scheduled" | "published" | "archived";
-
-export type BaseEntity = {
-  id: string;
-  status: Status;
-  createdAt: string;
-  updatedAt: string;
-  publishedAt?: string | null;
-  scheduledFor?: string | null;
-  author?: string;
-};
-
-export type ToolEntity = BaseEntity & {
-  slug: string;
-  title: string;
-  description: string;
-  emoji: string;
-  category: string;
-  featured: boolean;
-  popular: boolean;
-  isNew: boolean;
-  seoTitle?: string;
-  seoDescription?: string;
-};
-
-export type ArticleEntity = BaseEntity & {
-  slug: string;
-  title: string;
-  excerpt: string;
-  content: string;
-  category: string;
-  readingTime: number;
-  tags: string[];
-};
-
-export type CategoryEntity = BaseEntity & {
-  slug: string;
-  name: string;
-  emoji: string;
-  description: string;
-};
-
-export type TagEntity = BaseEntity & { slug: string; name: string; count: number };
-export type FaqEntity = BaseEntity & { question: string; answer: string; category: string };
-export type RedirectEntity = BaseEntity & { from: string; to: string; code: 301 | 302 };
-export type UserEntity = BaseEntity & { email: string; name: string; role: "admin" | "editor" | "viewer" };
+// Legacy re-exports for older imports
 export type LogEntity = BaseEntity & { level: "info" | "warn" | "error"; message: string; source: string };
+export type UserEntity = BaseEntity & { email: string; name: string; role: string };
 
-const now = () => new Date().toISOString();
-const uid = () => Math.random().toString(36).slice(2, 10);
-
-// Seed data on first load
-const seed: Record<string, unknown[]> = {
-  tools: TOOLS.map((t): ToolEntity => ({
-    id: uid(),
-    slug: t.slug,
-    title: t.title,
-    description: t.description,
-    emoji: t.emoji,
-    category: t.category,
-    featured: !!t.featured,
-    popular: !!t.popular,
-    isNew: !!t.isNew,
-    status: "published",
-    createdAt: now(),
-    updatedAt: now(),
-    publishedAt: now(),
-    author: "Editorial",
-  })),
-  articles: ARTICLES.map((a): ArticleEntity => ({
-    id: uid(),
-    slug: a.slug,
-    title: a.title,
-    excerpt: a.excerpt,
-    content: "",
-    category: a.category,
-    readingTime: a.readingTime,
-    tags: [],
-    status: "published",
-    createdAt: now(),
-    updatedAt: a.updatedAt,
-    publishedAt: a.updatedAt,
-    author: "Editorial",
-  })),
-  categories: CATEGORIES.map((c): CategoryEntity => ({
-    id: uid(),
-    slug: c.slug,
-    name: c.name,
-    emoji: c.emoji,
-    description: c.description,
-    status: "published",
-    createdAt: now(),
-    updatedAt: now(),
-  })),
-  tags: ["halloween", "spooky", "pumpkin", "costume", "party", "diy", "printable", "kids"].map((t): TagEntity => ({
-    id: uid(), slug: t, name: t, count: Math.floor(Math.random() * 30) + 3,
-    status: "published", createdAt: now(), updatedAt: now(),
-  })),
-  faqs: [
-    { question: "Are HalloweenTools tools free?", answer: "Yes, every tool is free with no signup.", category: "General" },
-    { question: "Do you save my data?", answer: "No — tools run in your browser whenever possible.", category: "Privacy" },
-    { question: "Can I use outputs commercially?", answer: "Most outputs are royalty-free for personal use.", category: "Legal" },
-  ].map((f): FaqEntity => ({ id: uid(), ...f, status: "published", createdAt: now(), updatedAt: now() })),
-  redirects: [] as RedirectEntity[],
-  users: [
-    { email: "admin@halloweentools.com", name: "Admin", role: "admin" as const },
-  ].map((u): UserEntity => ({ id: uid(), ...u, status: "published", createdAt: now(), updatedAt: now() })),
-  logs: [
-    { level: "info" as const, message: "Site deployed", source: "system" },
-    { level: "info" as const, message: "Seed data loaded", source: "cms" },
-  ].map((l): LogEntity => ({ id: uid(), ...l, status: "published", createdAt: now(), updatedAt: now() })),
+const keys = {
+  list: (entity: string) => ["cms", "list", entity] as const,
+  one: (entity: string, id: string) => ["cms", "one", entity, id] as const,
+  stats: () => ["cms", "stats"] as const,
+  activity: () => ["cms", "activity"] as const,
+  settings: () => ["cms", "settings"] as const,
 };
-
-const STORE_KEY = "halloweentools_cms_v1";
-
-type Store = Record<string, BaseEntity[]>;
-
-const listeners = new Set<() => void>();
-let cache: Store | null = null;
-
-function loadStore(): Store {
-  if (cache) return cache;
-  if (typeof window === "undefined") return seed as unknown as Store;
-  try {
-    const raw = localStorage.getItem(STORE_KEY);
-    if (raw) {
-      cache = JSON.parse(raw);
-      return cache!;
-    }
-  } catch {}
-  cache = seed as unknown as Store;
-  saveStore(cache);
-  return cache;
-}
-
-function saveStore(s: Store) {
-  cache = s;
-  if (typeof window !== "undefined") {
-    try { localStorage.setItem(STORE_KEY, JSON.stringify(s)); } catch {}
-  }
-  listeners.forEach((l) => l());
-}
-
-function subscribe(cb: () => void) {
-  listeners.add(cb);
-  return () => { listeners.delete(cb); };
-}
 
 export function useEntityList<T extends BaseEntity>(entity: string): T[] {
-  const store = useSyncExternalStore(
-    subscribe,
-    () => loadStore()[entity] ?? [],
-    () => seed[entity] as BaseEntity[] ?? [],
-  );
-  return store as T[];
+  const list = useServerFn(listEntities);
+  const { data } = useQuery({
+    queryKey: keys.list(entity),
+    queryFn: () => list({ data: { entity: entity as EntityKind } }),
+    staleTime: 30_000,
+    enabled: !!entity,
+  });
+  return (data ?? []) as T[];
 }
 
 export function useEntity<T extends BaseEntity>(entity: string, id: string): T | undefined {
-  const list = useEntityList<T>(entity);
-  return list.find((x) => x.id === id);
-}
-
-export function createEntity<T extends BaseEntity>(entity: string, data: Partial<T>): T {
-  const store = { ...loadStore() };
-  const item = {
-    id: uid(),
-    status: "draft" as Status,
-    createdAt: now(),
-    updatedAt: now(),
-    ...data,
-  } as unknown as T;
-  store[entity] = [item, ...(store[entity] ?? [])];
-  saveStore(store);
-  return item;
-}
-
-export function updateEntity<T extends BaseEntity>(entity: string, id: string, patch: Partial<T>): void {
-  const store = { ...loadStore() };
-  store[entity] = (store[entity] ?? []).map((x) =>
-    x.id === id ? ({ ...x, ...patch, updatedAt: now() } as BaseEntity) : x,
-  );
-  saveStore(store);
-}
-
-export function deleteEntity(entity: string, id: string): void {
-  const store = { ...loadStore() };
-  store[entity] = (store[entity] ?? []).filter((x) => x.id !== id);
-  saveStore(store);
-}
-
-export function bulkUpdate(entity: string, ids: string[], patch: Partial<BaseEntity>): void {
-  const store = { ...loadStore() };
-  store[entity] = (store[entity] ?? []).map((x) =>
-    ids.includes(x.id) ? ({ ...x, ...patch, updatedAt: now() }) : x,
-  );
-  saveStore(store);
-}
-
-export function bulkDelete(entity: string, ids: string[]): void {
-  const store = { ...loadStore() };
-  store[entity] = (store[entity] ?? []).filter((x) => !ids.includes(x.id));
-  saveStore(store);
+  const get = useServerFn(getEntity);
+  const { data } = useQuery({
+    queryKey: keys.one(entity, id),
+    queryFn: () => get({ data: { entity: entity as EntityKind, id } }),
+    enabled: !!id,
+  });
+  return (data ?? undefined) as T | undefined;
 }
 
 export function useAdminStats() {
-  const tools = useEntityList<ToolEntity>("tools");
-  const articles = useEntityList<ArticleEntity>("articles");
-  const categories = useEntityList<CategoryEntity>("categories");
-  const faqs = useEntityList<FaqEntity>("faqs");
-  return {
-    toolsCount: tools.length,
-    toolsPublished: tools.filter((t) => t.status === "published").length,
-    toolsDrafts: tools.filter((t) => t.status === "draft").length,
-    articlesCount: articles.length,
-    articlesPublished: articles.filter((a) => a.status === "published").length,
-    articlesDrafts: articles.filter((a) => a.status === "draft").length,
-    categoriesCount: categories.length,
-    faqsCount: faqs.length,
-  };
+  const fn = useServerFn(getAdminStats);
+  const { data } = useQuery({
+    queryKey: keys.stats(),
+    queryFn: () => fn(),
+    staleTime: 30_000,
+  });
+  return (
+    data ?? {
+      toolsCount: 0,
+      toolsPublished: 0,
+      toolsDrafts: 0,
+      articlesCount: 0,
+      articlesPublished: 0,
+      articlesDrafts: 0,
+      categoriesCount: 0,
+      faqsCount: 0,
+    }
+  );
 }
 
-/** Optional localStorage-backed settings/values (theme, site meta, etc.) */
-export function useKV<T>(key: string, initial: T): [T, (v: T) => void] {
-  const [val, setVal] = useState<T>(initial);
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    try {
-      const raw = localStorage.getItem(`kv:${key}`);
-      if (raw) setVal(JSON.parse(raw));
-    } catch {}
-  }, [key]);
-  const set = useCallback((v: T) => {
-    setVal(v);
-    try { localStorage.setItem(`kv:${key}`, JSON.stringify(v)); } catch {}
-  }, [key]);
-  return [val, set];
+export function useRecentActivity() {
+  const fn = useServerFn(getRecentActivity);
+  const { data } = useQuery({
+    queryKey: keys.activity(),
+    queryFn: () => fn(),
+    staleTime: 15_000,
+  });
+  return data ?? [];
+}
+
+// --- mutations ------------------------------------------------------
+
+export function useCreateEntity() {
+  const create = useServerFn(createEntityFn);
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (vars: { entity: string; values?: Record<string, any> }) =>
+      create({ data: { entity: vars.entity as EntityKind, values: vars.values } }),
+    onSuccess: (_res, vars) => {
+      qc.invalidateQueries({ queryKey: keys.list(vars.entity) });
+      qc.invalidateQueries({ queryKey: keys.stats() });
+    },
+  });
+}
+
+export function useUpdateEntity() {
+  const update = useServerFn(updateEntityFn);
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (vars: { entity: string; id: string; values: Record<string, any> }) =>
+      update({
+        data: { entity: vars.entity as EntityKind, id: vars.id, values: vars.values },
+      }),
+    onSuccess: (_r, vars) => {
+      qc.invalidateQueries({ queryKey: keys.list(vars.entity) });
+      qc.invalidateQueries({ queryKey: keys.one(vars.entity, vars.id) });
+      qc.invalidateQueries({ queryKey: keys.stats() });
+    },
+  });
+}
+
+export function useDeleteEntities() {
+  const del = useServerFn(deleteEntitiesFn);
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (vars: { entity: string; ids: string[] }) =>
+      del({ data: { entity: vars.entity as EntityKind, ids: vars.ids } }),
+    onSuccess: (_r, vars) => {
+      qc.invalidateQueries({ queryKey: keys.list(vars.entity) });
+      qc.invalidateQueries({ queryKey: keys.stats() });
+    },
+  });
+}
+
+export function useBulkStatus() {
+  const bulk = useServerFn(bulkUpdateStatus);
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (vars: { entity: string; ids: string[]; status: "draft" | "published" | "archived" }) =>
+      bulk({ data: { entity: vars.entity as EntityKind, ids: vars.ids, status: vars.status } }),
+    onSuccess: (_r, vars) => {
+      qc.invalidateQueries({ queryKey: keys.list(vars.entity) });
+      qc.invalidateQueries({ queryKey: keys.stats() });
+    },
+  });
+}
+
+// --- settings -------------------------------------------------------
+
+export function useSiteSettings<T>(defaults: T) {
+  const load = useServerFn(getSiteSettings);
+  const { data } = useQuery({
+    queryKey: keys.settings(),
+    queryFn: () => load(),
+    staleTime: 60_000,
+  });
+  const merged = useMemo(() => ({ ...defaults, ...(data as any) }), [defaults, data]);
+  return merged as T;
+}
+
+export function useSaveSettings() {
+  const save = useServerFn(saveSiteSettings);
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (values: Record<string, any>) => save({ data: { values } }),
+    onSuccess: () => qc.invalidateQueries({ queryKey: keys.settings() }),
+  });
 }

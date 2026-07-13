@@ -1,7 +1,4 @@
 import type { Field } from "@/components/admin/EntityForm";
-import { CATEGORIES } from "@/lib/site";
-
-const catOptions = CATEGORIES.map((c) => ({ value: c.name, label: c.name }));
 
 export type EntityConfig = {
   name: string;
@@ -24,9 +21,9 @@ export const ENTITY_CONFIGS: Record<string, EntityConfig> = {
     fields: [
       { key: "title", label: "Title", type: "text", required: true },
       { key: "slug", label: "Slug", type: "slug", required: true, help: "URL segment, e.g. halloween-card-maker" },
-      { key: "emoji", label: "Emoji", type: "text", placeholder: "🎃" },
+      { key: "emoji", label: "Icon (emoji)", type: "text", placeholder: "🎃" },
       { key: "description", label: "Short description", type: "textarea", required: true },
-      { key: "category", label: "Category", type: "select", options: catOptions, required: true },
+      { key: "categoryId", label: "Category", type: "category", required: true },
       { key: "featured", label: "Featured", type: "checkbox", placeholder: "Show on homepage" },
       { key: "popular", label: "Popular", type: "checkbox", placeholder: "Mark as trending" },
       { key: "isNew", label: "New", type: "checkbox", placeholder: "Show 'New' badge" },
@@ -48,7 +45,7 @@ export const ENTITY_CONFIGS: Record<string, EntityConfig> = {
       { key: "slug", label: "Slug", type: "slug", required: true },
       { key: "excerpt", label: "Excerpt", type: "textarea", required: true },
       { key: "content", label: "Content (Markdown)", type: "textarea" },
-      { key: "category", label: "Category", type: "text" },
+      { key: "categoryId", label: "Category", type: "category" },
       { key: "readingTime", label: "Reading time (min)", type: "number" },
     ],
   },
@@ -59,12 +56,12 @@ export const ENTITY_CONFIGS: Record<string, EntityConfig> = {
     columns: [
       { key: "name", label: "Category" },
       { key: "slug", label: "Slug" },
-      { key: "emoji", label: "Emoji" },
+      { key: "emoji", label: "Icon" },
     ],
     fields: [
       { key: "name", label: "Name", type: "text", required: true },
       { key: "slug", label: "Slug", type: "slug", required: true },
-      { key: "emoji", label: "Emoji", type: "text" },
+      { key: "emoji", label: "Icon (emoji)", type: "text" },
       { key: "description", label: "Description", type: "textarea" },
     ],
   },
@@ -75,11 +72,11 @@ export const ENTITY_CONFIGS: Record<string, EntityConfig> = {
     columns: [
       { key: "name", label: "Tag" },
       { key: "slug", label: "Slug" },
-      { key: "count", label: "Uses" },
     ],
     fields: [
       { key: "name", label: "Name", type: "text", required: true },
       { key: "slug", label: "Slug", type: "slug", required: true },
+      { key: "description", label: "Description", type: "textarea" },
     ],
   },
   faqs: {
@@ -93,7 +90,7 @@ export const ENTITY_CONFIGS: Record<string, EntityConfig> = {
     fields: [
       { key: "question", label: "Question", type: "text", required: true },
       { key: "answer", label: "Answer", type: "textarea", required: true },
-      { key: "category", label: "Category", type: "text" },
+      { key: "categoryId", label: "Category", type: "category" },
     ],
   },
   redirects: {
@@ -109,25 +106,6 @@ export const ENTITY_CONFIGS: Record<string, EntityConfig> = {
       { key: "from", label: "From path", type: "text", required: true, placeholder: "/old-url" },
       { key: "to", label: "To path", type: "text", required: true, placeholder: "/new-url" },
       { key: "code", label: "HTTP code", type: "select", options: [{ value: "301", label: "301 (Permanent)" }, { value: "302", label: "302 (Temporary)" }] },
-    ],
-  },
-  users: {
-    name: "users",
-    singular: "user",
-    primaryKey: "name",
-    columns: [
-      { key: "name", label: "Name" },
-      { key: "email", label: "Email" },
-      { key: "role", label: "Role" },
-    ],
-    fields: [
-      { key: "name", label: "Name", type: "text", required: true },
-      { key: "email", label: "Email", type: "text", required: true },
-      { key: "role", label: "Role", type: "select", options: [
-        { value: "admin", label: "Admin" },
-        { value: "editor", label: "Editor" },
-        { value: "viewer", label: "Viewer" },
-      ], required: true },
     ],
   },
 };
