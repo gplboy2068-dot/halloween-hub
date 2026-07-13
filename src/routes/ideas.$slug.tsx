@@ -87,6 +87,23 @@ function IdeaPage() {
     .map((s: string) => getIdeaPage(s))
     .filter((p): p is IdeaPageType => p !== null);
 
+  const relCtx = {
+    title: page.title,
+    description: page.description,
+    keywords: [page.category.noun, page.audience, page.style],
+    excludeHref: `/ideas/${page.slug}`,
+  };
+  const relatedAudiences = getRelatedAudiences(relCtx, 3);
+  const { data: relArticlesRaw } = useSuspenseQuery(
+    ideaRelatedArticlesQuery(page.slug, page.title, page.description, [
+      page.category.noun,
+      page.audience,
+      page.style,
+    ]),
+  );
+  const relatedArticles = (relArticlesRaw ?? []).map(articleToRelated);
+
+
   return (
     <PageShell>
       <article className="mx-auto max-w-4xl px-4 sm:px-6 py-14">
