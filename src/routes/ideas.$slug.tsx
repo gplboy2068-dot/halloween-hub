@@ -1,8 +1,23 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
+import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
 import { PageShell } from "@/components/PageShell";
 import { ToolCard } from "@/components/ToolCard";
 import { getIdeaPage, resolveToolsForIdea, IDEA_CATEGORIES, allIdeaSlugs } from "@/lib/pseo";
 import type { IdeaPage as IdeaPageType } from "@/lib/pseo";
+import { getRelatedAudiences, articleToRelated } from "@/lib/related";
+import { getRelatedArticlesForContext } from "@/lib/related.functions";
+import { RelatedSection } from "@/components/RelatedGrid";
+
+const ideaRelatedArticlesQuery = (slug: string, title: string, description: string, kw: string[]) =>
+  queryOptions({
+    queryKey: ["related-articles", "idea", slug],
+    queryFn: () =>
+      getRelatedArticlesForContext({
+        data: { title, description, keywords: kw, limit: 3 },
+      }),
+    staleTime: 5 * 60 * 1000,
+  });
+
 
 export const Route = createFileRoute("/ideas/$slug")({
   loader: ({ params }) => {
