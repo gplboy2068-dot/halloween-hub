@@ -181,17 +181,19 @@ export const getArticleBySlug = createServerFn({ method: "GET" })
       }
     }
     const contentRaw = (row as any).content ?? "";
-    const contentHtml = await renderMarkdown(contentRaw);
+    const rendered = await renderMarkdown(contentRaw, base.slug);
     return {
       ...base,
       contentRaw,
-      contentHtml,
+      contentHtml: rendered.html,
+      toc: rendered.toc,
       metaTitle: (row as any).meta_title ?? null,
       metaDescription: (row as any).meta_description ?? null,
       ogImage: (row as any).og_image ?? null,
       author,
     };
   });
+
 
 
 export const listRelatedArticles = createServerFn({ method: "GET" })
