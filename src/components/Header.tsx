@@ -1,16 +1,17 @@
 import { Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { Menu, Search, X, Moon, Sun, User as UserIcon, LogOut, LayoutDashboard } from "lucide-react";
-import { NAV_LINKS, SITE } from "@/lib/site";
+import { NAV_LINKS } from "@/lib/site";
 import { useAuth } from "@/hooks/use-auth";
+import { useSearch } from "@/components/SearchProvider";
 
 export function Header() {
   const [open, setOpen] = useState(false);
-  const [searchOpen, setSearchOpen] = useState(false);
   const [light, setLight] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const { user, isAdmin, signOut, loading } = useAuth();
+  const search = useSearch();
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 8);
@@ -59,11 +60,14 @@ export function Header() {
 
         <div className="flex items-center gap-1">
           <button
-            aria-label="Search"
-            onClick={() => setSearchOpen((v) => !v)}
-            className="p-2 rounded-md hover:bg-muted transition-colors"
+            aria-label="Search (Ctrl+K)"
+            onClick={() => search.open()}
+            className="p-2 rounded-md hover:bg-muted transition-colors inline-flex items-center gap-2"
           >
             <Search className="h-5 w-5" />
+            <kbd className="hidden lg:inline-flex items-center px-1.5 py-0.5 text-[10px] font-mono rounded border border-border bg-background/60 text-muted-foreground">
+              ⌘K
+            </kbd>
           </button>
           <button
             aria-label="Toggle theme"
