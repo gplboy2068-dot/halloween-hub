@@ -1,12 +1,13 @@
 import { useState, type ReactNode } from "react";
 import { Link } from "@tanstack/react-router";
 import { ArrowLeft, Save, Trash2 } from "lucide-react";
-import type { BaseEntity, Status } from "@/lib/admin-store";
+import type { BaseEntity, Status, CategoryEntity } from "@/lib/admin-store";
+import { useEntityList } from "@/lib/admin-store";
 
 export type Field = {
   key: string;
   label: string;
-  type: "text" | "textarea" | "number" | "select" | "checkbox" | "datetime" | "slug";
+  type: "text" | "textarea" | "number" | "select" | "checkbox" | "datetime" | "slug" | "category";
   options?: { value: string; label: string }[];
   placeholder?: string;
   required?: boolean;
@@ -107,6 +108,7 @@ export function EntityForm<T extends BaseEntity & Record<string, unknown>>({
 
 function FormField({ field, value, onChange }: { field: Field; value: unknown; onChange: (v: unknown) => void }) {
   const common = "w-full h-10 px-3 rounded-lg bg-input border border-border text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30";
+  const categories = useEntityList<CategoryEntity>(field.type === "category" ? "categories" : "");
   return (
     <div>
       <label className="block text-xs font-medium mb-1.5 text-muted-foreground">
@@ -124,6 +126,11 @@ function FormField({ field, value, onChange }: { field: Field; value: unknown; o
         <select value={(value as string) ?? ""} onChange={(e) => onChange(e.target.value)} className={common}>
           <option value="">— Select —</option>
           {field.options?.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
+        </select>
+      ) : field.type === "category" ? (
+        <select value={(value as string) ?? ""} onChange={(e) => onChange(e.target.value || null)} className={common}>
+          <option value="">— Select category —</option>
+          {categories.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
         </select>
       ) : field.type === "checkbox" ? (
         <label className="inline-flex items-center gap-2 cursor-pointer">

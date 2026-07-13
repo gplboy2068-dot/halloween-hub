@@ -3,9 +3,13 @@ import { AdminShell } from "@/components/admin/AdminShell";
 import { EntityForm } from "@/components/admin/EntityForm";
 import { ENTITY_CONFIGS, type EntityConfig } from "@/lib/entity-configs";
 import {
-  deleteEntity, updateEntity, useEntity,
+  useDeleteEntities,
+  useEntity,
+  useUpdateEntity,
   type BaseEntity,
 } from "@/lib/admin-store";
+import { toast } from "sonner";
+import { Loader2 } from "lucide-react";
 
 const ENTITIES = Object.keys(ENTITY_CONFIGS);
 
@@ -22,11 +26,16 @@ function EditEntity() {
   const cfg = Route.useLoaderData() as EntityConfig;
   const item = useEntity<BaseEntity & Record<string, unknown>>(entity, id);
   const navigate = useNavigate();
+  const updateMut = useUpdateEntity();
+  const deleteMut = useDeleteEntities();
 
   if (!item) {
     return (
-      <AdminShell title="Not found">
-        <p className="text-muted-foreground">This item doesn't exist. <Link to="/admin/$entity" params={{ entity }} className="text-primary hover:underline">Go back</Link></p>
+      <AdminShell title={`Edit ${cfg.singular}`}>
+        <div className="flex items-center gap-2 text-muted-foreground">
+          <Loader2 className="h-4 w-4 animate-spin" /> Loading…
+          <Link to="/admin/$entity" params={{ entity }} className="ml-4 text-primary hover:underline">Back</Link>
+        </div>
       </AdminShell>
     );
   }
@@ -38,13 +47,23 @@ function EditEntity() {
         backHref={`/admin/${entity}`}
         initial={item}
         fields={cfg.fields}
-        onSave={(values) => {
-          updateEntity(entity, id, values);
-          navigate({ to: "/admin/$entity", params: { entity } });
+        onSave={async (values) => {
+          try {
+            await updateMut.mutateAsync({ entity, id, values: values as Record<string, unknown> });
+            toast.success("Saved");
+            navigate({ to: "/admin/$entity", params: { entity } });
+          } catch (e: any) {
+            toast.error(e?.message ?? "Failed to save");
+          }
         }}
-        onDelete={() => {
-          deleteEntity(entity, id);
-          navigate({ to: "/admin/$entity", params: { entity } });
+        onDelete={async () => {
+          try {
+            await deleteMut.mutateAsync({ entity, ids: [id] });
+            toast.success("Deleted");
+            navigate({ to: "/admin/$entity", params: { entity } });
+          } catch (e: any) {
+            toast.error(e?.message ?? "Failed to delete");
+          }
         }}
       />
     </AdminShell>

@@ -1,7 +1,7 @@
 import { useMemo, useState, type ReactNode } from "react";
 import { Search, Trash2, Eye, EyeOff, Archive, CheckCircle2, MoreHorizontal } from "lucide-react";
 import { Link } from "@tanstack/react-router";
-import { bulkDelete, bulkUpdate, type BaseEntity, type Status } from "@/lib/admin-store";
+import { useBulkStatus, useDeleteEntities, type BaseEntity, type Status } from "@/lib/admin-store";
 import { StatusPill } from "./StatusPill";
 
 export type Column<T> = {
@@ -29,6 +29,8 @@ export function EntityTable<T extends BaseEntity>({
   const [q, setQ] = useState("");
   const [statusFilter, setStatusFilter] = useState<"all" | Status>("all");
   const [selected, setSelected] = useState<Set<string>>(new Set());
+  const bulkDel = useDeleteEntities();
+  const bulkStat = useBulkStatus();
 
   const filtered = useMemo(() => {
     return rows.filter((r) => {
@@ -54,15 +56,15 @@ export function EntityTable<T extends BaseEntity>({
     setSelected(next);
   };
 
-  const doBulk = (action: "publish" | "draft" | "archive" | "delete") => {
+  const doBulk = async (action: "publish" | "draft" | "archive" | "delete") => {
     const ids = Array.from(selected);
     if (ids.length === 0) return;
     if (action === "delete") {
       if (!confirm(`Delete ${ids.length} item(s)?`)) return;
-      bulkDelete(entity, ids);
+      await bulkDel.mutateAsync({ entity, ids });
     } else {
-      const status: Status = action === "publish" ? "published" : action === "draft" ? "draft" : "archived";
-      bulkUpdate(entity, ids, { status, ...(status === "published" ? { publishedAt: new Date().toISOString() } : {}) });
+      const status = (action === "publish" ? "published" : action === "draft" ? "draft" : "archived") as "draft" | "published" | "archived";
+      await bulkStat.mutateAsync({ entity, ids, status });
     }
     setSelected(new Set());
   };

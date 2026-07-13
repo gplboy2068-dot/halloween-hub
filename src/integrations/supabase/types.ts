@@ -329,21 +329,45 @@ export type Database = {
         }
         Relationships: []
       }
+      site_settings: {
+        Row: {
+          key: string
+          updated_at: string
+          updated_by: string | null
+          value: Json
+        }
+        Insert: {
+          key: string
+          updated_at?: string
+          updated_by?: string | null
+          value?: Json
+        }
+        Update: {
+          key?: string
+          updated_at?: string
+          updated_by?: string | null
+          value?: Json
+        }
+        Relationships: []
+      }
       tags: {
         Row: {
           created_at: string
+          description: string | null
           id: string
           name: string
           slug: string
         }
         Insert: {
           created_at?: string
+          description?: string | null
           id?: string
           name: string
           slug: string
         }
         Update: {
           created_at?: string
+          description?: string | null
           id?: string
           name?: string
           slug?: string
@@ -391,11 +415,14 @@ export type Database = {
           hero_image: string | null
           icon: string | null
           id: string
+          is_new: boolean
           meta_description: string | null
           meta_title: string | null
           og_image: string | null
+          popular: boolean
           published_at: string | null
           slug: string
+          sort_order: number
           status: Database["public"]["Enums"]["content_status"]
           tagline: string | null
           title: string
@@ -412,11 +439,14 @@ export type Database = {
           hero_image?: string | null
           icon?: string | null
           id?: string
+          is_new?: boolean
           meta_description?: string | null
           meta_title?: string | null
           og_image?: string | null
+          popular?: boolean
           published_at?: string | null
           slug: string
+          sort_order?: number
           status?: Database["public"]["Enums"]["content_status"]
           tagline?: string | null
           title: string
@@ -433,11 +463,14 @@ export type Database = {
           hero_image?: string | null
           icon?: string | null
           id?: string
+          is_new?: boolean
           meta_description?: string | null
           meta_title?: string | null
           og_image?: string | null
+          popular?: boolean
           published_at?: string | null
           slug?: string
+          sort_order?: number
           status?: Database["public"]["Enums"]["content_status"]
           tagline?: string | null
           title?: string
