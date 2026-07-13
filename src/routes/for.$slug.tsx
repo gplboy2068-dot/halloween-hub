@@ -64,6 +64,11 @@ function AudiencePageView() {
   const page = Route.useLoaderData() as AudiencePage;
   const tools = resolveToolsForAudience(page);
   const ideas = page.ideaSlugs.map((s: string) => getIdeaPage(s)).filter((x: IdeaPage | null): x is IdeaPage => x !== null);
+  const { data: articlesRaw } = useSuspenseQuery(
+    audienceArticlesQuery(page.slug, page.hero, page.intro, page.audience),
+  );
+  const relatedArticles = (articlesRaw ?? []).map(articleToRelated);
+
 
   return (
     <PageShell>
