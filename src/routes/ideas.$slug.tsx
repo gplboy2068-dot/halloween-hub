@@ -58,7 +58,20 @@ export const Route = createFileRoute("/ideas/$slug")({
             numberOfItems: 15,
           }),
         },
+        {
+          type: "application/ld+json",
+          children: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "BreadcrumbList",
+            itemListElement: [
+              { "@type": "ListItem", position: 1, name: "Home", item: "/" },
+              { "@type": "ListItem", position: 2, name: "Ideas", item: "/ideas" },
+              { "@type": "ListItem", position: 3, name: loaderData.title, item: `/ideas/${params.slug}` },
+            ],
+          }),
+        },
       ],
+
     };
   },
   component: IdeaPage,
