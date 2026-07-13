@@ -20,11 +20,21 @@ const ideaRelatedArticlesQuery = (slug: string, title: string, description: stri
 
 
 export const Route = createFileRoute("/ideas/$slug")({
-  loader: ({ params }) => {
+  loader: async ({ params, context }) => {
     const page = getIdeaPage(params.slug);
     if (!page) throw notFound();
+    await context.queryClient
+      .ensureQueryData(
+        ideaRelatedArticlesQuery(page.slug, page.title, page.description, [
+          page.category.noun,
+          page.audience,
+          page.style,
+        ]),
+      )
+      .catch(() => []);
     return page;
   },
+
   head: ({ loaderData, params }) => {
     if (!loaderData) return { meta: [{ title: "Not found" }, { name: "robots", content: "noindex" }] };
     return {
