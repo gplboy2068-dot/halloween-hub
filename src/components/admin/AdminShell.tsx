@@ -6,7 +6,9 @@ import {
   ArrowRightLeft, Link2, Menu, X, ExternalLink,
 } from "lucide-react";
 
-const NAV = [
+type NavItem = { to: string; label: string; icon: typeof LayoutDashboard; exact?: boolean };
+type NavGroup = { section: string; items: NavItem[] };
+const NAV: NavGroup[] = [
   { section: "Overview", items: [
     { to: "/admin", label: "Dashboard", icon: LayoutDashboard, exact: true },
   ]},
