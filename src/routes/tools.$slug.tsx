@@ -1,8 +1,27 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
+import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
 import { PageShell } from "@/components/PageShell";
 import { ToolCard } from "@/components/ToolCard";
 import { TOOLS } from "@/lib/site";
 import { getToolComponent } from "@/tools/registry";
+import {
+  getRelatedIdeas,
+  getRelatedAudiences,
+  articleToRelated,
+} from "@/lib/related";
+import { getRelatedArticlesForContext } from "@/lib/related.functions";
+import { RelatedSection, RelatedMixSection } from "@/components/RelatedGrid";
+
+const relatedArticlesQuery = (slug: string, title: string, description: string, category: string) =>
+  queryOptions({
+    queryKey: ["related-articles", "tool", slug],
+    queryFn: () =>
+      getRelatedArticlesForContext({
+        data: { title, description, keywords: [category], excludeSlug: slug, limit: 3 },
+      }),
+    staleTime: 5 * 60 * 1000,
+  });
+
 
 export const Route = createFileRoute("/tools/$slug")({
   loader: ({ params }) => {
