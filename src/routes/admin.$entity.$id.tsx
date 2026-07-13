@@ -1,7 +1,7 @@
 import { createFileRoute, useNavigate, notFound, Link } from "@tanstack/react-router";
 import { AdminShell } from "@/components/admin/AdminShell";
 import { EntityForm } from "@/components/admin/EntityForm";
-import { ENTITY_CONFIGS } from "@/lib/entity-configs";
+import { ENTITY_CONFIGS, type EntityConfig } from "@/lib/entity-configs";
 import {
   deleteEntity, updateEntity, useEntity,
   type BaseEntity,

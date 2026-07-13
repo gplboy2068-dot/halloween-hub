@@ -2,7 +2,7 @@ import { createFileRoute, Link, useNavigate, notFound } from "@tanstack/react-ro
 import { AdminShell } from "@/components/admin/AdminShell";
 import { EntityTable, type Column } from "@/components/admin/EntityTable";
 import { EntityForm } from "@/components/admin/EntityForm";
-import { ENTITY_CONFIGS } from "@/lib/entity-configs";
+import { ENTITY_CONFIGS, type EntityConfig } from "@/lib/entity-configs";
 import {
   createEntity, deleteEntity, updateEntity, useEntity, useEntityList,
   type BaseEntity,
@@ -26,11 +26,11 @@ export const Route = createFileRoute("/admin/$entity")({
 
 function EntityRoute() {
   const { entity } = Route.useParams();
-  const cfg = Route.useLoaderData();
+  const cfg = Route.useLoaderData() as EntityConfig;
   const rows = useEntityList<BaseEntity & Record<string, unknown>>(entity);
   const navigate = useNavigate();
 
-  const columns: Column<BaseEntity & Record<string, unknown>>[] = cfg.columns.map((c) => ({
+  const columns: Column<BaseEntity & Record<string, unknown>>[] = cfg.columns.map((c: EntityConfig["columns"][number]) => ({
     key: c.key,
     label: c.label,
     className: c.className,
