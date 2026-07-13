@@ -3,12 +3,12 @@ import { CATEGORIES } from "@/lib/site";
 
 const catOptions = CATEGORIES.map((c) => ({ value: c.name, label: c.name }));
 
-type EntityConfig = {
-  name: string;         // plural, used in URL and store key
+export type EntityConfig = {
+  name: string;
   singular: string;
   columns: { key: string; label: string; className?: string }[];
   fields: Field[];
-  primaryKey: string;   // field to show in first column
+  primaryKey: string;
 };
 
 export const ENTITY_CONFIGS: Record<string, EntityConfig> = {
