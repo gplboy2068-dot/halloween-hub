@@ -148,23 +148,6 @@ export function Header() {
         </div>
       </div>
 
-      {searchOpen && (
-        <div className="border-t border-border bg-background/95 backdrop-blur-xl">
-          <div className="mx-auto max-w-3xl px-4 py-4">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <input
-                autoFocus
-                placeholder={`Search ${SITE.name}…`}
-                className="w-full h-11 pl-10 pr-4 rounded-lg bg-input border border-border focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30 text-sm"
-              />
-            </div>
-            <p className="mt-2 text-xs text-muted-foreground">
-              Search tools, articles, categories & FAQs.
-            </p>
-          </div>
-        </div>
-      )}
 
       {open && (
         <div className="md:hidden border-t border-border bg-background/95 backdrop-blur-xl">
