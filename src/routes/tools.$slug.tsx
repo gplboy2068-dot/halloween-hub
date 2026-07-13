@@ -136,7 +136,7 @@ function ToolPage() {
           </p>
         </section>
 
-        {/* Related */}
+        {/* Related tools */}
         {related.length > 0 && (
           <section className="mt-14">
             <h2 className="font-display text-2xl font-bold mb-6">Related tools</h2>
@@ -145,7 +145,27 @@ function ToolPage() {
             </div>
           </section>
         )}
+
+        {/* Related ideas */}
+        <RelatedSection
+          heading="Idea pages that pair with this tool"
+          subheading="Curated ideas for the same audience — combine with the tool above."
+          items={relatedIdeas}
+        />
+
+        {/* Related articles */}
+        <RelatedSection
+          heading="Read next on the blog"
+          items={relatedArticles}
+        />
+
+        {/* Related audience hubs */}
+        <RelatedSection
+          heading="Halloween for…"
+          items={relatedAudiences}
+        />
       </article>
     </PageShell>
   );
 }
+
