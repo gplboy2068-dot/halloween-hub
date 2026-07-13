@@ -21,6 +21,7 @@ import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ToolsIndexRouteImport } from './routes/tools.index'
+import { Route as IdeasIndexRouteImport } from './routes/ideas.index'
 import { Route as CategoriesIndexRouteImport } from './routes/categories.index'
 import { Route as BlogIndexRouteImport } from './routes/blog.index'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
@@ -97,6 +98,11 @@ const IndexRoute = IndexRouteImport.update({
 const ToolsIndexRoute = ToolsIndexRouteImport.update({
   id: '/tools/',
   path: '/tools/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const IdeasIndexRoute = IdeasIndexRouteImport.update({
+  id: '/ideas/',
+  path: '/ideas/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CategoriesIndexRoute = CategoriesIndexRouteImport.update({
@@ -213,6 +219,7 @@ export interface FileRoutesByFullPath {
   '/admin/': typeof AdminIndexRoute
   '/blog/': typeof BlogIndexRoute
   '/categories/': typeof CategoriesIndexRoute
+  '/ideas/': typeof IdeasIndexRoute
   '/tools/': typeof ToolsIndexRoute
   '/admin/$entity/$id': typeof AdminEntityIdRoute
 }
@@ -243,6 +250,7 @@ export interface FileRoutesByTo {
   '/admin': typeof AdminIndexRoute
   '/blog': typeof BlogIndexRoute
   '/categories': typeof CategoriesIndexRoute
+  '/ideas': typeof IdeasIndexRoute
   '/tools': typeof ToolsIndexRoute
   '/admin/$entity/$id': typeof AdminEntityIdRoute
 }
@@ -275,6 +283,7 @@ export interface FileRoutesById {
   '/admin/': typeof AdminIndexRoute
   '/blog/': typeof BlogIndexRoute
   '/categories/': typeof CategoriesIndexRoute
+  '/ideas/': typeof IdeasIndexRoute
   '/tools/': typeof ToolsIndexRoute
   '/admin/$entity/$id': typeof AdminEntityIdRoute
 }
@@ -308,6 +317,7 @@ export interface FileRouteTypes {
     | '/admin/'
     | '/blog/'
     | '/categories/'
+    | '/ideas/'
     | '/tools/'
     | '/admin/$entity/$id'
   fileRoutesByTo: FileRoutesByTo
@@ -338,6 +348,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/blog'
     | '/categories'
+    | '/ideas'
     | '/tools'
     | '/admin/$entity/$id'
   id:
@@ -369,6 +380,7 @@ export interface FileRouteTypes {
     | '/admin/'
     | '/blog/'
     | '/categories/'
+    | '/ideas/'
     | '/tools/'
     | '/admin/$entity/$id'
   fileRoutesById: FileRoutesById
@@ -392,6 +404,7 @@ export interface RootRouteChildren {
   ToolsSlugRoute: typeof ToolsSlugRoute
   BlogIndexRoute: typeof BlogIndexRoute
   CategoriesIndexRoute: typeof CategoriesIndexRoute
+  IdeasIndexRoute: typeof IdeasIndexRoute
   ToolsIndexRoute: typeof ToolsIndexRoute
 }
 
@@ -479,6 +492,13 @@ declare module '@tanstack/react-router' {
       path: '/tools'
       fullPath: '/tools/'
       preLoaderRoute: typeof ToolsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/ideas/': {
+      id: '/ideas/'
+      path: '/ideas'
+      fullPath: '/ideas/'
+      preLoaderRoute: typeof IdeasIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/categories/': {
@@ -660,6 +680,7 @@ const rootRouteChildren: RootRouteChildren = {
   ToolsSlugRoute: ToolsSlugRoute,
   BlogIndexRoute: BlogIndexRoute,
   CategoriesIndexRoute: CategoriesIndexRoute,
+  IdeasIndexRoute: IdeasIndexRoute,
   ToolsIndexRoute: ToolsIndexRoute,
 }
 export const routeTree = rootRouteImport
