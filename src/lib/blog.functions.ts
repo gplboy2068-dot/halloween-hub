@@ -44,6 +44,7 @@ export type ArticleListItem = {
 export type ArticleDetail = ArticleListItem & {
   contentHtml: string;
   contentRaw: string;
+  toc: { id: string; text: string; level: 2 | 3 }[];
   metaTitle: string | null;
   metaDescription: string | null;
   ogImage: string | null;
@@ -54,6 +55,7 @@ export type ArticleDetail = ArticleListItem & {
     bio: string | null;
   } | null;
 };
+
 
 function shapeListRow(row: any): ArticleListItem {
   const cat = Array.isArray(row.categories) ? row.categories[0] : row.categories;
