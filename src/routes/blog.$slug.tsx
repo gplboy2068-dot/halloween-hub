@@ -264,6 +264,39 @@ function ArticlePage() {
           </section>
         )}
 
+        {(() => {
+          const ctx = {
+            title: article.title,
+            description: article.excerpt,
+            category: article.category?.name ?? "",
+            keywords: [
+              ...(article.category ? [article.category.name] : []),
+              ...article.tags.map((t) => t.name),
+            ],
+          };
+          const tools = getRelatedTools(ctx, 4);
+          const ideas = getRelatedIdeas(ctx, 4);
+          const audiences = getRelatedAudiences(ctx, 3);
+          return (
+            <>
+              <RelatedSection
+                heading="Try these free tools"
+                subheading="Hand-picked Halloween tools that match this article."
+                items={tools}
+              />
+              <RelatedSection
+                heading="Idea pages you'll love"
+                items={ideas}
+              />
+              <RelatedSection
+                heading="Halloween for…"
+                items={audiences}
+              />
+            </>
+          );
+        })()}
+
+
         <div className="mt-16">
           <Newsletter />
         </div>
