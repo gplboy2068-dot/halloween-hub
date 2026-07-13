@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import type {} from "@tanstack/react-start";
 import { TOOLS, CATEGORIES, ARTICLES } from "@/lib/site";
+import { allIdeaSlugs, AUDIENCE_PAGES } from "@/lib/pseo";
 
 // TODO: replace with your project URL once a project name or custom domain is set.
 const BASE_URL = "";
@@ -30,6 +31,10 @@ export const Route = createFileRoute("/sitemap.xml")({
           ...TOOLS.map((t) => ({ path: `/tools/${t.slug}`, changefreq: "weekly" as const, priority: "0.8" })),
           ...CATEGORIES.map((c) => ({ path: `/categories/${c.slug}`, changefreq: "weekly" as const, priority: "0.7" })),
           ...ARTICLES.map((a) => ({ path: `/blog/${a.slug}`, lastmod: a.updatedAt, changefreq: "monthly" as const, priority: "0.7" })),
+          { path: "/ideas", changefreq: "weekly" as const, priority: "0.8" },
+          { path: "/for", changefreq: "weekly" as const, priority: "0.8" },
+          ...allIdeaSlugs().map((slug) => ({ path: `/ideas/${slug}`, changefreq: "monthly" as const, priority: "0.6" })),
+          ...AUDIENCE_PAGES.map((p) => ({ path: `/for/${p.slug}`, changefreq: "monthly" as const, priority: "0.7" })),
         ];
 
         const urls = entries.map((e) =>

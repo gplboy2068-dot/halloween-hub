@@ -8,9 +8,10 @@ export const SITE = {
 
 export const NAV_LINKS = [
   { to: "/tools", label: "Tools" },
+  { to: "/ideas", label: "Ideas" },
+  { to: "/for", label: "For You" },
   { to: "/categories", label: "Categories" },
   { to: "/blog", label: "Blog" },
-  { to: "/about", label: "About" },
 ] as const;
 
 export type ToolCard = {
