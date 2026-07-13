@@ -130,6 +130,13 @@ function AudiencePageView() {
           </section>
         )}
 
+        <RelatedSection
+          heading="Read next on the blog"
+          items={relatedArticles}
+        />
+
+
+
         <section className="mt-14 text-center">
           <h2 className="font-display text-xl font-bold mb-4">Halloween for everyone</h2>
           <div className="flex flex-wrap justify-center gap-2">
