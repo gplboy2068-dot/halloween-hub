@@ -1,13 +1,16 @@
 import { Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Menu, Search, X, Moon, Sun } from "lucide-react";
+import { Menu, Search, X, Moon, Sun, User as UserIcon, LogOut, LayoutDashboard } from "lucide-react";
 import { NAV_LINKS, SITE } from "@/lib/site";
+import { useAuth } from "@/hooks/use-auth";
 
 export function Header() {
   const [open, setOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [light, setLight] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const { user, isAdmin, signOut, loading } = useAuth();
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 8);
@@ -19,6 +22,13 @@ export function Header() {
   useEffect(() => {
     document.documentElement.classList.toggle("light", light);
   }, [light]);
+
+  useEffect(() => {
+    if (!menuOpen) return;
+    const close = () => setMenuOpen(false);
+    window.addEventListener("click", close);
+    return () => window.removeEventListener("click", close);
+  }, [menuOpen]);
 
   return (
     <header
@@ -62,6 +72,68 @@ export function Header() {
           >
             {light ? <Moon className="h-5 w-5" /> : <Sun className="h-5 w-5" />}
           </button>
+
+          {!loading && !user && (
+            <Link
+              to="/auth"
+              className="hidden sm:inline-flex ml-1 items-center gap-1.5 px-3 py-2 rounded-md text-sm font-medium bg-primary text-primary-foreground hover:bg-primary-glow"
+            >
+              Sign in
+            </Link>
+          )}
+          {!loading && user && (
+            <div className="relative">
+              <button
+                aria-label="Account"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setMenuOpen((v) => !v);
+                }}
+                className="ml-1 h-9 w-9 rounded-full bg-primary/20 border border-primary/40 flex items-center justify-center hover:bg-primary/30"
+              >
+                <span className="text-xs font-semibold">
+                  {(user.email?.[0] ?? "?").toUpperCase()}
+                </span>
+              </button>
+              {menuOpen && (
+                <div
+                  onClick={(e) => e.stopPropagation()}
+                  className="absolute right-0 top-11 w-56 rounded-lg border border-border bg-card shadow-xl overflow-hidden"
+                >
+                  <div className="px-4 py-3 border-b border-border">
+                    <div className="text-xs text-muted-foreground">Signed in as</div>
+                    <div className="text-sm font-medium truncate">{user.email}</div>
+                  </div>
+                  {isAdmin && (
+                    <Link
+                      to="/admin"
+                      onClick={() => setMenuOpen(false)}
+                      className="flex items-center gap-2 px-4 py-2.5 text-sm hover:bg-muted"
+                    >
+                      <LayoutDashboard className="h-4 w-4" /> Admin dashboard
+                    </Link>
+                  )}
+                  <Link
+                    to="/admin"
+                    onClick={() => setMenuOpen(false)}
+                    className="flex items-center gap-2 px-4 py-2.5 text-sm hover:bg-muted"
+                  >
+                    <UserIcon className="h-4 w-4" /> Account
+                  </Link>
+                  <button
+                    onClick={() => {
+                      setMenuOpen(false);
+                      void signOut();
+                    }}
+                    className="w-full flex items-center gap-2 px-4 py-2.5 text-sm hover:bg-muted text-left border-t border-border"
+                  >
+                    <LogOut className="h-4 w-4" /> Sign out
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
+
           <button
             aria-label="Menu"
             onClick={() => setOpen((v) => !v)}
@@ -103,6 +175,15 @@ export function Header() {
                 {l.label}
               </Link>
             ))}
+            {!user && (
+              <Link
+                to="/auth"
+                onClick={() => setOpen(false)}
+                className="mt-2 px-3 py-2.5 rounded-md text-sm font-semibold bg-primary text-primary-foreground text-center"
+              >
+                Sign in
+              </Link>
+            )}
           </nav>
         </div>
       )}
