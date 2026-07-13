@@ -148,7 +148,7 @@ export const getArticleBySlug = createServerFn({ method: "GET" })
       .from("articles")
       .select(
         LIST_SELECT +
-          ", content, meta_title, meta_description, og_image, author_id, profiles!articles_author_id_fkey(id, display_name, avatar_url, bio)",
+          ", content, meta_title, meta_description, og_image, author_id",
       )
       .eq("slug", data.slug)
       .eq("status", "published")
@@ -156,9 +156,23 @@ export const getArticleBySlug = createServerFn({ method: "GET" })
     if (error) throw new Error(error.message);
     if (!row) return null;
     const base = shapeListRow(row);
-    const author = Array.isArray((row as any).profiles)
-      ? (row as any).profiles[0]
-      : (row as any).profiles;
+    let author: ArticleDetail["author"] = null;
+    const authorId = (row as any).author_id as string | null;
+    if (authorId) {
+      const { data: prof } = await supabase
+        .from("profiles")
+        .select("id, display_name, avatar_url, bio")
+        .eq("id", authorId)
+        .maybeSingle();
+      if (prof) {
+        author = {
+          id: (prof as any).id,
+          displayName: (prof as any).display_name,
+          avatarUrl: (prof as any).avatar_url,
+          bio: (prof as any).bio,
+        };
+      }
+    }
     const contentRaw = (row as any).content ?? "";
     const contentHtml = await renderMarkdown(contentRaw);
     return {
@@ -168,16 +182,10 @@ export const getArticleBySlug = createServerFn({ method: "GET" })
       metaTitle: (row as any).meta_title ?? null,
       metaDescription: (row as any).meta_description ?? null,
       ogImage: (row as any).og_image ?? null,
-      author: author
-        ? {
-            id: author.id,
-            displayName: author.display_name,
-            avatarUrl: author.avatar_url,
-            bio: author.bio,
-          }
-        : null,
+      author,
     };
   });
+
 
 export const listRelatedArticles = createServerFn({ method: "GET" })
   .inputValidator((input: { articleId: string; categoryId?: string | null; limit?: number }) =>
