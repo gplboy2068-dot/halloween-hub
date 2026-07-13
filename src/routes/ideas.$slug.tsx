@@ -2,6 +2,7 @@ import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { PageShell } from "@/components/PageShell";
 import { ToolCard } from "@/components/ToolCard";
 import { getIdeaPage, resolveToolsForIdea, IDEA_CATEGORIES, allIdeaSlugs } from "@/lib/pseo";
+import type { IdeaPage as IdeaPageType } from "@/lib/pseo";
 
 export const Route = createFileRoute("/ideas/$slug")({
   loader: ({ params }) => {
