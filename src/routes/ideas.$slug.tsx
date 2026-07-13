@@ -196,23 +196,7 @@ function IdeaPage() {
           items={relatedAudiences}
         />
 
-          <section className="mt-14">
-            <h2 className="font-display text-2xl font-bold mb-6">More {page.category.noun} ideas</h2>
-            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-              {related.map((r) => (
-                <Link
-                  key={r.slug}
-                  to="/ideas/$slug"
-                  params={{ slug: r.slug }}
-                  className="p-4 rounded-xl border border-border bg-background/40 hover:border-primary/40 hover:bg-primary/5 transition"
-                >
-                  <div className="text-sm font-semibold">{r.title}</div>
-                  <div className="text-xs text-muted-foreground mt-1 line-clamp-2">{r.description}</div>
-                </Link>
-              ))}
-            </div>
-          </section>
-        )}
+
 
         <section className="mt-14 text-center">
           <h2 className="font-display text-xl font-bold mb-4">Explore other categories</h2>
