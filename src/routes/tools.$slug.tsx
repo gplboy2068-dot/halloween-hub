@@ -2,6 +2,7 @@ import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { PageShell } from "@/components/PageShell";
 import { ToolCard } from "@/components/ToolCard";
 import { TOOLS } from "@/lib/site";
+import { getToolComponent } from "@/tools/registry";
 
 export const Route = createFileRoute("/tools/$slug")({
   loader: ({ params }) => {
