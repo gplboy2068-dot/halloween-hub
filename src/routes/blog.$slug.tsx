@@ -120,6 +120,24 @@ function ArticlePage() {
     },
     mainEntityOfPage: `/blog/${article.slug}`,
   };
+  const breadcrumbLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Home", item: "/" },
+      { "@type": "ListItem", position: 2, name: "Blog", item: "/blog" },
+      ...(article.category
+        ? [{ "@type": "ListItem", position: 3, name: article.category.name, item: `/blog/category/${article.category.slug}` }]
+        : []),
+      {
+        "@type": "ListItem",
+        position: article.category ? 4 : 3,
+        name: article.title,
+        item: `/blog/${article.slug}`,
+      },
+    ],
+  };
+
 
   return (
     <PageShell>
