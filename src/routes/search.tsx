@@ -27,20 +27,16 @@ const KIND_ORDER: SearchKind[] = ["tool", "article", "idea", "audience", "catego
 export const Route = createFileRoute("/search")({
   validateSearch: zodValidator(searchSchema),
   component: SearchPage,
-  head: ({ search }) => {
-    const q = (search as { q: string }).q;
-    const title = q ? `Search: "${q}" — HalloweenTools` : "Search — HalloweenTools";
-    return {
-      meta: [
-        { title },
-        { name: "description", content: "Search Halloween tools, articles, ideas, and categories on HalloweenTools." },
-        { name: "robots", content: "noindex, follow" },
-        { property: "og:title", content: title },
-        { property: "og:url", content: "/search" },
-      ],
-      links: [{ rel: "canonical", href: "/search" }],
-    };
-  },
+  head: () => ({
+    meta: [
+      { title: "Search — HalloweenTools" },
+      { name: "description", content: "Search Halloween tools, articles, ideas, and categories on HalloweenTools." },
+      { name: "robots", content: "noindex, follow" },
+      { property: "og:title", content: "Search — HalloweenTools" },
+      { property: "og:url", content: "/search" },
+    ],
+    links: [{ rel: "canonical", href: "/search" }],
+  }),
 });
 
 function SearchPage() {
