@@ -71,7 +71,7 @@ function AudiencePageView() {
           </section>
         )}
 
-        {page.sections.map((s) => (
+        {page.sections.map((s: AudiencePage["sections"][number]) => (
           <section key={s.heading} className="mt-14 rounded-2xl border border-border bg-card/40 p-6 sm:p-8">
             <h2 className="font-display text-2xl font-bold mb-6">{s.heading}</h2>
             <ul className="space-y-3">
