@@ -78,6 +78,20 @@ export const Route = createFileRoute("/tools/$slug")({
 function ToolPage() {
   const tool = Route.useLoaderData();
   const related = TOOLS.filter((t) => t.slug !== tool.slug && t.category === tool.category).slice(0, 8);
+  const ctx = {
+    title: tool.title,
+    description: tool.description,
+    category: tool.category,
+    keywords: [tool.category],
+    excludeHref: `/tools/${tool.slug}`,
+  };
+  const relatedIdeas = getRelatedIdeas(ctx, 6);
+  const relatedAudiences = getRelatedAudiences(ctx, 3);
+  const { data: relatedArticlesData } = useSuspenseQuery(
+    relatedArticlesQuery(tool.slug, tool.title, tool.description, tool.category),
+  );
+  const relatedArticles = (relatedArticlesData ?? []).map(articleToRelated);
+
 
   return (
     <PageShell>
