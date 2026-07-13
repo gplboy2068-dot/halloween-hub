@@ -44,6 +44,7 @@ export type ArticleListItem = {
 export type ArticleDetail = ArticleListItem & {
   contentHtml: string;
   contentRaw: string;
+  toc: { id: string; text: string; level: 2 | 3 }[];
   metaTitle: string | null;
   metaDescription: string | null;
   ogImage: string | null;
@@ -54,6 +55,7 @@ export type ArticleDetail = ArticleListItem & {
     bio: string | null;
   } | null;
 };
+
 
 function shapeListRow(row: any): ArticleListItem {
   const cat = Array.isArray(row.categories) ? row.categories[0] : row.categories;
@@ -78,17 +80,22 @@ function shapeListRow(row: any): ArticleListItem {
   };
 }
 
-async function renderMarkdown(md: string): Promise<string> {
-  if (!md?.trim()) return "";
+async function renderMarkdown(md: string, articleSlug?: string): Promise<{ html: string; toc: import("./internal-linking").TocEntry[] }> {
+  if (!md?.trim()) return { html: "", toc: [] };
   const { marked } = await import("marked");
   const DOMPurifyMod = await import("isomorphic-dompurify");
   const DOMPurify = (DOMPurifyMod as any).default ?? DOMPurifyMod;
+  const { autoLinkHtml, injectToc } = await import("./internal-linking");
   marked.setOptions({ gfm: true, breaks: false });
   const raw = await marked.parse(md);
-  return DOMPurify.sanitize(raw, {
-    ADD_ATTR: ["target", "rel"],
+  const clean = DOMPurify.sanitize(raw, { ADD_ATTR: ["target", "rel", "id", "class", "title"] });
+  const linked = autoLinkHtml(clean, {
+    excludeHref: articleSlug ? `/blog/${articleSlug}` : undefined,
   });
+  const { html, toc } = injectToc(linked);
+  return { html, toc };
 }
+
 
 const LIST_SELECT =
   "id, slug, title, excerpt, cover_image, read_time_min, featured, status, published_at, updated_at, created_at, category_id, categories(id, slug, name), article_tags(tags(slug, name))";
@@ -174,17 +181,19 @@ export const getArticleBySlug = createServerFn({ method: "GET" })
       }
     }
     const contentRaw = (row as any).content ?? "";
-    const contentHtml = await renderMarkdown(contentRaw);
+    const rendered = await renderMarkdown(contentRaw, base.slug);
     return {
       ...base,
       contentRaw,
-      contentHtml,
+      contentHtml: rendered.html,
+      toc: rendered.toc,
       metaTitle: (row as any).meta_title ?? null,
       metaDescription: (row as any).meta_description ?? null,
       ogImage: (row as any).og_image ?? null,
       author,
     };
   });
+
 
 
 export const listRelatedArticles = createServerFn({ method: "GET" })

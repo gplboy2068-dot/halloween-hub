@@ -158,3 +158,15 @@
 }
 .animate-float { animation: float 6s ease-in-out infinite; }
 .animate-flicker { animation: flicker 3s ease-in-out infinite; }
+
+/* Auto-linked internal references inside article prose */
+.ht-autolink {
+  color: hsl(var(--primary));
+  text-decoration: underline;
+  text-decoration-color: hsl(var(--primary) / 0.35);
+  text-underline-offset: 3px;
+  transition: text-decoration-color 0.15s ease;
+}
+.ht-autolink:hover {
+  text-decoration-color: hsl(var(--primary));
+}

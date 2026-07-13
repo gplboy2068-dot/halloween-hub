@@ -6,6 +6,8 @@ import { Newsletter } from "@/components/Newsletter";
 import { getArticleBySlug, listRelatedArticles } from "@/lib/blog.functions";
 import { getRelatedTools, getRelatedIdeas, getRelatedAudiences } from "@/lib/related";
 import { RelatedSection } from "@/components/RelatedGrid";
+import { TableOfContents } from "@/components/TableOfContents";
+
 
 
 const articleQuery = (slug: string) =>
@@ -120,6 +122,24 @@ function ArticlePage() {
     },
     mainEntityOfPage: `/blog/${article.slug}`,
   };
+  const breadcrumbLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Home", item: "/" },
+      { "@type": "ListItem", position: 2, name: "Blog", item: "/blog" },
+      ...(article.category
+        ? [{ "@type": "ListItem", position: 3, name: article.category.name, item: `/blog/category/${article.category.slug}` }]
+        : []),
+      {
+        "@type": "ListItem",
+        position: article.category ? 4 : 3,
+        name: article.title,
+        item: `/blog/${article.slug}`,
+      },
+    ],
+  };
+
 
   return (
     <PageShell>
@@ -199,6 +219,10 @@ function ArticlePage() {
           </div>
         )}
 
+        {article.toc && article.toc.length > 0 && (
+          <TableOfContents toc={article.toc} />
+        )}
+
         {article.contentHtml ? (
           <div
             className="prose prose-invert prose-headings:font-display prose-a:text-primary hover:prose-a:text-primary-glow prose-img:rounded-xl mt-10 max-w-none"
@@ -209,6 +233,7 @@ function ArticlePage() {
             Full article coming soon — subscribe below to be notified when it publishes.
           </div>
         )}
+
 
         {article.tags.length > 0 && (
           <div className="mt-12 pt-8 border-t border-border">
@@ -306,6 +331,11 @@ function ArticlePage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }}
+      />
     </PageShell>
   );
 }
+

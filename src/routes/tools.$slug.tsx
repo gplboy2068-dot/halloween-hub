@@ -46,18 +46,33 @@ export const Route = createFileRoute("/tools/$slug")({
         { property: "og:url", content: `/tools/${params.slug}` },
       ],
       links: [{ rel: "canonical", href: `/tools/${params.slug}` }],
-      scripts: [{
-        type: "application/ld+json",
-        children: JSON.stringify({
-          "@context": "https://schema.org",
-          "@type": "SoftwareApplication",
-          name: loaderData.title,
-          description: loaderData.description,
-          applicationCategory: "DesignApplication",
-          operatingSystem: "Web",
-          offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
-        }),
-      }],
+      scripts: [
+        {
+          type: "application/ld+json",
+          children: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "SoftwareApplication",
+            name: loaderData.title,
+            description: loaderData.description,
+            applicationCategory: "DesignApplication",
+            operatingSystem: "Web",
+            offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+          }),
+        },
+        {
+          type: "application/ld+json",
+          children: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "BreadcrumbList",
+            itemListElement: [
+              { "@type": "ListItem", position: 1, name: "Home", item: "/" },
+              { "@type": "ListItem", position: 2, name: "Tools", item: "/tools" },
+              { "@type": "ListItem", position: 3, name: loaderData.title, item: `/tools/${params.slug}` },
+            ],
+          }),
+        },
+      ],
+
     };
   },
   component: ToolPage,
