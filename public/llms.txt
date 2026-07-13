@@ -1,0 +1,17 @@
+# HalloweenTools
+
+> The internet's biggest Halloween toolkit — free interactive tools, AI generators, printables, wishes, quotes, pumpkin templates, and party ideas.
+
+## Pages
+- [Home](/): Overview of HalloweenTools and featured tools
+- [All Tools](/tools): Complete list of free Halloween tools
+- [Categories](/categories): Browse tools and content by category
+- [Blog](/blog): Halloween guides, ideas, and inspiration
+- [About](/about): About HalloweenTools
+- [Contact](/contact): Get in touch
+
+## Optional
+- [Privacy Policy](/privacy)
+- [Terms of Service](/terms)
+- [Disclaimer](/disclaimer)
+- [Cookie Policy](/cookies)
