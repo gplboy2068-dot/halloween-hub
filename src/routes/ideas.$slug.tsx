@@ -87,7 +87,7 @@ function IdeaPage() {
             Our top 15 picks
           </h2>
           <ol className="space-y-2">
-            {items.map((item, i) => (
+            {items.map((item: string, i: number) => (
               <li key={i} className="flex gap-3 p-3 sm:p-4 rounded-xl border border-border bg-background/40 hover:border-primary/40 transition">
                 <span className="text-primary font-display font-bold w-8 shrink-0">{i + 1}.</span>
                 <span className="text-sm sm:text-base leading-relaxed">{item}</span>
