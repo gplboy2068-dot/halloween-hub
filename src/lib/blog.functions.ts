@@ -78,17 +78,22 @@ function shapeListRow(row: any): ArticleListItem {
   };
 }
 
-async function renderMarkdown(md: string): Promise<string> {
-  if (!md?.trim()) return "";
+async function renderMarkdown(md: string, articleSlug?: string): Promise<{ html: string; toc: import("./internal-linking").TocEntry[] }> {
+  if (!md?.trim()) return { html: "", toc: [] };
   const { marked } = await import("marked");
   const DOMPurifyMod = await import("isomorphic-dompurify");
   const DOMPurify = (DOMPurifyMod as any).default ?? DOMPurifyMod;
+  const { autoLinkHtml, injectToc } = await import("./internal-linking");
   marked.setOptions({ gfm: true, breaks: false });
   const raw = await marked.parse(md);
-  return DOMPurify.sanitize(raw, {
-    ADD_ATTR: ["target", "rel"],
+  const clean = DOMPurify.sanitize(raw, { ADD_ATTR: ["target", "rel", "id", "class", "title"] });
+  const linked = autoLinkHtml(clean, {
+    excludeHref: articleSlug ? `/blog/${articleSlug}` : undefined,
   });
+  const { html, toc } = injectToc(linked);
+  return { html, toc };
 }
+
 
 const LIST_SELECT =
   "id, slug, title, excerpt, cover_image, read_time_min, featured, status, published_at, updated_at, created_at, category_id, categories(id, slug, name), article_tags(tags(slug, name))";
