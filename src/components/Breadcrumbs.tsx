@@ -11,10 +11,10 @@ export function Breadcrumbs({ items }: { items: Crumb[] }) {
           return (
             <li key={i} className="flex items-center gap-1">
               {c.to && !isLast ? (
-                // @ts-expect-error - dynamic route param spread
-                <Link to={c.to} params={c.params} className="hover:text-primary">
+                <Link to={c.to as any} params={c.params as any} className="hover:text-primary">
                   {c.label}
                 </Link>
+
               ) : (
                 <span className={isLast ? "text-foreground line-clamp-1" : ""}>{c.label}</span>
               )}
