@@ -4,6 +4,9 @@ import { PageShell } from "@/components/PageShell";
 import { ArticleCard } from "@/components/ArticleCard";
 import { Newsletter } from "@/components/Newsletter";
 import { getArticleBySlug, listRelatedArticles } from "@/lib/blog.functions";
+import { getRelatedTools, getRelatedIdeas, getRelatedAudiences } from "@/lib/related";
+import { RelatedSection } from "@/components/RelatedGrid";
+
 
 const articleQuery = (slug: string) =>
   queryOptions({
