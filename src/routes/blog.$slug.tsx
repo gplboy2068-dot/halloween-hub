@@ -7,6 +7,7 @@ import { getArticleBySlug, listRelatedArticles } from "@/lib/blog.functions";
 import { getRelatedTools, getRelatedIdeas, getRelatedAudiences } from "@/lib/related";
 import { RelatedSection } from "@/components/RelatedGrid";
 import { TableOfContents } from "@/components/TableOfContents";
+import { publisherLd, imageObjectLd, speakableLd, wordCountFromHtml } from "@/lib/schema";
 
 
 
