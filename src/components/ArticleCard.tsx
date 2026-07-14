@@ -18,6 +18,17 @@ export function ArticleCard({ article, featured = false }: { article: ArticleLis
         featured ? "md:col-span-2 lg:col-span-2" : ""
       }`}
     >
+      <div className="absolute top-3 right-3 z-10">
+        <SaveButton
+          item={{
+            kind: "article",
+            slug: article.slug,
+            title: article.title,
+            emoji: "📖",
+            href: `/blog/${article.slug}`,
+          }}
+        />
+      </div>
       {article.coverImage ? (
         <div className="aspect-[16/9] overflow-hidden bg-muted">
           <img
