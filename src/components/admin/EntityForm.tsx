@@ -66,6 +66,35 @@ export function EntityForm<T extends BaseEntity & Record<string, unknown>>({
                 />
               );
             }
+            if (f.type === "image-insert") {
+              const targetKey = (f.targetKey ?? "content") as keyof T;
+              return (
+                <ImageUploader
+                  key={f.key}
+                  label={f.label}
+                  help={f.help}
+                  mode="insert"
+                  onInsert={(url) => {
+                    const current = (values[targetKey] as string) ?? "";
+                    const md = `![](${url})`;
+                    const next = current ? `${current}\n\n${md}` : md;
+                    set(targetKey, next as T[keyof T]);
+                  }}
+                />
+              );
+            }
+            if (f.type === "image") {
+              return (
+                <ImageUploader
+                  key={f.key}
+                  label={f.label}
+                  help={f.help}
+                  mode="single"
+                  value={(values[f.key] as string) ?? ""}
+                  onChange={(url) => set(f.key as keyof T, url as T[keyof T])}
+                />
+              );
+            }
             return (
               <FormField key={f.key} field={f} value={values[f.key] as never} onChange={(v) => set(f.key as keyof T, v as T[keyof T])} />
             );
