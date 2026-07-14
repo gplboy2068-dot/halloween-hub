@@ -25,6 +25,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as ToolsIndexRouteImport } from './routes/tools.index'
 import { Route as IdeasIndexRouteImport } from './routes/ideas.index'
 import { Route as ForIndexRouteImport } from './routes/for.index'
+import { Route as CollectionsIndexRouteImport } from './routes/collections.index'
 import { Route as CategoriesIndexRouteImport } from './routes/categories.index'
 import { Route as BlogIndexRouteImport } from './routes/blog.index'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
@@ -124,6 +125,11 @@ const IdeasIndexRoute = IdeasIndexRouteImport.update({
 const ForIndexRoute = ForIndexRouteImport.update({
   id: '/for/',
   path: '/for/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CollectionsIndexRoute = CollectionsIndexRouteImport.update({
+  id: '/collections/',
+  path: '/collections/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CategoriesIndexRoute = CategoriesIndexRouteImport.update({
@@ -258,6 +264,7 @@ export interface FileRoutesByFullPath {
   '/admin/': typeof AdminIndexRoute
   '/blog/': typeof BlogIndexRoute
   '/categories/': typeof CategoriesIndexRoute
+  '/collections/': typeof CollectionsIndexRoute
   '/for/': typeof ForIndexRoute
   '/ideas/': typeof IdeasIndexRoute
   '/tools/': typeof ToolsIndexRoute
@@ -295,6 +302,7 @@ export interface FileRoutesByTo {
   '/admin': typeof AdminIndexRoute
   '/blog': typeof BlogIndexRoute
   '/categories': typeof CategoriesIndexRoute
+  '/collections': typeof CollectionsIndexRoute
   '/for': typeof ForIndexRoute
   '/ideas': typeof IdeasIndexRoute
   '/tools': typeof ToolsIndexRoute
@@ -334,6 +342,7 @@ export interface FileRoutesById {
   '/admin/': typeof AdminIndexRoute
   '/blog/': typeof BlogIndexRoute
   '/categories/': typeof CategoriesIndexRoute
+  '/collections/': typeof CollectionsIndexRoute
   '/for/': typeof ForIndexRoute
   '/ideas/': typeof IdeasIndexRoute
   '/tools/': typeof ToolsIndexRoute
@@ -374,6 +383,7 @@ export interface FileRouteTypes {
     | '/admin/'
     | '/blog/'
     | '/categories/'
+    | '/collections/'
     | '/for/'
     | '/ideas/'
     | '/tools/'
@@ -411,6 +421,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/blog'
     | '/categories'
+    | '/collections'
     | '/for'
     | '/ideas'
     | '/tools'
@@ -449,6 +460,7 @@ export interface FileRouteTypes {
     | '/admin/'
     | '/blog/'
     | '/categories/'
+    | '/collections/'
     | '/for/'
     | '/ideas/'
     | '/tools/'
@@ -479,6 +491,7 @@ export interface RootRouteChildren {
   ToolsSlugRoute: typeof ToolsSlugRoute
   BlogIndexRoute: typeof BlogIndexRoute
   CategoriesIndexRoute: typeof CategoriesIndexRoute
+  CollectionsIndexRoute: typeof CollectionsIndexRoute
   ForIndexRoute: typeof ForIndexRoute
   IdeasIndexRoute: typeof IdeasIndexRoute
   ToolsIndexRoute: typeof ToolsIndexRoute
@@ -598,6 +611,13 @@ declare module '@tanstack/react-router' {
       path: '/for'
       fullPath: '/for/'
       preLoaderRoute: typeof ForIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/collections/': {
+      id: '/collections/'
+      path: '/collections'
+      fullPath: '/collections/'
+      preLoaderRoute: typeof CollectionsIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/categories/': {
@@ -803,6 +823,7 @@ const rootRouteChildren: RootRouteChildren = {
   ToolsSlugRoute: ToolsSlugRoute,
   BlogIndexRoute: BlogIndexRoute,
   CategoriesIndexRoute: CategoriesIndexRoute,
+  CollectionsIndexRoute: CollectionsIndexRoute,
   ForIndexRoute: ForIndexRoute,
   IdeasIndexRoute: IdeasIndexRoute,
   ToolsIndexRoute: ToolsIndexRoute,
