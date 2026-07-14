@@ -59,7 +59,10 @@ function SearchPage() {
   function submit(e: React.FormEvent) {
     e.preventDefault();
     const clean = q.trim();
-    if (clean) pushRecentSearch(clean);
+    if (clean) {
+      pushRecentSearch(clean);
+      track("search", { q: clean, results: results.length });
+    }
     navigate({ search: { q: clean } });
   }
 
