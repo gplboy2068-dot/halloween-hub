@@ -1,19 +1,21 @@
-import { useState, type ReactNode } from "react";
+import { useState, useRef, type ReactNode } from "react";
 import { Link } from "@tanstack/react-router";
-import { ArrowLeft, Save, Trash2 } from "lucide-react";
+import { ArrowLeft, Save, Trash2, Upload, X, Loader2, ImagePlus } from "lucide-react";
 import type { BaseEntity, Status, CategoryEntity } from "@/lib/admin-store";
 import { useEntityList } from "@/lib/admin-store";
 import { InternalLinkPicker } from "@/components/admin/InternalLinkPicker";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 export type Field = {
   key: string;
   label: string;
-  type: "text" | "textarea" | "number" | "select" | "checkbox" | "datetime" | "slug" | "category" | "internal-links";
+  type: "text" | "textarea" | "number" | "select" | "checkbox" | "datetime" | "slug" | "category" | "internal-links" | "image" | "image-insert";
   options?: { value: string; label: string }[];
   placeholder?: string;
   required?: boolean;
   help?: string;
-  targetKey?: string; // for internal-links: which field to insert markdown into
+  targetKey?: string; // for internal-links / image-insert: which field to insert markdown into
 };
 
 export function EntityForm<T extends BaseEntity & Record<string, unknown>>({
