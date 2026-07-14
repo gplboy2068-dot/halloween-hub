@@ -195,3 +195,40 @@ function SectionHeader({ eyebrow, title, href }: { eyebrow: string; title: strin
     </div>
   );
 }
+
+function HomeCommunityStrip() {
+  const { data } = useQuery({
+    queryKey: ["home-trending"],
+    queryFn: () => listTrendingCompact({ data: { limit: 8 } }),
+  });
+  const items = data?.items ?? [];
+  if (items.length === 0) {
+    return (
+      <div className="rounded-2xl border border-dashed border-border p-10 text-center text-muted-foreground">
+        Community creations coming soon — <Link to="/tools" className="text-primary hover:underline">create the first</Link>.
+      </div>
+    );
+  }
+  return (
+    <div className="grid gap-4 grid-cols-2 sm:grid-cols-3 lg:grid-cols-4">
+      {items.map((r: any) => (
+        <Link
+          key={r.id}
+          to="/community/$slug"
+          params={{ slug: r.slug ?? r.id }}
+          className="group rounded-xl border border-border bg-card/60 overflow-hidden hover:border-primary/40 transition"
+        >
+          {r.kind === "image" ? (
+            <img src={r.output} alt={r.title ?? r.tool_title} loading="lazy" className="aspect-square w-full object-cover" />
+          ) : (
+            <div className="p-3 aspect-square text-xs line-clamp-[10] whitespace-pre-wrap bg-muted/20">{r.output}</div>
+          )}
+          <div className="p-2 border-t border-border/50">
+            <div className="font-semibold text-xs line-clamp-1 group-hover:text-primary">{r.title ?? r.tool_title}</div>
+            <div className="text-[10px] text-muted-foreground">❤️ {r.likes_count} · 👁 {r.views_count}</div>
+          </div>
+        </Link>
+      ))}
+    </div>
+  );
+}
