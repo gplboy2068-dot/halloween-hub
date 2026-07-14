@@ -47,6 +47,7 @@ import { Route as AdminSchemaRouteImport } from './routes/admin.schema'
 import { Route as AdminMediaRouteImport } from './routes/admin.media'
 import { Route as AdminLogsRouteImport } from './routes/admin.logs'
 import { Route as AdminLinkingRouteImport } from './routes/admin.linking'
+import { Route as AdminCommunityRouteImport } from './routes/admin.community'
 import { Route as AdminAnalyticsRouteImport } from './routes/admin.analytics'
 import { Route as AdminEntityRouteImport } from './routes/admin.$entity'
 import { Route as AdminEntityIndexRouteImport } from './routes/admin.$entity.index'
@@ -244,6 +245,11 @@ const AdminLinkingRoute = AdminLinkingRouteImport.update({
   path: '/linking',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminCommunityRoute = AdminCommunityRouteImport.update({
+  id: '/community',
+  path: '/community',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminAnalyticsRoute = AdminAnalyticsRouteImport.update({
   id: '/analytics',
   path: '/analytics',
@@ -295,6 +301,7 @@ export interface FileRoutesByFullPath {
   '/terms': typeof TermsRoute
   '/admin/$entity': typeof AdminEntityRouteWithChildren
   '/admin/analytics': typeof AdminAnalyticsRoute
+  '/admin/community': typeof AdminCommunityRoute
   '/admin/linking': typeof AdminLinkingRoute
   '/admin/logs': typeof AdminLogsRoute
   '/admin/media': typeof AdminMediaRoute
@@ -339,6 +346,7 @@ export interface FileRoutesByTo {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
+  '/admin/community': typeof AdminCommunityRoute
   '/admin/linking': typeof AdminLinkingRoute
   '/admin/logs': typeof AdminLogsRoute
   '/admin/media': typeof AdminMediaRoute
@@ -386,6 +394,7 @@ export interface FileRoutesById {
   '/terms': typeof TermsRoute
   '/admin/$entity': typeof AdminEntityRouteWithChildren
   '/admin/analytics': typeof AdminAnalyticsRoute
+  '/admin/community': typeof AdminCommunityRoute
   '/admin/linking': typeof AdminLinkingRoute
   '/admin/logs': typeof AdminLogsRoute
   '/admin/media': typeof AdminMediaRoute
@@ -434,6 +443,7 @@ export interface FileRouteTypes {
     | '/terms'
     | '/admin/$entity'
     | '/admin/analytics'
+    | '/admin/community'
     | '/admin/linking'
     | '/admin/logs'
     | '/admin/media'
@@ -478,6 +488,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/terms'
     | '/admin/analytics'
+    | '/admin/community'
     | '/admin/linking'
     | '/admin/logs'
     | '/admin/media'
@@ -524,6 +535,7 @@ export interface FileRouteTypes {
     | '/terms'
     | '/admin/$entity'
     | '/admin/analytics'
+    | '/admin/community'
     | '/admin/linking'
     | '/admin/logs'
     | '/admin/media'
@@ -855,6 +867,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminLinkingRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/community': {
+      id: '/admin/community'
+      path: '/community'
+      fullPath: '/admin/community'
+      preLoaderRoute: typeof AdminCommunityRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/analytics': {
       id: '/admin/analytics'
       path: '/analytics'
@@ -917,6 +936,7 @@ const AdminEntityRouteWithChildren = AdminEntityRoute._addFileChildren(
 interface AdminRouteChildren {
   AdminEntityRoute: typeof AdminEntityRouteWithChildren
   AdminAnalyticsRoute: typeof AdminAnalyticsRoute
+  AdminCommunityRoute: typeof AdminCommunityRoute
   AdminLinkingRoute: typeof AdminLinkingRoute
   AdminLogsRoute: typeof AdminLogsRoute
   AdminMediaRoute: typeof AdminMediaRoute
@@ -929,6 +949,7 @@ interface AdminRouteChildren {
 const AdminRouteChildren: AdminRouteChildren = {
   AdminEntityRoute: AdminEntityRouteWithChildren,
   AdminAnalyticsRoute: AdminAnalyticsRoute,
+  AdminCommunityRoute: AdminCommunityRoute,
   AdminLinkingRoute: AdminLinkingRoute,
   AdminLogsRoute: AdminLogsRoute,
   AdminMediaRoute: AdminMediaRoute,
