@@ -86,6 +86,7 @@ export const Route = createFileRoute("/tools/$slug")({
         },
         { type: "application/ld+json", children: JSON.stringify(howToJsonLd(loaderData, content)) },
         { type: "application/ld+json", children: JSON.stringify(faqJsonLd(content)) },
+        { type: "application/ld+json", children: JSON.stringify(personJsonLd(authorForCategory(loaderData.category))) },
       ],
     };
   },
