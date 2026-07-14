@@ -37,6 +37,7 @@ export const Route = createFileRoute("/ideas/$slug")({
 
   head: ({ loaderData, params }) => {
     if (!loaderData) return { meta: [{ title: "Not found" }, { name: "robots", content: "noindex" }] };
+    const items = loaderData.category.items(loaderData.audience, loaderData.style);
     return {
       meta: [
         { title: loaderData.title },
@@ -55,7 +56,24 @@ export const Route = createFileRoute("/ideas/$slug")({
             "@type": "ItemList",
             name: loaderData.title,
             description: loaderData.description,
-            numberOfItems: 15,
+            numberOfItems: items.length,
+            itemListElement: items.map((it: string, i: number) => ({
+              "@type": "ListItem",
+              position: i + 1,
+              name: it,
+            })),
+          }),
+        },
+        {
+          type: "application/ld+json",
+          children: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "FAQPage",
+            mainEntity: [
+              { "@type": "Question", name: "When should I start planning?", acceptedAnswer: { "@type": "Answer", text: "Start 3–4 weeks before Halloween for costumes and party ideas; 1 week is fine for last-minute picks." } },
+              { "@type": "Question", name: "Do I need special supplies?", acceptedAnswer: { "@type": "Answer", text: "Most ideas above use household items plus a small trip to a craft or party store. We flag what's genuinely optional vs required." } },
+              { "@type": "Question", name: "Is any of this AI-generated?", acceptedAnswer: { "@type": "Answer", text: "The suggestions are curated by our team. HalloweenTools can help you generate custom variations of any idea." } },
+            ],
           }),
         },
         {
