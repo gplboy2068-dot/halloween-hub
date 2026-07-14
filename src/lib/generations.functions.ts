@@ -151,3 +151,51 @@ export const deleteGeneration = createServerFn({ method: "POST" })
     if (error) throw new Error(error.message);
     return { ok: true };
   });
+
+/** Sign-in required — share a generated image to the feed (uploads base64 to storage). */
+export const shareGenerationImage = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: {
+    toolSlug: string;
+    toolTitle: string;
+    dataUrl: string;
+    prompt?: string;
+  }) =>
+    z
+      .object({
+        toolSlug: z.string().min(1).max(120),
+        toolTitle: z.string().min(1).max(200),
+        // ~10MB base64 cap
+        dataUrl: z.string().regex(/^data:image\/(png|jpe?g|webp);base64,/).max(14_000_000),
+        prompt: z.string().max(2000).optional(),
+      })
+      .parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    const match = data.dataUrl.match(/^data:image\/(png|jpe?g|webp);base64,(.+)$/);
+    if (!match) throw new Error("Invalid image data");
+    const ext = match[1] === "jpeg" ? "jpg" : match[1];
+    const bytes = Buffer.from(match[2], "base64");
+    const path = `${context.userId}/${crypto.randomUUID()}.${ext}`;
+
+    const { error: upErr } = await context.supabase.storage
+      .from("community")
+      .upload(path, bytes, { contentType: `image/${match[1]}`, upsert: false });
+    if (upErr) throw new Error(upErr.message);
+
+    const { data: row, error } = await context.supabase
+      .from("generations")
+      .insert({
+        user_id: context.userId,
+        tool_slug: data.toolSlug,
+        tool_title: data.toolTitle,
+        output: path,
+        prompt: data.prompt ?? null,
+        kind: "image",
+      })
+      .select("id")
+      .single();
+    if (error) throw new Error(error.message);
+    return { id: row!.id };
+  });
+
