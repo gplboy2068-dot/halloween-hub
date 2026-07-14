@@ -3,6 +3,7 @@ import { Search, Sparkles, ArrowRight } from "lucide-react";
 import { PageShell } from "@/components/PageShell";
 import { ToolCard } from "@/components/ToolCard";
 import { Newsletter } from "@/components/Newsletter";
+import { LazyMount } from "@/components/LazyMount";
 import { TOOLS, CATEGORIES, ARTICLES, SITE } from "@/lib/site";
 import heroImg from "@/assets/hero-halloween.jpg";
 
