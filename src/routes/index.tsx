@@ -116,49 +116,56 @@ function Home() {
       </section>
 
       {/* ARTICLES */}
-      <section className="mx-auto max-w-7xl px-4 sm:px-6 py-16">
-        <SectionHeader eyebrow="Read" title="From the Blog" href="/blog" />
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {ARTICLES.slice(0, 6).map((a) => (
-            <Link
-              key={a.slug}
-              to="/blog/$slug"
-              params={{ slug: a.slug }}
-              className="group rounded-2xl border border-border bg-card p-6 hover:border-primary/60 hover:-translate-y-0.5 transition-all"
-            >
-              <span className="text-xs uppercase tracking-wider text-primary font-semibold">{a.category}</span>
-              <h3 className="mt-2 font-display text-lg font-semibold group-hover:text-primary transition-colors">
-                {a.title}
-              </h3>
-              <p className="mt-2 text-sm text-muted-foreground line-clamp-2">{a.excerpt}</p>
-              <p className="mt-3 text-xs text-muted-foreground">{a.readingTime} min read</p>
-            </Link>
-          ))}
-        </div>
-      </section>
+      <LazyMount minHeight={600}>
+        <section className="mx-auto max-w-7xl px-4 sm:px-6 py-16">
+          <SectionHeader eyebrow="Read" title="From the Blog" href="/blog" />
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            {ARTICLES.slice(0, 6).map((a) => (
+              <Link
+                key={a.slug}
+                to="/blog/$slug"
+                params={{ slug: a.slug }}
+                className="group rounded-2xl border border-border bg-card p-6 hover:border-primary/60 hover:-translate-y-0.5 transition-all"
+              >
+                <span className="text-xs uppercase tracking-wider text-primary font-semibold">{a.category}</span>
+                <h3 className="mt-2 font-display text-lg font-semibold group-hover:text-primary transition-colors">
+                  {a.title}
+                </h3>
+                <p className="mt-2 text-sm text-muted-foreground line-clamp-2">{a.excerpt}</p>
+                <p className="mt-3 text-xs text-muted-foreground">{a.readingTime} min read</p>
+              </Link>
+            ))}
+          </div>
+        </section>
+      </LazyMount>
 
       {/* FAQ */}
-      <section className="mx-auto max-w-3xl px-4 sm:px-6 py-16">
-        <SectionHeader eyebrow="Help" title="Frequently Asked" />
-        <div className="space-y-3">
-          {[
-            { q: "Are HalloweenTools tools really free?", a: "Yes — every tool is free to use with no signup required." },
-            { q: "Can I use the generated content commercially?", a: "Most outputs are royalty-free for personal use. Check each tool's guidance for commercial terms." },
-            { q: "Do you save my data?", a: "No. Tools run in your browser whenever possible and never sell your data." },
-            { q: "Will you add more tools?", a: "Yes — new tools launch weekly during the Halloween season." },
-          ].map((f, i) => (
-            <details key={i} className="group rounded-xl border border-border bg-card p-5">
-              <summary className="cursor-pointer font-medium list-none flex items-center justify-between">
-                {f.q}
-                <span className="text-primary group-open:rotate-45 transition-transform text-xl leading-none">+</span>
-              </summary>
-              <p className="mt-3 text-sm text-muted-foreground">{f.a}</p>
-            </details>
-          ))}
-        </div>
-      </section>
+      <LazyMount minHeight={500}>
+        <section className="mx-auto max-w-3xl px-4 sm:px-6 py-16">
+          <SectionHeader eyebrow="Help" title="Frequently Asked" />
+          <div className="space-y-3">
+            {[
+              { q: "Are HalloweenTools tools really free?", a: "Yes — every tool is free to use with no signup required." },
+              { q: "Can I use the generated content commercially?", a: "Most outputs are royalty-free for personal use. Check each tool's guidance for commercial terms." },
+              { q: "Do you save my data?", a: "No. Tools run in your browser whenever possible and never sell your data." },
+              { q: "Will you add more tools?", a: "Yes — new tools launch weekly during the Halloween season." },
+            ].map((f, i) => (
+              <details key={i} className="group rounded-xl border border-border bg-card p-5">
+                <summary className="cursor-pointer font-medium list-none flex items-center justify-between">
+                  {f.q}
+                  <span className="text-primary group-open:rotate-45 transition-transform text-xl leading-none">+</span>
+                </summary>
+                <p className="mt-3 text-sm text-muted-foreground">{f.a}</p>
+              </details>
+            ))}
+          </div>
+        </section>
+      </LazyMount>
 
-      <div className="py-8"><Newsletter /></div>
+      <LazyMount minHeight={300}>
+        <div className="py-8"><Newsletter /></div>
+      </LazyMount>
+
     </PageShell>
   );
 }
