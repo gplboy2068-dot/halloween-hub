@@ -36,10 +36,12 @@ export function ResultList({
   items,
   onRegenerate,
   emptyLabel = "Click generate to conjure ideas",
+  share,
 }: {
   items: string[];
   onRegenerate?: () => void;
   emptyLabel?: string;
+  share?: { toolSlug: string; toolTitle: string; prompt?: string };
 }) {
   if (items.length === 0) {
     return <p className="text-center text-muted-foreground py-10">{emptyLabel}</p>;
@@ -53,7 +55,18 @@ export function ResultList({
         >
           <span className="text-primary font-display text-sm mt-0.5 w-6">{i + 1}.</span>
           <p className="flex-1 text-sm sm:text-base leading-relaxed whitespace-pre-wrap">{item}</p>
-          <CopyButton text={item} />
+          <div className="flex flex-col gap-1.5 items-end">
+            <CopyButton text={item} />
+            {share && share.toolSlug && (
+              <ShareGenerationButton
+                toolSlug={share.toolSlug}
+                toolTitle={share.toolTitle}
+                output={item}
+                prompt={share.prompt}
+                kind="text"
+              />
+            )}
+          </div>
         </div>
       ))}
       {onRegenerate && (
@@ -71,6 +84,7 @@ export function ResultList({
     </div>
   );
 }
+
 
 export function ToolControls({ children }: { children: ReactNode }) {
   return <div className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-end">{children}</div>;
