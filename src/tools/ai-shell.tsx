@@ -41,12 +41,16 @@ export function AITextListTool({
 }) {
   const [loading, setLoading] = useState(false);
   const [items, setItems] = useState<string[]>([]);
+  const [lastPrompt, setLastPrompt] = useState<string>("");
   const runFn = useServerFn(aiGenerateText);
+  const meta = useToolMeta();
 
   const run = async () => {
     setLoading(true);
     try {
-      const res = await runFn({ data: { system, prompt: buildPrompt(), count } });
+      const prompt = buildPrompt();
+      setLastPrompt(prompt);
+      const res = await runFn({ data: { system, prompt, count } });
       setItems(res.items);
       if (res.items.length === 0) toast.error("No results — try tweaking your input.");
     } catch (e) {
@@ -64,10 +68,16 @@ export function AITextListTool({
           {loading ? "Conjuring…" : cta}
         </button>
       </ToolControls>
-      <ResultList items={items} onRegenerate={items.length ? run : undefined} emptyLabel={emptyLabel} />
+      <ResultList
+        items={items}
+        onRegenerate={items.length ? run : undefined}
+        emptyLabel={emptyLabel}
+        share={meta.slug ? { toolSlug: meta.slug, toolTitle: meta.title, prompt: lastPrompt } : undefined}
+      />
     </ToolShell>
   );
 }
+
 
 /**
  * AI long-form text (single result, e.g. a story).
