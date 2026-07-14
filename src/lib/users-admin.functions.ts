@@ -67,10 +67,10 @@ export const adminListUsers = createServerFn({ method: "GET" })
 
 export const adminSetUserRole = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: { userId: string; role: "admin" | "moderator" | "user"; grant: boolean }) =>
+  .inputValidator((input: { userId: string; role: "admin" | "editor" | "user"; grant: boolean }) =>
     z.object({
       userId: z.string().uuid(),
-      role: z.enum(["admin", "moderator", "user"]),
+      role: z.enum(["admin", "editor", "user"]),
       grant: z.boolean(),
     }).parse(input),
   )
