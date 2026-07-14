@@ -138,7 +138,7 @@ function CollectionPageView() {
         <section className="mt-14">
           <h2 className="font-display text-2xl font-bold">Frequently asked questions</h2>
           <div className="mt-6 divide-y divide-border rounded-2xl border border-border bg-card/40">
-            {page.faqs.map((f) => (
+            {page.faqs.map((f: { q: string; a: string }) => (
               <details key={f.q} className="group p-5 open:bg-primary/5">
                 <summary className="cursor-pointer font-display font-semibold flex items-center justify-between gap-4 list-none">
                   <span>{f.q}</span>
