@@ -189,6 +189,10 @@ function ArticlePage() {
                 <img
                   src={article.author.avatarUrl}
                   alt={article.author.displayName}
+                  loading="lazy"
+                  decoding="async"
+                  width={24}
+                  height={24}
                   className="w-6 h-6 rounded-full object-cover"
                 />
               ) : (
@@ -214,6 +218,10 @@ function ArticlePage() {
             <img
               src={article.coverImage}
               alt={article.title}
+              fetchPriority="high"
+              decoding="async"
+              width={1600}
+              height={900}
               className="w-full aspect-[16/9] object-cover"
             />
           </div>
@@ -261,6 +269,10 @@ function ArticlePage() {
               <img
                 src={article.author.avatarUrl}
                 alt={article.author.displayName ?? "Author"}
+                loading="lazy"
+                decoding="async"
+                width={56}
+                height={56}
                 className="w-14 h-14 rounded-full object-cover flex-shrink-0"
               />
             ) : (
