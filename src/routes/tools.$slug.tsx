@@ -102,6 +102,7 @@ export const Route = createFileRoute("/tools/$slug")({
 
 function ToolPage() {
   const tool = Route.useLoaderData();
+  const content = getToolContent(tool);
   const related = TOOLS.filter((t) => t.slug !== tool.slug && t.category === tool.category).slice(0, 8);
   const ctx = {
     title: tool.title,
