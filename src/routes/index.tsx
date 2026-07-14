@@ -163,8 +163,16 @@ function Home() {
       </LazyMount>
 
       <LazyMount minHeight={300}>
+        <section className="mx-auto max-w-7xl px-4 sm:px-6 py-12">
+          <SectionHeader eyebrow="From the community" title="Trending creations" href="/community" />
+          <HomeCommunityStrip />
+        </section>
+      </LazyMount>
+
+      <LazyMount minHeight={300}>
         <div className="py-8"><Newsletter /></div>
       </LazyMount>
+
 
     </PageShell>
   );
