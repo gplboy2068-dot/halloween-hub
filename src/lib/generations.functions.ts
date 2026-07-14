@@ -63,6 +63,19 @@ export const listGenerations = createServerFn({ method: "GET" })
         .in("id", userIds);
       names = Object.fromEntries((profs ?? []).map((p) => [p.id, p.display_name ?? "Guest"]));
     }
+    // Sign image URLs (private bucket)
+    const imagePaths = (rows ?? [])
+      .filter((r) => r.kind === "image")
+      .map((r) => r.output);
+    const signed: Record<string, string> = {};
+    if (imagePaths.length) {
+      const { data: sig } = await supabase.storage
+        .from("community")
+        .createSignedUrls(imagePaths, 60 * 60 * 24);
+      (sig ?? []).forEach((s) => {
+        if (s.path && s.signedUrl) signed[s.path] = s.signedUrl;
+      });
+    }
     return {
       items: (rows ?? []).map((r) => ({
         id: r.id,
@@ -70,12 +83,13 @@ export const listGenerations = createServerFn({ method: "GET" })
         tool_title: r.tool_title,
         kind: r.kind,
         prompt: r.prompt,
-        output: r.output,
+        output: r.kind === "image" ? (signed[r.output] ?? r.output) : r.output,
         created_at: r.created_at,
         author: names[r.user_id] ?? "Guest",
       })),
     };
   });
+
 
 /** Sign-in required — share your generation to the public feed. */
 export const createGeneration = createServerFn({ method: "POST" })
