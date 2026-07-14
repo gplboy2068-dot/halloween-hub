@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as TermsRouteImport } from './routes/terms'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
+import { Route as SitemapRouteImport } from './routes/sitemap'
 import { Route as SearchRouteImport } from './routes/search'
 import { Route as SavedRouteImport } from './routes/saved'
 import { Route as RssDotxmlRouteImport } from './routes/rss[.]xml'
@@ -59,6 +60,11 @@ const TermsRoute = TermsRouteImport.update({
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
   path: '/sitemap.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SitemapRoute = SitemapRouteImport.update({
+  id: '/sitemap',
+  path: '/sitemap',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SearchRoute = SearchRouteImport.update({
@@ -271,6 +277,7 @@ export interface FileRoutesByFullPath {
   '/rss.xml': typeof RssDotxmlRoute
   '/saved': typeof SavedRoute
   '/search': typeof SearchRoute
+  '/sitemap': typeof SitemapRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
   '/admin/$entity': typeof AdminEntityRouteWithChildren
@@ -313,6 +320,7 @@ export interface FileRoutesByTo {
   '/rss.xml': typeof RssDotxmlRoute
   '/saved': typeof SavedRoute
   '/search': typeof SearchRoute
+  '/sitemap': typeof SitemapRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
   '/admin/$entity': typeof AdminEntityRouteWithChildren
@@ -357,6 +365,7 @@ export interface FileRoutesById {
   '/rss.xml': typeof RssDotxmlRoute
   '/saved': typeof SavedRoute
   '/search': typeof SearchRoute
+  '/sitemap': typeof SitemapRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
   '/admin/$entity': typeof AdminEntityRouteWithChildren
@@ -402,6 +411,7 @@ export interface FileRouteTypes {
     | '/rss.xml'
     | '/saved'
     | '/search'
+    | '/sitemap'
     | '/sitemap.xml'
     | '/terms'
     | '/admin/$entity'
@@ -444,6 +454,7 @@ export interface FileRouteTypes {
     | '/rss.xml'
     | '/saved'
     | '/search'
+    | '/sitemap'
     | '/sitemap.xml'
     | '/terms'
     | '/admin/$entity'
@@ -487,6 +498,7 @@ export interface FileRouteTypes {
     | '/rss.xml'
     | '/saved'
     | '/search'
+    | '/sitemap'
     | '/sitemap.xml'
     | '/terms'
     | '/admin/$entity'
@@ -531,6 +543,7 @@ export interface RootRouteChildren {
   RssDotxmlRoute: typeof RssDotxmlRoute
   SavedRoute: typeof SavedRoute
   SearchRoute: typeof SearchRoute
+  SitemapRoute: typeof SitemapRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   TermsRoute: typeof TermsRoute
   AuthorsSlugRoute: typeof AuthorsSlugRoute
@@ -565,6 +578,13 @@ declare module '@tanstack/react-router' {
       path: '/sitemap.xml'
       fullPath: '/sitemap.xml'
       preLoaderRoute: typeof SitemapDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sitemap': {
+      id: '/sitemap'
+      path: '/sitemap'
+      fullPath: '/sitemap'
+      preLoaderRoute: typeof SitemapRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/search': {
@@ -895,6 +915,7 @@ const rootRouteChildren: RootRouteChildren = {
   RssDotxmlRoute: RssDotxmlRoute,
   SavedRoute: SavedRoute,
   SearchRoute: SearchRoute,
+  SitemapRoute: SitemapRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   TermsRoute: TermsRoute,
   AuthorsSlugRoute: AuthorsSlugRoute,
