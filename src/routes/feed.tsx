@@ -153,6 +153,22 @@ function FeedCard({ item }: { item: FeedItem }) {
 
 function FeedPage() {
   const { data } = useSuspenseQuery(feedQuery);
+  const [activeTool, setActiveTool] = useState<string>("all");
+
+  // Build categories from what's actually in the feed
+  const categoryMap = new Map<string, { title: string; count: number }>();
+  for (const it of data.items) {
+    const cur = categoryMap.get(it.tool_slug);
+    if (cur) cur.count += 1;
+    else categoryMap.set(it.tool_slug, { title: it.tool_title, count: 1 });
+  }
+  const categories = Array.from(categoryMap.entries())
+    .map(([slug, v]) => ({ slug, title: v.title, count: v.count }))
+    .sort((a, b) => b.count - a.count);
+
+  const filtered =
+    activeTool === "all" ? data.items : data.items.filter((i) => i.tool_slug === activeTool);
+
   return (
     <PageShell>
       <div className="mx-auto max-w-6xl px-4 sm:px-6 py-14">
@@ -162,10 +178,42 @@ function FeedPage() {
           <span className="text-primary font-semibold">🌍 Share</span> to see it here.
         </p>
 
-        {data.items.length === 0 ? (
+        {categories.length > 0 && (
+          <div className="mt-8 flex flex-wrap gap-2">
+            <button
+              onClick={() => setActiveTool("all")}
+              className={`px-3.5 py-1.5 rounded-full text-sm font-medium border transition ${
+                activeTool === "all"
+                  ? "bg-primary text-primary-foreground border-primary"
+                  : "border-border bg-background/60 text-muted-foreground hover:border-primary/40 hover:text-foreground"
+              }`}
+            >
+              All <span className="opacity-70">({data.items.length})</span>
+            </button>
+            {categories.map((c) => (
+              <button
+                key={c.slug}
+                onClick={() => setActiveTool(c.slug)}
+                className={`px-3.5 py-1.5 rounded-full text-sm font-medium border transition ${
+                  activeTool === c.slug
+                    ? "bg-primary text-primary-foreground border-primary"
+                    : "border-border bg-background/60 text-muted-foreground hover:border-primary/40 hover:text-foreground"
+                }`}
+              >
+                {c.title} <span className="opacity-70">({c.count})</span>
+              </button>
+            ))}
+          </div>
+        )}
+
+        {filtered.length === 0 ? (
           <div className="mt-16 text-center text-muted-foreground">
             <div className="text-5xl mb-3">👻</div>
-            <p>No creations yet. Be the first!</p>
+            <p>
+              {data.items.length === 0
+                ? "No creations yet. Be the first!"
+                : "Nothing in this category yet."}
+            </p>
             <Link
               to="/tools"
               className="mt-6 inline-flex px-5 py-2.5 rounded-lg bg-primary text-primary-foreground font-semibold"
@@ -174,8 +222,8 @@ function FeedPage() {
             </Link>
           </div>
         ) : (
-          <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {data.items.map((item) => (
+          <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {filtered.map((item) => (
               <FeedCard key={item.id} item={item} />
             ))}
           </div>
