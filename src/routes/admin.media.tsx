@@ -49,7 +49,7 @@ function MediaLibrary() {
           {items.map((it) => (
             <div key={it.id} className="group rounded-xl border border-border bg-card overflow-hidden">
               <div className="aspect-square bg-muted">
-                <img src={it.url} alt={it.name} className="h-full w-full object-cover" />
+                <img src={it.url} alt={it.name} loading="lazy" decoding="async" className="h-full w-full object-cover" />
               </div>
               <div className="p-2">
                 <p className="text-xs font-medium truncate">{it.name}</p>
