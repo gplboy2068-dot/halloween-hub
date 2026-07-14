@@ -34,17 +34,49 @@ export const Route = createFileRoute("/for/$slug")({
   head: ({ loaderData, params }) => {
     if (!loaderData) return { meta: [{ title: "Not found" }, { name: "robots", content: "noindex" }] };
     const title = `${loaderData.hero} — Ideas, Tools & Inspiration 2026`;
+    const description = loaderData.intro.slice(0, 155);
+    const url = `/for/${params.slug}`;
+    const tools = resolveToolsForAudience(loaderData);
     return {
       meta: [
         { title },
-        { name: "description", content: loaderData.intro.slice(0, 155) },
+        { name: "description", content: description },
         { property: "og:title", content: title },
-        { property: "og:description", content: loaderData.intro.slice(0, 155) },
+        { property: "og:description", content: description },
         { property: "og:type", content: "website" },
-        { property: "og:url", content: `/for/${params.slug}` },
+        { property: "og:url", content: url },
       ],
-      links: [{ rel: "canonical", href: `/for/${params.slug}` }],
+      links: [{ rel: "canonical", href: url }],
       scripts: [
+        {
+          type: "application/ld+json",
+          children: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "CollectionPage",
+            name: title,
+            description,
+            url,
+            audience: { "@type": "Audience", audienceType: loaderData.audience },
+            isPartOf: { "@type": "WebSite", name: "HalloweenTools", url: "/" },
+          }),
+        },
+        ...(tools.length
+          ? [{
+              type: "application/ld+json",
+              children: JSON.stringify({
+                "@context": "https://schema.org",
+                "@type": "ItemList",
+                name: `Recommended tools for ${loaderData.audience}`,
+                numberOfItems: tools.length,
+                itemListElement: tools.map((t, i) => ({
+                  "@type": "ListItem",
+                  position: i + 1,
+                  name: t.title,
+                  url: `/tools/${t.slug}`,
+                })),
+              }),
+            }]
+          : []),
         {
           type: "application/ld+json",
           children: JSON.stringify({
@@ -53,7 +85,7 @@ export const Route = createFileRoute("/for/$slug")({
             itemListElement: [
               { "@type": "ListItem", position: 1, name: "Home", item: "/" },
               { "@type": "ListItem", position: 2, name: "For You", item: "/for" },
-              { "@type": "ListItem", position: 3, name: loaderData.hero, item: `/for/${params.slug}` },
+              { "@type": "ListItem", position: 3, name: loaderData.hero, item: url },
             ],
           }),
         },

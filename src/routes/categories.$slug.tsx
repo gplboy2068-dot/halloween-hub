@@ -2,6 +2,7 @@ import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { PageShell } from "@/components/PageShell";
 import { ToolCard } from "@/components/ToolCard";
 import { CATEGORIES, TOOLS } from "@/lib/site";
+import { breadcrumbListLd, collectionPageLd, itemListLd } from "@/lib/schema";
 
 export const Route = createFileRoute("/categories/$slug")({
   loader: ({ params }) => {
@@ -11,14 +12,48 @@ export const Route = createFileRoute("/categories/$slug")({
   },
   head: ({ loaderData, params }) => {
     if (!loaderData) return { meta: [{ title: "Not found" }, { name: "robots", content: "noindex" }] };
+    const url = `/categories/${params.slug}`;
+    const tools = TOOLS.filter((t) => t.category.toLowerCase() === loaderData.name.toLowerCase());
     return {
       meta: [
         { title: `${loaderData.name} — Halloween Tools & Ideas` },
         { name: "description", content: `${loaderData.description}. Free Halloween ${loaderData.name.toLowerCase()} tools & inspiration.` },
         { property: "og:title", content: `${loaderData.name} — HalloweenTools` },
-        { property: "og:url", content: `/categories/${params.slug}` },
+        { property: "og:url", content: url },
       ],
-      links: [{ rel: "canonical", href: `/categories/${params.slug}` }],
+      links: [{ rel: "canonical", href: url }],
+      scripts: [
+        {
+          type: "application/ld+json",
+          children: JSON.stringify(
+            collectionPageLd({
+              name: `${loaderData.name} — Halloween Tools`,
+              description: loaderData.description,
+              url,
+              numberOfItems: tools.length,
+            }),
+          ),
+        },
+        {
+          type: "application/ld+json",
+          children: JSON.stringify(
+            itemListLd(
+              tools.map((t) => ({ name: t.title, url: `/tools/${t.slug}`, description: t.description })),
+              { name: `${loaderData.name} tools` },
+            ),
+          ),
+        },
+        {
+          type: "application/ld+json",
+          children: JSON.stringify(
+            breadcrumbListLd([
+              { name: "Home", item: "/" },
+              { name: "Categories", item: "/categories" },
+              { name: loaderData.name, item: url },
+            ]),
+          ),
+        },
+      ],
     };
   },
   component: CategoryPage,

@@ -56,6 +56,30 @@ export const Route = createFileRoute("/blog/")({
       { rel: "canonical", href: "/blog" },
       { rel: "alternate", type: "application/rss+xml", title: "HalloweenTools Blog RSS", href: "/rss.xml" },
     ],
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "Blog",
+          name: "HalloweenTools Blog",
+          description: "Guides, ideas & inspiration for the spookiest season.",
+          url: "/blog",
+          publisher: { "@type": "Organization", name: "HalloweenTools", url: "/" },
+        }),
+      },
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "BreadcrumbList",
+          itemListElement: [
+            { "@type": "ListItem", position: 1, name: "Home", item: "/" },
+            { "@type": "ListItem", position: 2, name: "Blog", item: "/blog" },
+          ],
+        }),
+      },
+    ],
   }),
   errorComponent: ({ error }) => (
     <PageShell>

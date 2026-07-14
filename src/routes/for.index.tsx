@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { PageShell } from "@/components/PageShell";
 import { AUDIENCE_PAGES } from "@/lib/pseo";
+import { breadcrumbListLd, collectionPageLd, itemListLd } from "@/lib/schema";
 
 export const Route = createFileRoute("/for/")({
   head: () => ({
@@ -13,6 +14,37 @@ export const Route = createFileRoute("/for/")({
       { property: "og:url", content: "/for" },
     ],
     links: [{ rel: "canonical", href: "/for" }],
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: JSON.stringify(
+          collectionPageLd({
+            name: "Halloween For Everyone",
+            description: "Audience-tuned Halloween hubs.",
+            url: "/for",
+            numberOfItems: AUDIENCE_PAGES.length,
+          }),
+        ),
+      },
+      {
+        type: "application/ld+json",
+        children: JSON.stringify(
+          itemListLd(
+            AUDIENCE_PAGES.map((p) => ({ name: p.hero, url: `/for/${p.slug}`, description: p.intro.slice(0, 155) })),
+            { name: "Audiences" },
+          ),
+        ),
+      },
+      {
+        type: "application/ld+json",
+        children: JSON.stringify(
+          breadcrumbListLd([
+            { name: "Home", item: "/" },
+            { name: "For You", item: "/for" },
+          ]),
+        ),
+      },
+    ],
   }),
   component: ForHub,
 });

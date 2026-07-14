@@ -7,6 +7,7 @@ import { getArticleBySlug, listRelatedArticles } from "@/lib/blog.functions";
 import { getRelatedTools, getRelatedIdeas, getRelatedAudiences } from "@/lib/related";
 import { RelatedSection } from "@/components/RelatedGrid";
 import { TableOfContents } from "@/components/TableOfContents";
+import { publisherLd, imageObjectLd, speakableLd, wordCountFromHtml } from "@/lib/schema";
 
 
 
@@ -105,22 +106,34 @@ function ArticlePage() {
     relatedQuery(article.id, article.category?.id ?? null),
   );
 
+  const articleUrl = `/blog/${article.slug}`;
+  const wordCount = wordCountFromHtml(article.contentHtml);
+  const keywords = [
+    ...(article.category ? [article.category.name] : []),
+    ...article.tags.map((t) => t.name),
+  ];
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "Article",
     headline: article.title,
     description: article.excerpt,
-    image: article.coverImage ? [article.coverImage] : undefined,
+    image: article.coverImage ? [imageObjectLd(article.coverImage)] : undefined,
     datePublished: article.publishedAt ?? article.updatedAt,
     dateModified: article.updatedAt,
     author: article.author?.displayName
-      ? { "@type": "Person", name: article.author.displayName }
+      ? {
+          "@type": "Person",
+          name: article.author.displayName,
+          ...(article.author.bio ? { description: article.author.bio } : {}),
+        }
       : { "@type": "Organization", name: "HalloweenTools" },
-    publisher: {
-      "@type": "Organization",
-      name: "HalloweenTools",
-    },
-    mainEntityOfPage: `/blog/${article.slug}`,
+    publisher: publisherLd(),
+    mainEntityOfPage: { "@type": "WebPage", "@id": articleUrl },
+    ...(article.category ? { articleSection: article.category.name } : {}),
+    ...(keywords.length ? { keywords: keywords.join(", ") } : {}),
+    ...(wordCount ? { wordCount } : {}),
+    inLanguage: "en",
+    speakable: speakableLd(),
   };
   const breadcrumbLd = {
     "@context": "https://schema.org",

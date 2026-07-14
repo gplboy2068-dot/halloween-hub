@@ -46,7 +46,35 @@ export const Route = createFileRoute("/blog/category/$slug")({
       { property: "og:type", content: "website" },
     ];
     if (loaderData.image) meta.push({ property: "og:image", content: loaderData.image });
-    return { meta, links: [{ rel: "canonical", href: url }] };
+    return {
+      meta,
+      links: [{ rel: "canonical", href: url }],
+      scripts: [
+        {
+          type: "application/ld+json",
+          children: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "CollectionPage",
+            name: title,
+            description,
+            url,
+            isPartOf: { "@type": "Blog", name: "HalloweenTools Blog", url: "/blog" },
+          }),
+        },
+        {
+          type: "application/ld+json",
+          children: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "BreadcrumbList",
+            itemListElement: [
+              { "@type": "ListItem", position: 1, name: "Home", item: "/" },
+              { "@type": "ListItem", position: 2, name: "Blog", item: "/blog" },
+              { "@type": "ListItem", position: 3, name: loaderData.name, item: url },
+            ],
+          }),
+        },
+      ],
+    };
   },
   notFoundComponent: () => (
     <PageShell>
