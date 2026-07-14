@@ -3,6 +3,7 @@ import type {} from "@tanstack/react-start";
 import { TOOLS, CATEGORIES } from "@/lib/site";
 import { allIdeaSlugs, AUDIENCE_PAGES } from "@/lib/pseo";
 import { allCollectionSlugs } from "@/lib/collections";
+import { allAuthorSlugs } from "@/lib/authors";
 import { listArticles, listBlogCategories, listBlogTags } from "@/lib/blog.functions";
 
 const BASE_URL = "";
@@ -31,6 +32,9 @@ export const Route = createFileRoute("/sitemap.xml")({
           { path: "/blog", changefreq: "daily", priority: "0.8" },
           { path: "/about", changefreq: "monthly", priority: "0.5" },
           { path: "/contact", changefreq: "monthly", priority: "0.5" },
+          { path: "/authors", changefreq: "monthly", priority: "0.6" },
+          { path: "/editorial-policy", changefreq: "yearly", priority: "0.5" },
+          ...allAuthorSlugs().map((slug) => ({ path: `/authors/${slug}`, changefreq: "monthly" as const, priority: "0.5" })),
           { path: "/privacy", changefreq: "yearly", priority: "0.3" },
           { path: "/terms", changefreq: "yearly", priority: "0.3" },
           { path: "/disclaimer", changefreq: "yearly", priority: "0.3" },

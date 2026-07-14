@@ -15,6 +15,7 @@ import { Route as SearchRouteImport } from './routes/search'
 import { Route as RssDotxmlRouteImport } from './routes/rss[.]xml'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as PrivacyRouteImport } from './routes/privacy'
+import { Route as EditorialPolicyRouteImport } from './routes/editorial-policy'
 import { Route as DisclaimerRouteImport } from './routes/disclaimer'
 import { Route as CookiesRouteImport } from './routes/cookies'
 import { Route as ContactRouteImport } from './routes/contact'
@@ -28,6 +29,7 @@ import { Route as ForIndexRouteImport } from './routes/for.index'
 import { Route as CollectionsIndexRouteImport } from './routes/collections.index'
 import { Route as CategoriesIndexRouteImport } from './routes/categories.index'
 import { Route as BlogIndexRouteImport } from './routes/blog.index'
+import { Route as AuthorsIndexRouteImport } from './routes/authors.index'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as ToolsSlugRouteImport } from './routes/tools.$slug'
 import { Route as IdeasSlugRouteImport } from './routes/ideas.$slug'
@@ -35,6 +37,7 @@ import { Route as ForSlugRouteImport } from './routes/for.$slug'
 import { Route as CollectionsSlugRouteImport } from './routes/collections.$slug'
 import { Route as CategoriesSlugRouteImport } from './routes/categories.$slug'
 import { Route as BlogSlugRouteImport } from './routes/blog.$slug'
+import { Route as AuthorsSlugRouteImport } from './routes/authors.$slug'
 import { Route as AdminSettingsRouteImport } from './routes/admin.settings'
 import { Route as AdminSeoRouteImport } from './routes/admin.seo'
 import { Route as AdminSchemaRouteImport } from './routes/admin.schema'
@@ -75,6 +78,11 @@ const ResetPasswordRoute = ResetPasswordRouteImport.update({
 const PrivacyRoute = PrivacyRouteImport.update({
   id: '/privacy',
   path: '/privacy',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EditorialPolicyRoute = EditorialPolicyRouteImport.update({
+  id: '/editorial-policy',
+  path: '/editorial-policy',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DisclaimerRoute = DisclaimerRouteImport.update({
@@ -142,6 +150,11 @@ const BlogIndexRoute = BlogIndexRouteImport.update({
   path: '/blog/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthorsIndexRoute = AuthorsIndexRouteImport.update({
+  id: '/authors/',
+  path: '/authors/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AdminIndexRoute = AdminIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -175,6 +188,11 @@ const CategoriesSlugRoute = CategoriesSlugRouteImport.update({
 const BlogSlugRoute = BlogSlugRouteImport.update({
   id: '/blog/$slug',
   path: '/blog/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthorsSlugRoute = AuthorsSlugRouteImport.update({
+  id: '/authors/$slug',
+  path: '/authors/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminSettingsRoute = AdminSettingsRouteImport.update({
@@ -241,6 +259,7 @@ export interface FileRoutesByFullPath {
   '/contact': typeof ContactRoute
   '/cookies': typeof CookiesRoute
   '/disclaimer': typeof DisclaimerRoute
+  '/editorial-policy': typeof EditorialPolicyRoute
   '/privacy': typeof PrivacyRoute
   '/reset-password': typeof ResetPasswordRoute
   '/rss.xml': typeof RssDotxmlRoute
@@ -255,6 +274,7 @@ export interface FileRoutesByFullPath {
   '/admin/schema': typeof AdminSchemaRoute
   '/admin/seo': typeof AdminSeoRoute
   '/admin/settings': typeof AdminSettingsRoute
+  '/authors/$slug': typeof AuthorsSlugRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/categories/$slug': typeof CategoriesSlugRoute
   '/collections/$slug': typeof CollectionsSlugRoute
@@ -262,6 +282,7 @@ export interface FileRoutesByFullPath {
   '/ideas/$slug': typeof IdeasSlugRoute
   '/tools/$slug': typeof ToolsSlugRoute
   '/admin/': typeof AdminIndexRoute
+  '/authors/': typeof AuthorsIndexRoute
   '/blog/': typeof BlogIndexRoute
   '/categories/': typeof CategoriesIndexRoute
   '/collections/': typeof CollectionsIndexRoute
@@ -279,6 +300,7 @@ export interface FileRoutesByTo {
   '/contact': typeof ContactRoute
   '/cookies': typeof CookiesRoute
   '/disclaimer': typeof DisclaimerRoute
+  '/editorial-policy': typeof EditorialPolicyRoute
   '/privacy': typeof PrivacyRoute
   '/reset-password': typeof ResetPasswordRoute
   '/rss.xml': typeof RssDotxmlRoute
@@ -293,6 +315,7 @@ export interface FileRoutesByTo {
   '/admin/schema': typeof AdminSchemaRoute
   '/admin/seo': typeof AdminSeoRoute
   '/admin/settings': typeof AdminSettingsRoute
+  '/authors/$slug': typeof AuthorsSlugRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/categories/$slug': typeof CategoriesSlugRoute
   '/collections/$slug': typeof CollectionsSlugRoute
@@ -300,6 +323,7 @@ export interface FileRoutesByTo {
   '/ideas/$slug': typeof IdeasSlugRoute
   '/tools/$slug': typeof ToolsSlugRoute
   '/admin': typeof AdminIndexRoute
+  '/authors': typeof AuthorsIndexRoute
   '/blog': typeof BlogIndexRoute
   '/categories': typeof CategoriesIndexRoute
   '/collections': typeof CollectionsIndexRoute
@@ -319,6 +343,7 @@ export interface FileRoutesById {
   '/contact': typeof ContactRoute
   '/cookies': typeof CookiesRoute
   '/disclaimer': typeof DisclaimerRoute
+  '/editorial-policy': typeof EditorialPolicyRoute
   '/privacy': typeof PrivacyRoute
   '/reset-password': typeof ResetPasswordRoute
   '/rss.xml': typeof RssDotxmlRoute
@@ -333,6 +358,7 @@ export interface FileRoutesById {
   '/admin/schema': typeof AdminSchemaRoute
   '/admin/seo': typeof AdminSeoRoute
   '/admin/settings': typeof AdminSettingsRoute
+  '/authors/$slug': typeof AuthorsSlugRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/categories/$slug': typeof CategoriesSlugRoute
   '/collections/$slug': typeof CollectionsSlugRoute
@@ -340,6 +366,7 @@ export interface FileRoutesById {
   '/ideas/$slug': typeof IdeasSlugRoute
   '/tools/$slug': typeof ToolsSlugRoute
   '/admin/': typeof AdminIndexRoute
+  '/authors/': typeof AuthorsIndexRoute
   '/blog/': typeof BlogIndexRoute
   '/categories/': typeof CategoriesIndexRoute
   '/collections/': typeof CollectionsIndexRoute
@@ -360,6 +387,7 @@ export interface FileRouteTypes {
     | '/contact'
     | '/cookies'
     | '/disclaimer'
+    | '/editorial-policy'
     | '/privacy'
     | '/reset-password'
     | '/rss.xml'
@@ -374,6 +402,7 @@ export interface FileRouteTypes {
     | '/admin/schema'
     | '/admin/seo'
     | '/admin/settings'
+    | '/authors/$slug'
     | '/blog/$slug'
     | '/categories/$slug'
     | '/collections/$slug'
@@ -381,6 +410,7 @@ export interface FileRouteTypes {
     | '/ideas/$slug'
     | '/tools/$slug'
     | '/admin/'
+    | '/authors/'
     | '/blog/'
     | '/categories/'
     | '/collections/'
@@ -398,6 +428,7 @@ export interface FileRouteTypes {
     | '/contact'
     | '/cookies'
     | '/disclaimer'
+    | '/editorial-policy'
     | '/privacy'
     | '/reset-password'
     | '/rss.xml'
@@ -412,6 +443,7 @@ export interface FileRouteTypes {
     | '/admin/schema'
     | '/admin/seo'
     | '/admin/settings'
+    | '/authors/$slug'
     | '/blog/$slug'
     | '/categories/$slug'
     | '/collections/$slug'
@@ -419,6 +451,7 @@ export interface FileRouteTypes {
     | '/ideas/$slug'
     | '/tools/$slug'
     | '/admin'
+    | '/authors'
     | '/blog'
     | '/categories'
     | '/collections'
@@ -437,6 +470,7 @@ export interface FileRouteTypes {
     | '/contact'
     | '/cookies'
     | '/disclaimer'
+    | '/editorial-policy'
     | '/privacy'
     | '/reset-password'
     | '/rss.xml'
@@ -451,6 +485,7 @@ export interface FileRouteTypes {
     | '/admin/schema'
     | '/admin/seo'
     | '/admin/settings'
+    | '/authors/$slug'
     | '/blog/$slug'
     | '/categories/$slug'
     | '/collections/$slug'
@@ -458,6 +493,7 @@ export interface FileRouteTypes {
     | '/ideas/$slug'
     | '/tools/$slug'
     | '/admin/'
+    | '/authors/'
     | '/blog/'
     | '/categories/'
     | '/collections/'
@@ -477,18 +513,21 @@ export interface RootRouteChildren {
   ContactRoute: typeof ContactRoute
   CookiesRoute: typeof CookiesRoute
   DisclaimerRoute: typeof DisclaimerRoute
+  EditorialPolicyRoute: typeof EditorialPolicyRoute
   PrivacyRoute: typeof PrivacyRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   RssDotxmlRoute: typeof RssDotxmlRoute
   SearchRoute: typeof SearchRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   TermsRoute: typeof TermsRoute
+  AuthorsSlugRoute: typeof AuthorsSlugRoute
   BlogSlugRoute: typeof BlogSlugRoute
   CategoriesSlugRoute: typeof CategoriesSlugRoute
   CollectionsSlugRoute: typeof CollectionsSlugRoute
   ForSlugRoute: typeof ForSlugRoute
   IdeasSlugRoute: typeof IdeasSlugRoute
   ToolsSlugRoute: typeof ToolsSlugRoute
+  AuthorsIndexRoute: typeof AuthorsIndexRoute
   BlogIndexRoute: typeof BlogIndexRoute
   CategoriesIndexRoute: typeof CategoriesIndexRoute
   CollectionsIndexRoute: typeof CollectionsIndexRoute
@@ -541,6 +580,13 @@ declare module '@tanstack/react-router' {
       path: '/privacy'
       fullPath: '/privacy'
       preLoaderRoute: typeof PrivacyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/editorial-policy': {
+      id: '/editorial-policy'
+      path: '/editorial-policy'
+      fullPath: '/editorial-policy'
+      preLoaderRoute: typeof EditorialPolicyRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/disclaimer': {
@@ -634,6 +680,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof BlogIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/authors/': {
+      id: '/authors/'
+      path: '/authors'
+      fullPath: '/authors/'
+      preLoaderRoute: typeof AuthorsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/admin/': {
       id: '/admin/'
       path: '/'
@@ -681,6 +734,13 @@ declare module '@tanstack/react-router' {
       path: '/blog/$slug'
       fullPath: '/blog/$slug'
       preLoaderRoute: typeof BlogSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/authors/$slug': {
+      id: '/authors/$slug'
+      path: '/authors/$slug'
+      fullPath: '/authors/$slug'
+      preLoaderRoute: typeof AuthorsSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin/settings': {
@@ -809,18 +869,21 @@ const rootRouteChildren: RootRouteChildren = {
   ContactRoute: ContactRoute,
   CookiesRoute: CookiesRoute,
   DisclaimerRoute: DisclaimerRoute,
+  EditorialPolicyRoute: EditorialPolicyRoute,
   PrivacyRoute: PrivacyRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   RssDotxmlRoute: RssDotxmlRoute,
   SearchRoute: SearchRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   TermsRoute: TermsRoute,
+  AuthorsSlugRoute: AuthorsSlugRoute,
   BlogSlugRoute: BlogSlugRoute,
   CategoriesSlugRoute: CategoriesSlugRoute,
   CollectionsSlugRoute: CollectionsSlugRoute,
   ForSlugRoute: ForSlugRoute,
   IdeasSlugRoute: IdeasSlugRoute,
   ToolsSlugRoute: ToolsSlugRoute,
+  AuthorsIndexRoute: AuthorsIndexRoute,
   BlogIndexRoute: BlogIndexRoute,
   CategoriesIndexRoute: CategoriesIndexRoute,
   CollectionsIndexRoute: CollectionsIndexRoute,

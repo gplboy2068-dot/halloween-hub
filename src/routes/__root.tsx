@@ -101,6 +101,46 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         href: "https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap",
       },
     ],
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "Organization",
+          name: SITE.name,
+          url: "/",
+          description: SITE.description,
+          sameAs: [
+            "https://twitter.com/HalloweenTools",
+          ],
+          knowsAbout: [
+            "Halloween",
+            "Halloween costumes",
+            "Pumpkin carving",
+            "Halloween party planning",
+            "Halloween printables",
+            "AI generators",
+          ],
+          foundingDate: "2024",
+          areaServed: "Worldwide",
+        }),
+      },
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "WebSite",
+          name: SITE.name,
+          url: "/",
+          description: SITE.description,
+          potentialAction: {
+            "@type": "SearchAction",
+            target: "/search?q={search_term_string}",
+            "query-input": "required name=search_term_string",
+          },
+        }),
+      },
+    ],
   }),
   shellComponent: RootShell,
   component: RootComponent,

@@ -19,6 +19,10 @@ import {
   ToolTips,
   ToolFaqs,
 } from "@/components/ToolContentSections";
+import { authorForCategory, personJsonLd } from "@/lib/authors";
+import { TrustBar } from "@/components/TrustBar";
+
+const TOOL_LAST_UPDATED = "2026-07-14";
 
 const relatedArticlesQuery = (slug: string, title: string, description: string, category: string) =>
   queryOptions({
@@ -82,6 +86,7 @@ export const Route = createFileRoute("/tools/$slug")({
         },
         { type: "application/ld+json", children: JSON.stringify(howToJsonLd(loaderData, content)) },
         { type: "application/ld+json", children: JSON.stringify(faqJsonLd(content)) },
+        { type: "application/ld+json", children: JSON.stringify(personJsonLd(authorForCategory(loaderData.category))) },
       ],
     };
   },
@@ -136,6 +141,8 @@ function ToolPage() {
           <h1 className="font-display text-4xl sm:text-5xl font-bold">{tool.title}</h1>
           <p className="mt-4 text-lg text-muted-foreground max-w-2xl mx-auto">{tool.description}</p>
         </header>
+
+        <TrustBar reviewer={authorForCategory(tool.category)} updatedAt={TOOL_LAST_UPDATED} />
 
         {/* Tool interface */}
         {(() => {
