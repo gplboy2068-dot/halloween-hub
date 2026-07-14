@@ -4,7 +4,7 @@ import { useParams } from "@tanstack/react-router";
 import { toast } from "sonner";
 import { aiGenerateText, aiGenerateImage, aiGenerateLongText } from "@/lib/ai.functions";
 import { ToolShell, ToolControls, ResultList, CopyButton, btnPrimary } from "./shell";
-import { ShareGenerationButton } from "@/components/ShareGenerationButton";
+import { ShareGenerationButton, ShareImageButton } from "@/components/ShareGenerationButton";
 import { TOOLS } from "@/lib/site";
 
 function useToolMeta() {
@@ -168,12 +168,16 @@ export function AIImageTool({
 }) {
   const [loading, setLoading] = useState(false);
   const [imageUrl, setImageUrl] = useState<string | null>(null);
+  const [lastPrompt, setLastPrompt] = useState("");
   const runFn = useServerFn(aiGenerateImage);
+  const meta = useToolMeta();
 
   const run = async () => {
     setLoading(true);
     try {
-      const res = await runFn({ data: { prompt: `${system}\n\n${buildPrompt()}` } });
+      const prompt = `${system}\n\n${buildPrompt()}`;
+      setLastPrompt(prompt);
+      const res = await runFn({ data: { prompt } });
       setImageUrl(res.imageUrl);
     } catch (e) {
       handleError(e);
@@ -181,6 +185,7 @@ export function AIImageTool({
       setLoading(false);
     }
   };
+
 
   const download = () => {
     if (!imageUrl) return;
@@ -215,11 +220,20 @@ export function AIImageTool({
               <button type="button" onClick={download} className="px-6 py-2.5 rounded-lg border border-primary/40 bg-primary/10 text-primary font-semibold text-sm hover:bg-primary/20 transition">
                 ⬇️ Download PNG
               </button>
+              {meta.slug && (
+                <ShareImageButton
+                  toolSlug={meta.slug}
+                  toolTitle={meta.title}
+                  dataUrl={imageUrl}
+                  prompt={lastPrompt}
+                />
+              )}
               <button type="button" onClick={run} className="px-6 py-2.5 rounded-lg border border-border bg-background/60 text-sm font-medium hover:border-primary/40 transition">
                 🎲 Regenerate
               </button>
             </>
           )}
+
         </div>
       </div>
     </ToolShell>

@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import { Link } from "@tanstack/react-router";
-import { createGeneration } from "@/lib/generations.functions";
+import { createGeneration, shareGenerationImage } from "@/lib/generations.functions";
 import { useAuth } from "@/hooks/use-auth";
 
 export function ShareGenerationButton({
@@ -67,3 +67,54 @@ export function ShareGenerationButton({
     </button>
   );
 }
+
+export function ShareImageButton({
+  toolSlug,
+  toolTitle,
+  dataUrl,
+  prompt,
+  className,
+}: {
+  toolSlug: string;
+  toolTitle: string;
+  dataUrl: string;
+  prompt?: string;
+  className?: string;
+}) {
+  const { session } = useAuth();
+  const [shared, setShared] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const shareFn = useServerFn(shareGenerationImage);
+
+  const cls =
+    className ??
+    "px-6 py-2.5 rounded-lg border border-primary/40 bg-primary/10 text-primary font-semibold text-sm hover:bg-primary/20 transition disabled:opacity-60";
+
+  if (!session) {
+    return (
+      <Link to="/auth" className={cls} title="Sign in to share to the community feed">
+        🔒 Share to feed
+      </Link>
+    );
+  }
+
+  const share = async () => {
+    setLoading(true);
+    try {
+      await shareFn({ data: { toolSlug, toolTitle, dataUrl, prompt } });
+      setShared(true);
+      toast.success("Shared to community feed");
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Failed to share");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <button type="button" onClick={share} disabled={loading || shared} className={cls}>
+      {shared ? "✓ Shared" : loading ? "Sharing…" : "🌍 Share to feed"}
+    </button>
+  );
+}
+
