@@ -1,5 +1,6 @@
 import { type ReactNode, useState } from "react";
 import { toast } from "sonner";
+import { ShareGenerationButton } from "@/components/ShareGenerationButton";
 
 export function ToolShell({ children }: { children: ReactNode }) {
   return (
