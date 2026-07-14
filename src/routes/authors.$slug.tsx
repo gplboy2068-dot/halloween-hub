@@ -24,7 +24,14 @@ export const Route = createFileRoute("/authors/$slug")({
       scripts: [
         {
           type: "application/ld+json",
-          children: JSON.stringify(personJsonLd(loaderData)),
+          children: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "ProfilePage",
+            name: `${loaderData.name} — ${loaderData.role}`,
+            url,
+            dateModified: loaderData.updatedAt,
+            mainEntity: personJsonLd(loaderData),
+          }),
         },
         {
           type: "application/ld+json",
