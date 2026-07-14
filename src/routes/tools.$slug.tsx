@@ -128,7 +128,24 @@ export const Route = createFileRoute("/tools/$slug")({
 function ToolPage() {
   const tool = Route.useLoaderData();
   const content = getToolContent(tool);
-  const related = TOOLS.filter((t) => t.slug !== tool.slug && t.category === tool.category).slice(0, 8);
+
+  // Related tools: same-category first, then popular fill-in — capped at 12.
+  const sameCategory = TOOLS.filter((t) => t.slug !== tool.slug && t.category === tool.category);
+  const filler = TOOLS.filter(
+    (t) => t.slug !== tool.slug && t.category !== tool.category && (t.popular || t.featured || t.isNew),
+  );
+  const related = [...sameCategory, ...filler]
+    .filter((t, i, arr) => arr.findIndex((x) => x.slug === t.slug) === i)
+    .slice(0, 12);
+
+  const ctaTool = content.ctaSlug
+    ? TOOLS.find((t) => t.slug === content.ctaSlug)
+    : related[0];
+
+  const otherCategories = CATEGORIES.filter(
+    (c) => c.name.toLowerCase() !== tool.category.toLowerCase(),
+  ).slice(0, 8);
+
   const ctx = {
     title: tool.title,
     description: tool.description,
@@ -136,8 +153,8 @@ function ToolPage() {
     keywords: [tool.category],
     excludeHref: `/tools/${tool.slug}`,
   };
-  const relatedIdeas = getRelatedIdeas(ctx, 6);
-  const relatedAudiences = getRelatedAudiences(ctx, 3);
+  const relatedIdeas = getRelatedIdeas(ctx, 8);
+  const relatedAudiences = getRelatedAudiences(ctx, 4);
   const { data: relatedArticlesData } = useSuspenseQuery(
     relatedArticlesQuery(tool.slug, tool.title, tool.description, tool.category),
   );
@@ -148,7 +165,7 @@ function ToolPage() {
     <PageShell>
       <article className="mx-auto max-w-4xl px-4 sm:px-6 py-14">
         {/* Breadcrumb */}
-        <nav className="text-xs text-muted-foreground mb-6">
+        <nav aria-label="Breadcrumb" className="text-xs text-muted-foreground mb-6">
           <Link to="/" className="hover:text-primary">Home</Link>
           <span className="mx-2">/</span>
           <Link to="/tools" className="hover:text-primary">Tools</Link>
@@ -157,21 +174,21 @@ function ToolPage() {
         </nav>
 
         <header className="text-center">
-          <div className="text-6xl mb-4">{tool.emoji}</div>
+          <div className="text-6xl mb-4" aria-hidden="true">{tool.emoji}</div>
           <h1 className="font-display text-4xl sm:text-5xl font-bold">{tool.title}</h1>
-          <p className="mt-4 text-lg text-muted-foreground max-w-2xl mx-auto">{tool.description}</p>
+          <p className="mt-4 text-lg text-muted-foreground max-w-2xl mx-auto">{content.intro}</p>
         </header>
 
         <TrustBar reviewer={authorForCategory(tool.category)} updatedAt={TOOL_LAST_UPDATED} />
 
-        {/* Tool interface */}
+        {/* Interactive tool — stays at the top */}
         {(() => {
           const ToolComponent = getToolComponent(tool.slug);
           if (ToolComponent) return <ToolComponent />;
           return (
             <div className="mt-10 rounded-3xl border border-border bg-card p-8 sm:p-12 text-center bg-gradient-hero">
               <p className="text-sm uppercase tracking-widest text-primary font-semibold">Coming soon</p>
-              <h2 className="mt-2 font-display text-2xl font-bold">This tool is brewing</h2>
+              <p className="mt-2 font-display text-2xl font-bold">This tool is brewing</p>
               <p className="mt-3 text-muted-foreground max-w-md mx-auto">
                 The {tool.title.toLowerCase()} is in production. Check back soon — or explore related tools below.
               </p>
@@ -179,22 +196,34 @@ function ToolPage() {
           );
         })()}
 
-        {/* About */}
-        <section className="mt-12">
-          <h2 className="font-display text-2xl font-bold">About the {tool.title}</h2>
-          <p className="mt-3 text-muted-foreground leading-relaxed">{content.intro}</p>
-        </section>
+        {/* 1. About */}
+        <ToolAbout toolTitle={tool.title} about={content.about} />
 
+        {/* 2. Key benefits (8-12 detailed) */}
+        <ToolBenefits benefits={content.benefits} />
+
+        {/* Legacy feature grid retained for continuity */}
         <ToolFeatures features={content.features} />
+
+        {/* 3. How to use (step-by-step) */}
         <ToolHowTo steps={content.howTo} toolTitle={tool.title} />
+
+        {/* 4. Best use cases */}
         <ToolUseCases useCases={content.useCases} />
+
+        {/* 5. Tips & best practices */}
         <ToolTips tips={content.tips} />
+
+        {/* 6. Common mistakes */}
+        <ToolMistakes mistakes={content.mistakes} />
+
+        {/* 7. FAQ (schema is emitted in head) */}
         <ToolFaqs faqs={content.faqs} />
 
-        {/* Related tools */}
+        {/* 8. Related tools (8-12) */}
         {related.length > 0 && (
           <section className="mt-14">
-            <h2 className="font-display text-2xl font-bold mb-6">Related tools</h2>
+            <h2 className="font-display text-2xl font-bold mb-6">Related Halloween tools</h2>
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
               {related.map((t) => <ToolCard key={t.slug} tool={t} />)}
             </div>
@@ -208,19 +237,27 @@ function ToolPage() {
           items={relatedIdeas}
         />
 
-        {/* Related articles */}
+        {/* 9. Related articles */}
         <RelatedSection
-          heading="Read next on the blog"
+          heading="Related Halloween articles"
+          subheading="Deep dives, guides and roundups from the HalloweenTools blog."
           items={relatedArticles}
         />
 
-        {/* Related audience hubs */}
+        {/* Halloween-for audience hubs */}
         <RelatedSection
           heading="Halloween for…"
           items={relatedAudiences}
         />
+
+        {/* 10. Continue exploring — other categories */}
+        <ContinueExploring categories={otherCategories} />
+
+        {/* 11. CTA — try another tool */}
+        <ToolCta cta={ctaTool} currentSlug={tool.slug} />
       </article>
     </PageShell>
   );
 }
+
 
