@@ -168,12 +168,16 @@ export function AIImageTool({
 }) {
   const [loading, setLoading] = useState(false);
   const [imageUrl, setImageUrl] = useState<string | null>(null);
+  const [lastPrompt, setLastPrompt] = useState("");
   const runFn = useServerFn(aiGenerateImage);
+  const meta = useToolMeta();
 
   const run = async () => {
     setLoading(true);
     try {
-      const res = await runFn({ data: { prompt: `${system}\n\n${buildPrompt()}` } });
+      const prompt = `${system}\n\n${buildPrompt()}`;
+      setLastPrompt(prompt);
+      const res = await runFn({ data: { prompt } });
       setImageUrl(res.imageUrl);
     } catch (e) {
       handleError(e);
@@ -181,6 +185,7 @@ export function AIImageTool({
       setLoading(false);
     }
   };
+
 
   const download = () => {
     if (!imageUrl) return;
