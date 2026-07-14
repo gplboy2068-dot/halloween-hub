@@ -7,6 +7,11 @@ import { TOOLS, CATEGORIES, ARTICLES, SITE } from "@/lib/site";
 import heroImg from "@/assets/hero-halloween.jpg";
 
 export const Route = createFileRoute("/")({
+  head: () => ({
+    links: [
+      { rel: "preload", as: "image", href: heroImg, fetchpriority: "high" } as unknown as { rel: string; as: string; href: string },
+    ],
+  }),
   component: Home,
 });
 
