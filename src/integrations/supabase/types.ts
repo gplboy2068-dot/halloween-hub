@@ -287,6 +287,77 @@ export type Database = {
           },
         ]
       }
+      generation_reports: {
+        Row: {
+          created_at: string
+          generation_id: string
+          id: string
+          reason: string | null
+          reporter_id: string
+        }
+        Insert: {
+          created_at?: string
+          generation_id: string
+          id?: string
+          reason?: string | null
+          reporter_id: string
+        }
+        Update: {
+          created_at?: string
+          generation_id?: string
+          id?: string
+          reason?: string | null
+          reporter_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "generation_reports_generation_id_fkey"
+            columns: ["generation_id"]
+            isOneToOne: false
+            referencedRelation: "generations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      generations: {
+        Row: {
+          created_at: string
+          hidden: boolean
+          id: string
+          kind: string
+          output: string
+          prompt: string | null
+          report_count: number
+          tool_slug: string
+          tool_title: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          hidden?: boolean
+          id?: string
+          kind?: string
+          output: string
+          prompt?: string | null
+          report_count?: number
+          tool_slug: string
+          tool_title: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          hidden?: boolean
+          id?: string
+          kind?: string
+          output?: string
+          prompt?: string | null
+          report_count?: number
+          tool_slug?: string
+          tool_title?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       newsletter_subscribers: {
         Row: {
           confirmed: boolean

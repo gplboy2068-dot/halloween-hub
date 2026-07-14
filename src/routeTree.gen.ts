@@ -17,6 +17,7 @@ import { Route as SavedRouteImport } from './routes/saved'
 import { Route as RssDotxmlRouteImport } from './routes/rss[.]xml'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as PrivacyRouteImport } from './routes/privacy'
+import { Route as FeedRouteImport } from './routes/feed'
 import { Route as EditorialPolicyRouteImport } from './routes/editorial-policy'
 import { Route as DisclaimerRouteImport } from './routes/disclaimer'
 import { Route as CookiesRouteImport } from './routes/cookies'
@@ -91,6 +92,11 @@ const ResetPasswordRoute = ResetPasswordRouteImport.update({
 const PrivacyRoute = PrivacyRouteImport.update({
   id: '/privacy',
   path: '/privacy',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FeedRoute = FeedRouteImport.update({
+  id: '/feed',
+  path: '/feed',
   getParentRoute: () => rootRouteImport,
 } as any)
 const EditorialPolicyRoute = EditorialPolicyRouteImport.update({
@@ -278,6 +284,7 @@ export interface FileRoutesByFullPath {
   '/cookies': typeof CookiesRoute
   '/disclaimer': typeof DisclaimerRoute
   '/editorial-policy': typeof EditorialPolicyRoute
+  '/feed': typeof FeedRoute
   '/privacy': typeof PrivacyRoute
   '/reset-password': typeof ResetPasswordRoute
   '/rss.xml': typeof RssDotxmlRoute
@@ -322,6 +329,7 @@ export interface FileRoutesByTo {
   '/cookies': typeof CookiesRoute
   '/disclaimer': typeof DisclaimerRoute
   '/editorial-policy': typeof EditorialPolicyRoute
+  '/feed': typeof FeedRoute
   '/privacy': typeof PrivacyRoute
   '/reset-password': typeof ResetPasswordRoute
   '/rss.xml': typeof RssDotxmlRoute
@@ -367,6 +375,7 @@ export interface FileRoutesById {
   '/cookies': typeof CookiesRoute
   '/disclaimer': typeof DisclaimerRoute
   '/editorial-policy': typeof EditorialPolicyRoute
+  '/feed': typeof FeedRoute
   '/privacy': typeof PrivacyRoute
   '/reset-password': typeof ResetPasswordRoute
   '/rss.xml': typeof RssDotxmlRoute
@@ -414,6 +423,7 @@ export interface FileRouteTypes {
     | '/cookies'
     | '/disclaimer'
     | '/editorial-policy'
+    | '/feed'
     | '/privacy'
     | '/reset-password'
     | '/rss.xml'
@@ -458,6 +468,7 @@ export interface FileRouteTypes {
     | '/cookies'
     | '/disclaimer'
     | '/editorial-policy'
+    | '/feed'
     | '/privacy'
     | '/reset-password'
     | '/rss.xml'
@@ -502,6 +513,7 @@ export interface FileRouteTypes {
     | '/cookies'
     | '/disclaimer'
     | '/editorial-policy'
+    | '/feed'
     | '/privacy'
     | '/reset-password'
     | '/rss.xml'
@@ -548,6 +560,7 @@ export interface RootRouteChildren {
   CookiesRoute: typeof CookiesRoute
   DisclaimerRoute: typeof DisclaimerRoute
   EditorialPolicyRoute: typeof EditorialPolicyRoute
+  FeedRoute: typeof FeedRoute
   PrivacyRoute: typeof PrivacyRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   RssDotxmlRoute: typeof RssDotxmlRoute
@@ -630,6 +643,13 @@ declare module '@tanstack/react-router' {
       path: '/privacy'
       fullPath: '/privacy'
       preLoaderRoute: typeof PrivacyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/feed': {
+      id: '/feed'
+      path: '/feed'
+      fullPath: '/feed'
+      preLoaderRoute: typeof FeedRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/editorial-policy': {
@@ -929,6 +949,7 @@ const rootRouteChildren: RootRouteChildren = {
   CookiesRoute: CookiesRoute,
   DisclaimerRoute: DisclaimerRoute,
   EditorialPolicyRoute: EditorialPolicyRoute,
+  FeedRoute: FeedRoute,
   PrivacyRoute: PrivacyRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   RssDotxmlRoute: RssDotxmlRoute,

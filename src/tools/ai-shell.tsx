@@ -1,13 +1,25 @@
 import { useState, type ReactNode } from "react";
 import { useServerFn } from "@tanstack/react-start";
+import { useParams } from "@tanstack/react-router";
 import { toast } from "sonner";
 import { aiGenerateText, aiGenerateImage, aiGenerateLongText } from "@/lib/ai.functions";
 import { ToolShell, ToolControls, ResultList, CopyButton, btnPrimary } from "./shell";
+import { ShareGenerationButton } from "@/components/ShareGenerationButton";
+import { TOOLS } from "@/lib/site";
+
+function useToolMeta() {
+  // best-effort: read the current /tools/$slug param; falls back gracefully off-route
+  const params = useParams({ strict: false }) as { slug?: string };
+  const slug = params?.slug ?? "";
+  const tool = TOOLS.find((t) => t.slug === slug);
+  return { slug, title: tool?.title ?? slug };
+}
 
 function handleError(err: unknown) {
   const msg = err instanceof Error ? err.message : "Something went wrong.";
   toast.error(msg);
 }
+
 
 /**
  * AI text list tool: user fills a form, we call aiGenerateText, results appear.
@@ -29,12 +41,16 @@ export function AITextListTool({
 }) {
   const [loading, setLoading] = useState(false);
   const [items, setItems] = useState<string[]>([]);
+  const [lastPrompt, setLastPrompt] = useState<string>("");
   const runFn = useServerFn(aiGenerateText);
+  const meta = useToolMeta();
 
   const run = async () => {
     setLoading(true);
     try {
-      const res = await runFn({ data: { system, prompt: buildPrompt(), count } });
+      const prompt = buildPrompt();
+      setLastPrompt(prompt);
+      const res = await runFn({ data: { system, prompt, count } });
       setItems(res.items);
       if (res.items.length === 0) toast.error("No results — try tweaking your input.");
     } catch (e) {
@@ -52,10 +68,16 @@ export function AITextListTool({
           {loading ? "Conjuring…" : cta}
         </button>
       </ToolControls>
-      <ResultList items={items} onRegenerate={items.length ? run : undefined} emptyLabel={emptyLabel} />
+      <ResultList
+        items={items}
+        onRegenerate={items.length ? run : undefined}
+        emptyLabel={emptyLabel}
+        share={meta.slug ? { toolSlug: meta.slug, toolTitle: meta.title, prompt: lastPrompt } : undefined}
+      />
     </ToolShell>
   );
 }
+
 
 /**
  * AI long-form text (single result, e.g. a story).
@@ -73,12 +95,16 @@ export function AILongTextTool({
 }) {
   const [loading, setLoading] = useState(false);
   const [text, setText] = useState("");
+  const [lastPrompt, setLastPrompt] = useState("");
   const runFn = useServerFn(aiGenerateLongText);
+  const meta = useToolMeta();
 
   const run = async () => {
     setLoading(true);
     try {
-      const res = await runFn({ data: { system, prompt: buildPrompt() } });
+      const prompt = buildPrompt();
+      setLastPrompt(prompt);
+      const res = await runFn({ data: { system, prompt } });
       setText(res.text);
     } catch (e) {
       handleError(e);
@@ -98,8 +124,17 @@ export function AILongTextTool({
       {text ? (
         <div className="mt-6 rounded-xl border border-border bg-background/40 p-5 sm:p-7 relative">
           <p className="whitespace-pre-wrap leading-relaxed text-sm sm:text-base">{text}</p>
-          <div className="mt-4 flex justify-end gap-2">
+          <div className="mt-4 flex flex-wrap justify-end gap-2">
             <CopyButton text={text} label="Copy" />
+            {meta.slug && (
+              <ShareGenerationButton
+                toolSlug={meta.slug}
+                toolTitle={meta.title}
+                output={text}
+                prompt={lastPrompt}
+                kind="long"
+              />
+            )}
             <button type="button" onClick={run} className="px-4 py-1.5 rounded-md border border-primary/40 bg-primary/10 text-primary text-xs font-semibold hover:bg-primary/20 transition">
               🎲 New version
             </button>
@@ -111,6 +146,7 @@ export function AILongTextTool({
     </ToolShell>
   );
 }
+
 
 /**
  * AI image tool: prompt → data URL preview → download.
