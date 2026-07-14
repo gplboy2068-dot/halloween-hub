@@ -154,13 +154,15 @@ function ToolPage() {
 
         {/* About */}
         <section className="mt-12">
-          <h2 className="font-display text-2xl font-bold">About this tool</h2>
-          <p className="mt-3 text-muted-foreground leading-relaxed">
-            The {tool.title} is a free, browser-based Halloween utility built for creators, families,
-            teachers and party hosts. Whether you're planning a spooky bash or crafting content for social,
-            this tool is designed to make your Halloween prep faster, easier and more fun.
-          </p>
+          <h2 className="font-display text-2xl font-bold">About the {tool.title}</h2>
+          <p className="mt-3 text-muted-foreground leading-relaxed">{content.intro}</p>
         </section>
+
+        <ToolFeatures features={content.features} />
+        <ToolHowTo steps={content.howTo} toolTitle={tool.title} />
+        <ToolUseCases useCases={content.useCases} />
+        <ToolTips tips={content.tips} />
+        <ToolFaqs faqs={content.faqs} />
 
         {/* Related tools */}
         {related.length > 0 && (
