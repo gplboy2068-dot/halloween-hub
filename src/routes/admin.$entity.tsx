@@ -1,10 +1,6 @@
-import { createFileRoute, useNavigate, notFound } from "@tanstack/react-router";
+import { createFileRoute, Outlet, notFound } from "@tanstack/react-router";
 import { AdminShell } from "@/components/admin/AdminShell";
-import { EntityTable, type Column } from "@/components/admin/EntityTable";
 import { ENTITY_CONFIGS, type EntityConfig } from "@/lib/entity-configs";
-import { useCreateEntity, useEntityList, type BaseEntity } from "@/lib/admin-store";
-import { Plus, Loader2 } from "lucide-react";
-import { toast } from "sonner";
 
 const ENTITIES = Object.keys(ENTITY_CONFIGS);
 
@@ -13,63 +9,15 @@ export const Route = createFileRoute("/admin/$entity")({
     if (!ENTITIES.includes(params.entity)) throw notFound();
     return ENTITY_CONFIGS[params.entity];
   },
-  component: EntityRoute,
+  component: () => <Outlet />,
+  errorComponent: () => (
+    <AdminShell title="Admin error">
+      <p className="text-muted-foreground">Unable to load this admin module.</p>
+    </AdminShell>
+  ),
   notFoundComponent: () => (
     <AdminShell title="Not found">
       <p className="text-muted-foreground">This admin module doesn't exist.</p>
     </AdminShell>
   ),
 });
-
-function EntityRoute() {
-  const { entity } = Route.useParams();
-  const cfg = Route.useLoaderData() as EntityConfig;
-  const rows = useEntityList<BaseEntity & Record<string, unknown>>(entity);
-  const navigate = useNavigate();
-  const createMut = useCreateEntity();
-
-  const columns: Column<BaseEntity & Record<string, unknown>>[] = cfg.columns.map((c) => ({
-    key: c.key,
-    label: c.label,
-    className: c.className,
-    render: (row) => {
-      const v = row[c.key];
-      if (c.key === cfg.primaryKey)
-        return <span className="font-medium text-foreground">{String(v ?? "—")}</span>;
-      return <span className="text-muted-foreground">{String(v ?? "—")}</span>;
-    },
-  }));
-
-  async function handleCreate() {
-    try {
-      const res = await createMut.mutateAsync({ entity });
-      navigate({ to: "/admin/$entity/$id", params: { entity, id: res.id } });
-    } catch (e: any) {
-      toast.error(e?.message ?? "Failed to create");
-    }
-  }
-
-  return (
-    <AdminShell
-      title={cfg.name.charAt(0).toUpperCase() + cfg.name.slice(1)}
-      actions={
-        <button
-          onClick={handleCreate}
-          disabled={createMut.isPending}
-          className="inline-flex items-center gap-1.5 h-9 px-3 rounded-lg bg-primary text-primary-foreground text-sm font-semibold hover:bg-primary-glow disabled:opacity-50 glow-primary"
-        >
-          {createMut.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
-          New {cfg.singular}
-        </button>
-      }
-    >
-      <EntityTable
-        entity={entity}
-        rows={rows}
-        columns={columns}
-        editHref={(row) => `/admin/${entity}/${row.id}`}
-        primaryLabel={cfg.singular}
-      />
-    </AdminShell>
-  );
-}
