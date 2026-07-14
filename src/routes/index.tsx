@@ -29,6 +29,9 @@ function Home() {
           alt="Glowing jack-o-lantern in a misty graveyard"
           width={1920}
           height={1088}
+          fetchPriority="high"
+          loading="eager"
+          decoding="async"
           className="absolute inset-0 h-full w-full object-cover opacity-40"
         />
         <div className="absolute inset-0 bg-gradient-to-b from-background/60 via-background/70 to-background" />
