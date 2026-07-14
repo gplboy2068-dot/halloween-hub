@@ -1,19 +1,57 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { PageShell } from "@/components/PageShell";
 import { IDEA_CATEGORIES, AUDIENCES, STYLES, allIdeaSlugs, getIdeaPage } from "@/lib/pseo";
+import { breadcrumbListLd, collectionPageLd, itemListLd } from "@/lib/schema";
 
 export const Route = createFileRoute("/ideas/")({
-  head: () => ({
-    meta: [
-      { title: "Halloween Ideas Hub — Costumes, Makeup, Decor, Food & More (2026)" },
-      { name: "description", content: "Curated Halloween idea pages: costumes, makeup, decorations, food, party themes, pumpkin carving — filtered by audience and style. Free, refreshed for 2026." },
-      { property: "og:title", content: "Halloween Ideas Hub — 2026" },
-      { property: "og:description", content: "Every Halloween idea you need, organized by audience and style." },
-      { property: "og:type", content: "website" },
-      { property: "og:url", content: "/ideas" },
-    ],
-    links: [{ rel: "canonical", href: "/ideas" }],
-  }),
+  head: () => {
+    const slugs = allIdeaSlugs();
+    return {
+      meta: [
+        { title: "Halloween Ideas Hub — Costumes, Makeup, Decor, Food & More (2026)" },
+        { name: "description", content: "Curated Halloween idea pages: costumes, makeup, decorations, food, party themes, pumpkin carving — filtered by audience and style. Free, refreshed for 2026." },
+        { property: "og:title", content: "Halloween Ideas Hub — 2026" },
+        { property: "og:description", content: "Every Halloween idea you need, organized by audience and style." },
+        { property: "og:type", content: "website" },
+        { property: "og:url", content: "/ideas" },
+      ],
+      links: [{ rel: "canonical", href: "/ideas" }],
+      scripts: [
+        {
+          type: "application/ld+json",
+          children: JSON.stringify(
+            collectionPageLd({
+              name: "Halloween Ideas Hub",
+              description: "Every Halloween idea, organized by audience and style.",
+              url: "/ideas",
+              numberOfItems: slugs.length,
+            }),
+          ),
+        },
+        {
+          type: "application/ld+json",
+          children: JSON.stringify(
+            itemListLd(
+              slugs
+                .map((s) => getIdeaPage(s))
+                .filter((p): p is NonNullable<ReturnType<typeof getIdeaPage>> => p !== null)
+                .map((p) => ({ name: p.title, url: `/ideas/${p.slug}`, description: p.description })),
+              { name: "Halloween idea pages" },
+            ),
+          ),
+        },
+        {
+          type: "application/ld+json",
+          children: JSON.stringify(
+            breadcrumbListLd([
+              { name: "Home", item: "/" },
+              { name: "Ideas", item: "/ideas" },
+            ]),
+          ),
+        },
+      ],
+    };
+  },
   component: IdeasHub,
 });
 
