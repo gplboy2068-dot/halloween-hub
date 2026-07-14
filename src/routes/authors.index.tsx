@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { PageShell } from "@/components/PageShell";
 import { AUTHORS } from "@/lib/authors";
+import { breadcrumbListLd, collectionPageLd, itemListLd } from "@/lib/schema";
 
 export const Route = createFileRoute("/authors/")({
   head: () => ({
@@ -13,6 +14,41 @@ export const Route = createFileRoute("/authors/")({
       { property: "og:url", content: "/authors" },
     ],
     links: [{ rel: "canonical", href: "/authors" }],
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: JSON.stringify(
+          collectionPageLd({
+            name: "HalloweenTools Editorial Team",
+            description: "Named, credentialed reviewers behind every guide.",
+            url: "/authors",
+            numberOfItems: AUTHORS.length,
+          }),
+        ),
+      },
+      {
+        type: "application/ld+json",
+        children: JSON.stringify(
+          itemListLd(
+            AUTHORS.map((a) => ({
+              name: a.name,
+              url: `/authors/${a.slug}`,
+              description: `${a.role} — ${a.shortBio}`,
+            })),
+            { name: "Editorial team" },
+          ),
+        ),
+      },
+      {
+        type: "application/ld+json",
+        children: JSON.stringify(
+          breadcrumbListLd([
+            { name: "Home", item: "/" },
+            { name: "Authors", item: "/authors" },
+          ]),
+        ),
+      },
+    ],
   }),
   component: AuthorsIndex,
 });
