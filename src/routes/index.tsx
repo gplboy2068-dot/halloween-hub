@@ -1,10 +1,12 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
 import { Search, Sparkles, ArrowRight } from "lucide-react";
 import { PageShell } from "@/components/PageShell";
 import { ToolCard } from "@/components/ToolCard";
 import { Newsletter } from "@/components/Newsletter";
 import { LazyMount } from "@/components/LazyMount";
 import { TOOLS, CATEGORIES, ARTICLES, SITE } from "@/lib/site";
+import { listTrendingCompact } from "@/lib/community.functions";
 import heroImg from "@/assets/hero-halloween.jpg";
 
 export const Route = createFileRoute("/")({
