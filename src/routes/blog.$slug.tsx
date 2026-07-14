@@ -8,6 +8,9 @@ import { getRelatedTools, getRelatedIdeas, getRelatedAudiences } from "@/lib/rel
 import { RelatedSection } from "@/components/RelatedGrid";
 import { TableOfContents } from "@/components/TableOfContents";
 import { publisherLd, imageObjectLd, speakableLd, wordCountFromHtml } from "@/lib/schema";
+import { ReadingProgress } from "@/components/ReadingProgress";
+import { StickyShareBar } from "@/components/StickyShareBar";
+import { SaveButton } from "@/components/SaveButton";
 
 
 
