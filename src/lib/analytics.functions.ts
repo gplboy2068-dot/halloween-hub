@@ -52,8 +52,19 @@ export type AnalyticsSummary = {
 
 /** Admin-only aggregate summary of the last N days. */
 export const getAnalyticsSummary = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
   .inputValidator((data: unknown) => rangeSchema.parse(data))
-  .handler(async ({ data }): Promise<AnalyticsSummary> => {
+  .handler(async ({ data, context }): Promise<AnalyticsSummary> => {
+    const { data: isAdmin } = await context.supabase.rpc("has_role", {
+      _user_id: context.userId,
+      _role: "admin",
+    });
+    if (!isAdmin) {
+      return {
+        totals: { events: 0, sessions: 0, pageviews: 0 },
+        topEvents: [], topPaths: [], topSearches: [], topToolUses: [], daily: [],
+      };
+    }
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const since = new Date(Date.now() - data.days * 86400_000).toISOString();
 
