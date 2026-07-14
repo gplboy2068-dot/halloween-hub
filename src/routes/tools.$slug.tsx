@@ -10,7 +10,15 @@ import {
   articleToRelated,
 } from "@/lib/related";
 import { getRelatedArticlesForContext } from "@/lib/related.functions";
-import { RelatedSection, RelatedMixSection } from "@/components/RelatedGrid";
+import { RelatedSection } from "@/components/RelatedGrid";
+import { getToolContent, howToJsonLd, faqJsonLd } from "@/lib/tool-content";
+import {
+  ToolFeatures,
+  ToolHowTo,
+  ToolUseCases,
+  ToolTips,
+  ToolFaqs,
+} from "@/components/ToolContentSections";
 
 const relatedArticlesQuery = (slug: string, title: string, description: string, category: string) =>
   queryOptions({
