@@ -55,6 +55,7 @@ import { Route as AdminEntityIndexRouteImport } from './routes/admin.$entity.ind
 import { Route as BlogTagSlugRouteImport } from './routes/blog.tag.$slug'
 import { Route as BlogCategorySlugRouteImport } from './routes/blog.category.$slug'
 import { Route as AdminEntityIdRouteImport } from './routes/admin.$entity.$id'
+import { Route as ApiPublicArticleImageSplatRouteImport } from './routes/api/public/article-image.$'
 
 const TermsRoute = TermsRouteImport.update({
   id: '/terms',
@@ -286,6 +287,12 @@ const AdminEntityIdRoute = AdminEntityIdRouteImport.update({
   path: '/$id',
   getParentRoute: () => AdminEntityRoute,
 } as any)
+const ApiPublicArticleImageSplatRoute =
+  ApiPublicArticleImageSplatRouteImport.update({
+    id: '/api/public/article-image/$',
+    path: '/api/public/article-image/$',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -334,6 +341,7 @@ export interface FileRoutesByFullPath {
   '/blog/category/$slug': typeof BlogCategorySlugRoute
   '/blog/tag/$slug': typeof BlogTagSlugRoute
   '/admin/$entity/': typeof AdminEntityIndexRoute
+  '/api/public/article-image/$': typeof ApiPublicArticleImageSplatRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -380,6 +388,7 @@ export interface FileRoutesByTo {
   '/blog/category/$slug': typeof BlogCategorySlugRoute
   '/blog/tag/$slug': typeof BlogTagSlugRoute
   '/admin/$entity': typeof AdminEntityIndexRoute
+  '/api/public/article-image/$': typeof ApiPublicArticleImageSplatRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -429,6 +438,7 @@ export interface FileRoutesById {
   '/blog/category/$slug': typeof BlogCategorySlugRoute
   '/blog/tag/$slug': typeof BlogTagSlugRoute
   '/admin/$entity/': typeof AdminEntityIndexRoute
+  '/api/public/article-image/$': typeof ApiPublicArticleImageSplatRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -479,6 +489,7 @@ export interface FileRouteTypes {
     | '/blog/category/$slug'
     | '/blog/tag/$slug'
     | '/admin/$entity/'
+    | '/api/public/article-image/$'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -525,6 +536,7 @@ export interface FileRouteTypes {
     | '/blog/category/$slug'
     | '/blog/tag/$slug'
     | '/admin/$entity'
+    | '/api/public/article-image/$'
   id:
     | '__root__'
     | '/'
@@ -573,6 +585,7 @@ export interface FileRouteTypes {
     | '/blog/category/$slug'
     | '/blog/tag/$slug'
     | '/admin/$entity/'
+    | '/api/public/article-image/$'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -609,6 +622,7 @@ export interface RootRouteChildren {
   ToolsIndexRoute: typeof ToolsIndexRoute
   BlogCategorySlugRoute: typeof BlogCategorySlugRoute
   BlogTagSlugRoute: typeof BlogTagSlugRoute
+  ApiPublicArticleImageSplatRoute: typeof ApiPublicArticleImageSplatRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -935,6 +949,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminEntityIdRouteImport
       parentRoute: typeof AdminEntityRoute
     }
+    '/api/public/article-image/$': {
+      id: '/api/public/article-image/$'
+      path: '/api/public/article-image/$'
+      fullPath: '/api/public/article-image/$'
+      preLoaderRoute: typeof ApiPublicArticleImageSplatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -1016,6 +1037,7 @@ const rootRouteChildren: RootRouteChildren = {
   ToolsIndexRoute: ToolsIndexRoute,
   BlogCategorySlugRoute: BlogCategorySlugRoute,
   BlogTagSlugRoute: BlogTagSlugRoute,
+  ApiPublicArticleImageSplatRoute: ApiPublicArticleImageSplatRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
