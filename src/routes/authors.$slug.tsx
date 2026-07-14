@@ -88,7 +88,7 @@ function AuthorPage() {
         <section className="mt-10">
           <h2 className="font-display text-2xl font-bold">Areas of expertise</h2>
           <ul className="mt-4 flex flex-wrap gap-2">
-            {a.expertise.map((e) => (
+            {a.expertise.map((e: string) => (
               <li
                 key={e}
                 className="px-3 py-1 rounded-full text-xs border border-border bg-card/40"
