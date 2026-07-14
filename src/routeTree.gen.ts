@@ -25,12 +25,14 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as ToolsIndexRouteImport } from './routes/tools.index'
 import { Route as IdeasIndexRouteImport } from './routes/ideas.index'
 import { Route as ForIndexRouteImport } from './routes/for.index'
+import { Route as CollectionsIndexRouteImport } from './routes/collections.index'
 import { Route as CategoriesIndexRouteImport } from './routes/categories.index'
 import { Route as BlogIndexRouteImport } from './routes/blog.index'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as ToolsSlugRouteImport } from './routes/tools.$slug'
 import { Route as IdeasSlugRouteImport } from './routes/ideas.$slug'
 import { Route as ForSlugRouteImport } from './routes/for.$slug'
+import { Route as CollectionsSlugRouteImport } from './routes/collections.$slug'
 import { Route as CategoriesSlugRouteImport } from './routes/categories.$slug'
 import { Route as BlogSlugRouteImport } from './routes/blog.$slug'
 import { Route as AdminSettingsRouteImport } from './routes/admin.settings'
@@ -125,6 +127,11 @@ const ForIndexRoute = ForIndexRouteImport.update({
   path: '/for/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CollectionsIndexRoute = CollectionsIndexRouteImport.update({
+  id: '/collections/',
+  path: '/collections/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const CategoriesIndexRoute = CategoriesIndexRouteImport.update({
   id: '/categories/',
   path: '/categories/',
@@ -153,6 +160,11 @@ const IdeasSlugRoute = IdeasSlugRouteImport.update({
 const ForSlugRoute = ForSlugRouteImport.update({
   id: '/for/$slug',
   path: '/for/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CollectionsSlugRoute = CollectionsSlugRouteImport.update({
+  id: '/collections/$slug',
+  path: '/collections/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CategoriesSlugRoute = CategoriesSlugRouteImport.update({
@@ -245,12 +257,14 @@ export interface FileRoutesByFullPath {
   '/admin/settings': typeof AdminSettingsRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/categories/$slug': typeof CategoriesSlugRoute
+  '/collections/$slug': typeof CollectionsSlugRoute
   '/for/$slug': typeof ForSlugRoute
   '/ideas/$slug': typeof IdeasSlugRoute
   '/tools/$slug': typeof ToolsSlugRoute
   '/admin/': typeof AdminIndexRoute
   '/blog/': typeof BlogIndexRoute
   '/categories/': typeof CategoriesIndexRoute
+  '/collections/': typeof CollectionsIndexRoute
   '/for/': typeof ForIndexRoute
   '/ideas/': typeof IdeasIndexRoute
   '/tools/': typeof ToolsIndexRoute
@@ -281,12 +295,14 @@ export interface FileRoutesByTo {
   '/admin/settings': typeof AdminSettingsRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/categories/$slug': typeof CategoriesSlugRoute
+  '/collections/$slug': typeof CollectionsSlugRoute
   '/for/$slug': typeof ForSlugRoute
   '/ideas/$slug': typeof IdeasSlugRoute
   '/tools/$slug': typeof ToolsSlugRoute
   '/admin': typeof AdminIndexRoute
   '/blog': typeof BlogIndexRoute
   '/categories': typeof CategoriesIndexRoute
+  '/collections': typeof CollectionsIndexRoute
   '/for': typeof ForIndexRoute
   '/ideas': typeof IdeasIndexRoute
   '/tools': typeof ToolsIndexRoute
@@ -319,12 +335,14 @@ export interface FileRoutesById {
   '/admin/settings': typeof AdminSettingsRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/categories/$slug': typeof CategoriesSlugRoute
+  '/collections/$slug': typeof CollectionsSlugRoute
   '/for/$slug': typeof ForSlugRoute
   '/ideas/$slug': typeof IdeasSlugRoute
   '/tools/$slug': typeof ToolsSlugRoute
   '/admin/': typeof AdminIndexRoute
   '/blog/': typeof BlogIndexRoute
   '/categories/': typeof CategoriesIndexRoute
+  '/collections/': typeof CollectionsIndexRoute
   '/for/': typeof ForIndexRoute
   '/ideas/': typeof IdeasIndexRoute
   '/tools/': typeof ToolsIndexRoute
@@ -358,12 +376,14 @@ export interface FileRouteTypes {
     | '/admin/settings'
     | '/blog/$slug'
     | '/categories/$slug'
+    | '/collections/$slug'
     | '/for/$slug'
     | '/ideas/$slug'
     | '/tools/$slug'
     | '/admin/'
     | '/blog/'
     | '/categories/'
+    | '/collections/'
     | '/for/'
     | '/ideas/'
     | '/tools/'
@@ -394,12 +414,14 @@ export interface FileRouteTypes {
     | '/admin/settings'
     | '/blog/$slug'
     | '/categories/$slug'
+    | '/collections/$slug'
     | '/for/$slug'
     | '/ideas/$slug'
     | '/tools/$slug'
     | '/admin'
     | '/blog'
     | '/categories'
+    | '/collections'
     | '/for'
     | '/ideas'
     | '/tools'
@@ -431,12 +453,14 @@ export interface FileRouteTypes {
     | '/admin/settings'
     | '/blog/$slug'
     | '/categories/$slug'
+    | '/collections/$slug'
     | '/for/$slug'
     | '/ideas/$slug'
     | '/tools/$slug'
     | '/admin/'
     | '/blog/'
     | '/categories/'
+    | '/collections/'
     | '/for/'
     | '/ideas/'
     | '/tools/'
@@ -461,11 +485,13 @@ export interface RootRouteChildren {
   TermsRoute: typeof TermsRoute
   BlogSlugRoute: typeof BlogSlugRoute
   CategoriesSlugRoute: typeof CategoriesSlugRoute
+  CollectionsSlugRoute: typeof CollectionsSlugRoute
   ForSlugRoute: typeof ForSlugRoute
   IdeasSlugRoute: typeof IdeasSlugRoute
   ToolsSlugRoute: typeof ToolsSlugRoute
   BlogIndexRoute: typeof BlogIndexRoute
   CategoriesIndexRoute: typeof CategoriesIndexRoute
+  CollectionsIndexRoute: typeof CollectionsIndexRoute
   ForIndexRoute: typeof ForIndexRoute
   IdeasIndexRoute: typeof IdeasIndexRoute
   ToolsIndexRoute: typeof ToolsIndexRoute
@@ -587,6 +613,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ForIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/collections/': {
+      id: '/collections/'
+      path: '/collections'
+      fullPath: '/collections/'
+      preLoaderRoute: typeof CollectionsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/categories/': {
       id: '/categories/'
       path: '/categories'
@@ -627,6 +660,13 @@ declare module '@tanstack/react-router' {
       path: '/for/$slug'
       fullPath: '/for/$slug'
       preLoaderRoute: typeof ForSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/collections/$slug': {
+      id: '/collections/$slug'
+      path: '/collections/$slug'
+      fullPath: '/collections/$slug'
+      preLoaderRoute: typeof CollectionsSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/categories/$slug': {
@@ -777,11 +817,13 @@ const rootRouteChildren: RootRouteChildren = {
   TermsRoute: TermsRoute,
   BlogSlugRoute: BlogSlugRoute,
   CategoriesSlugRoute: CategoriesSlugRoute,
+  CollectionsSlugRoute: CollectionsSlugRoute,
   ForSlugRoute: ForSlugRoute,
   IdeasSlugRoute: IdeasSlugRoute,
   ToolsSlugRoute: ToolsSlugRoute,
   BlogIndexRoute: BlogIndexRoute,
   CategoriesIndexRoute: CategoriesIndexRoute,
+  CollectionsIndexRoute: CollectionsIndexRoute,
   ForIndexRoute: ForIndexRoute,
   IdeasIndexRoute: IdeasIndexRoute,
   ToolsIndexRoute: ToolsIndexRoute,

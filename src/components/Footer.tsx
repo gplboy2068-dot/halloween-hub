@@ -20,6 +20,9 @@ export function Footer() {
           <ul className="space-y-2 text-sm text-muted-foreground">
             <li><Link to="/tools" className="hover:text-primary">All Tools</Link></li>
             <li><Link to="/categories" className="hover:text-primary">Categories</Link></li>
+            <li><Link to="/collections" className="hover:text-primary">Collections</Link></li>
+            <li><Link to="/ideas" className="hover:text-primary">Ideas</Link></li>
+            <li><Link to="/for" className="hover:text-primary">For You</Link></li>
             <li><Link to="/blog" className="hover:text-primary">Blog</Link></li>
             <li><Link to="/about" className="hover:text-primary">About</Link></li>
             <li><Link to="/contact" className="hover:text-primary">Contact</Link></li>
