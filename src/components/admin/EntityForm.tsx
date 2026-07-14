@@ -195,3 +195,88 @@ function FormField({ field, value, onChange }: { field: Field; value: unknown; o
     </div>
   );
 }
+
+type ImageUploaderProps =
+  | { mode: "single"; label: string; help?: string; value: string; onChange: (url: string) => void; onInsert?: undefined }
+  | { mode: "insert"; label: string; help?: string; onInsert: (url: string) => void; value?: undefined; onChange?: undefined };
+
+function ImageUploader(props: ImageUploaderProps) {
+  const inputRef = useRef<HTMLInputElement>(null);
+  const [uploading, setUploading] = useState(false);
+
+  const handleFile = async (file: File) => {
+    if (!file) return;
+    if (!file.type.startsWith("image/")) {
+      toast.error("Please choose an image file");
+      return;
+    }
+    if (file.size > 8 * 1024 * 1024) {
+      toast.error("Image must be under 8MB");
+      return;
+    }
+    setUploading(true);
+    try {
+      const ext = file.name.split(".").pop()?.toLowerCase() || "jpg";
+      const path = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
+      const { error } = await supabase.storage
+        .from("article-images")
+        .upload(path, file, { cacheControl: "31536000", upsert: false, contentType: file.type });
+      if (error) throw error;
+      const url = `/api/public/article-image/${path}`;
+      if (props.mode === "single") props.onChange(url);
+      else props.onInsert(url);
+      toast.success("Image uploaded");
+    } catch (e: any) {
+      toast.error(e?.message ?? "Upload failed");
+    } finally {
+      setUploading(false);
+      if (inputRef.current) inputRef.current.value = "";
+    }
+  };
+
+  return (
+    <div>
+      <label className="block text-xs font-medium mb-1.5 text-muted-foreground">{props.label}</label>
+      <input
+        ref={inputRef}
+        type="file"
+        accept="image/*"
+        className="hidden"
+        onChange={(e) => e.target.files?.[0] && handleFile(e.target.files[0])}
+      />
+      {props.mode === "single" && props.value ? (
+        <div className="flex items-start gap-3">
+          <img src={props.value} alt="" className="h-24 w-24 object-cover rounded-lg border border-border" />
+          <div className="flex flex-col gap-2">
+            <button
+              type="button"
+              onClick={() => inputRef.current?.click()}
+              disabled={uploading}
+              className="h-9 px-3 rounded-lg bg-secondary text-secondary-foreground text-sm inline-flex items-center gap-2 hover:bg-secondary/80 disabled:opacity-50"
+            >
+              {uploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />} Replace
+            </button>
+            <button
+              type="button"
+              onClick={() => props.onChange("")}
+              className="h-9 px-3 rounded-lg border border-border text-sm inline-flex items-center gap-2 hover:bg-muted"
+            >
+              <X className="h-4 w-4" /> Remove
+            </button>
+          </div>
+        </div>
+      ) : (
+        <button
+          type="button"
+          onClick={() => inputRef.current?.click()}
+          disabled={uploading}
+          className="h-10 px-4 rounded-lg bg-primary text-primary-foreground text-sm font-medium inline-flex items-center gap-2 hover:bg-primary-glow disabled:opacity-50"
+        >
+          {uploading ? <Loader2 className="h-4 w-4 animate-spin" /> : props.mode === "insert" ? <ImagePlus className="h-4 w-4" /> : <Upload className="h-4 w-4" />}
+          {uploading ? "Uploading…" : props.mode === "insert" ? "Upload & insert image" : "Upload image"}
+        </button>
+      )}
+      {props.help && <p className="mt-1 text-xs text-muted-foreground">{props.help}</p>}
+    </div>
+  );
+}
