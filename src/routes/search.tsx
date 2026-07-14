@@ -17,6 +17,7 @@ import {
   type SearchKind,
 } from "@/lib/search";
 import { listSearchArticles, type SearchArticle } from "@/lib/search.functions";
+import { track } from "@/lib/analytics";
 
 const searchSchema = z.object({
   q: fallback(z.string(), "").default(""),
