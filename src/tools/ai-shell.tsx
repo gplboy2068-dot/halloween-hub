@@ -4,7 +4,7 @@ import { useParams } from "@tanstack/react-router";
 import { toast } from "sonner";
 import { aiGenerateText, aiGenerateImage, aiGenerateLongText } from "@/lib/ai.functions";
 import { ToolShell, ToolControls, ResultList, CopyButton, btnPrimary } from "./shell";
-import { ShareGenerationButton } from "@/components/ShareGenerationButton";
+import { ShareGenerationButton, ShareImageButton } from "@/components/ShareGenerationButton";
 import { TOOLS } from "@/lib/site";
 
 function useToolMeta() {
