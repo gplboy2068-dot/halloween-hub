@@ -3,15 +3,17 @@ import { Link } from "@tanstack/react-router";
 import { ArrowLeft, Save, Trash2 } from "lucide-react";
 import type { BaseEntity, Status, CategoryEntity } from "@/lib/admin-store";
 import { useEntityList } from "@/lib/admin-store";
+import { InternalLinkPicker } from "@/components/admin/InternalLinkPicker";
 
 export type Field = {
   key: string;
   label: string;
-  type: "text" | "textarea" | "number" | "select" | "checkbox" | "datetime" | "slug" | "category";
+  type: "text" | "textarea" | "number" | "select" | "checkbox" | "datetime" | "slug" | "category" | "internal-links";
   options?: { value: string; label: string }[];
   placeholder?: string;
   required?: boolean;
   help?: string;
+  targetKey?: string; // for internal-links: which field to insert markdown into
 };
 
 export function EntityForm<T extends BaseEntity & Record<string, unknown>>({
