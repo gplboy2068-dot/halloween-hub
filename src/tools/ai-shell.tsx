@@ -220,11 +220,20 @@ export function AIImageTool({
               <button type="button" onClick={download} className="px-6 py-2.5 rounded-lg border border-primary/40 bg-primary/10 text-primary font-semibold text-sm hover:bg-primary/20 transition">
                 ⬇️ Download PNG
               </button>
+              {meta.slug && (
+                <ShareImageButton
+                  toolSlug={meta.slug}
+                  toolTitle={meta.title}
+                  dataUrl={imageUrl}
+                  prompt={lastPrompt}
+                />
+              )}
               <button type="button" onClick={run} className="px-6 py-2.5 rounded-lg border border-border bg-background/60 text-sm font-medium hover:border-primary/40 transition">
                 🎲 Regenerate
               </button>
             </>
           )}
+
         </div>
       </div>
     </ToolShell>
