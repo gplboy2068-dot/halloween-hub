@@ -19,6 +19,10 @@ import {
   ToolTips,
   ToolFaqs,
 } from "@/components/ToolContentSections";
+import { authorForCategory, personJsonLd } from "@/lib/authors";
+import { TrustBar } from "@/components/TrustBar";
+
+const TOOL_LAST_UPDATED = "2026-07-14";
 
 const relatedArticlesQuery = (slug: string, title: string, description: string, category: string) =>
   queryOptions({
