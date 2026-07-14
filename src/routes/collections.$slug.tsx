@@ -120,7 +120,7 @@ function CollectionPageView() {
         </header>
 
         <section className="mt-10 grid gap-3 sm:grid-cols-2 max-w-3xl mx-auto">
-          {page.bullets.map((b) => (
+          {page.bullets.map((b: string) => (
             <div key={b} className="flex gap-3 rounded-xl border border-border bg-card/40 p-4 text-sm">
               <span className="text-primary" aria-hidden="true">✦</span>
               <span className="text-muted-foreground">{b}</span>
