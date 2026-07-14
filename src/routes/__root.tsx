@@ -171,6 +171,7 @@ function RootComponent() {
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
         <SearchProvider>
+          <AnalyticsTracker />
           <Outlet />
           <Toaster richColors position="top-right" theme="dark" />
         </SearchProvider>
