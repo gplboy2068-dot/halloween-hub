@@ -44,6 +44,7 @@ export const Route = createFileRoute("/tools/$slug")({
   head: ({ loaderData, params }) => {
     if (!loaderData) return { meta: [{ title: "Not found" }, { name: "robots", content: "noindex" }] };
     const title = `${loaderData.title} — Free Halloween Tool`;
+    const content = getToolContent(loaderData);
     return {
       meta: [
         { title },
@@ -79,8 +80,9 @@ export const Route = createFileRoute("/tools/$slug")({
             ],
           }),
         },
+        { type: "application/ld+json", children: JSON.stringify(howToJsonLd(loaderData, content)) },
+        { type: "application/ld+json", children: JSON.stringify(faqJsonLd(content)) },
       ],
-
     };
   },
   component: ToolPage,
