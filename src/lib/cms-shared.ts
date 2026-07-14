@@ -44,6 +44,7 @@ export type ArticleEntity = BaseEntity & {
   title: string;
   excerpt: string;
   content: string;
+  coverImage?: string | null;
   category: string;
   categoryId?: string | null;
   readingTime: number;
