@@ -3,6 +3,7 @@ import type {} from "@tanstack/react-start";
 import { TOOLS, CATEGORIES } from "@/lib/site";
 import { allIdeaSlugs, AUDIENCE_PAGES } from "@/lib/pseo";
 import { allCollectionSlugs } from "@/lib/collections";
+import { allAuthorSlugs } from "@/lib/authors";
 import { listArticles, listBlogCategories, listBlogTags } from "@/lib/blog.functions";
 
 const BASE_URL = "";
