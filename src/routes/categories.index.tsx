@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { PageShell } from "@/components/PageShell";
 import { CATEGORIES, TOOLS } from "@/lib/site";
+import { breadcrumbListLd, collectionPageLd, itemListLd } from "@/lib/schema";
 
 export const Route = createFileRoute("/categories/")({
   component: CategoriesIndex,
@@ -12,6 +13,37 @@ export const Route = createFileRoute("/categories/")({
       { property: "og:url", content: "/categories" },
     ],
     links: [{ rel: "canonical", href: "/categories" }],
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: JSON.stringify(
+          collectionPageLd({
+            name: "Halloween Categories",
+            description: "Every Halloween category on HalloweenTools.",
+            url: "/categories",
+            numberOfItems: CATEGORIES.length,
+          }),
+        ),
+      },
+      {
+        type: "application/ld+json",
+        children: JSON.stringify(
+          itemListLd(
+            CATEGORIES.map((c) => ({ name: c.name, url: `/categories/${c.slug}`, description: c.description })),
+            { name: "Categories" },
+          ),
+        ),
+      },
+      {
+        type: "application/ld+json",
+        children: JSON.stringify(
+          breadcrumbListLd([
+            { name: "Home", item: "/" },
+            { name: "Categories", item: "/categories" },
+          ]),
+        ),
+      },
+    ],
   }),
 });
 
