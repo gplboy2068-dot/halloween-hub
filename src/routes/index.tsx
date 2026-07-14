@@ -1,10 +1,12 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
 import { Search, Sparkles, ArrowRight } from "lucide-react";
 import { PageShell } from "@/components/PageShell";
 import { ToolCard } from "@/components/ToolCard";
 import { Newsletter } from "@/components/Newsletter";
 import { LazyMount } from "@/components/LazyMount";
 import { TOOLS, CATEGORIES, ARTICLES, SITE } from "@/lib/site";
+import { listTrendingCompact } from "@/lib/community.functions";
 import heroImg from "@/assets/hero-halloween.jpg";
 
 export const Route = createFileRoute("/")({
@@ -163,8 +165,16 @@ function Home() {
       </LazyMount>
 
       <LazyMount minHeight={300}>
+        <section className="mx-auto max-w-7xl px-4 sm:px-6 py-12">
+          <SectionHeader eyebrow="From the community" title="Trending creations" href="/community" />
+          <HomeCommunityStrip />
+        </section>
+      </LazyMount>
+
+      <LazyMount minHeight={300}>
         <div className="py-8"><Newsletter /></div>
       </LazyMount>
+
 
     </PageShell>
   );
@@ -182,6 +192,43 @@ function SectionHeader({ eyebrow, title, href }: { eyebrow: string; title: strin
           View all <ArrowRight className="h-4 w-4" />
         </Link>
       )}
+    </div>
+  );
+}
+
+function HomeCommunityStrip() {
+  const { data } = useQuery({
+    queryKey: ["home-trending"],
+    queryFn: () => listTrendingCompact({ data: { limit: 8 } }),
+  });
+  const items = data?.items ?? [];
+  if (items.length === 0) {
+    return (
+      <div className="rounded-2xl border border-dashed border-border p-10 text-center text-muted-foreground">
+        Community creations coming soon — <Link to="/tools" className="text-primary hover:underline">create the first</Link>.
+      </div>
+    );
+  }
+  return (
+    <div className="grid gap-4 grid-cols-2 sm:grid-cols-3 lg:grid-cols-4">
+      {items.map((r: any) => (
+        <Link
+          key={r.id}
+          to="/community/$slug"
+          params={{ slug: r.slug ?? r.id }}
+          className="group rounded-xl border border-border bg-card/60 overflow-hidden hover:border-primary/40 transition"
+        >
+          {r.kind === "image" ? (
+            <img src={r.output} alt={r.title ?? r.tool_title} loading="lazy" className="aspect-square w-full object-cover" />
+          ) : (
+            <div className="p-3 aspect-square text-xs line-clamp-[10] whitespace-pre-wrap bg-muted/20">{r.output}</div>
+          )}
+          <div className="p-2 border-t border-border/50">
+            <div className="font-semibold text-xs line-clamp-1 group-hover:text-primary">{r.title ?? r.tool_title}</div>
+            <div className="text-[10px] text-muted-foreground">❤️ {r.likes_count} · 👁 {r.views_count}</div>
+          </div>
+        </Link>
+      ))}
     </div>
   );
 }

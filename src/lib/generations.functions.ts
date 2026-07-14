@@ -160,14 +160,21 @@ export const shareGenerationImage = createServerFn({ method: "POST" })
     toolTitle: string;
     dataUrl: string;
     prompt?: string;
+    title?: string;
+    description?: string;
+    category?: string;
+    tags?: string[];
   }) =>
     z
       .object({
         toolSlug: z.string().min(1).max(120),
         toolTitle: z.string().min(1).max(200),
-        // ~10MB base64 cap
         dataUrl: z.string().regex(/^data:image\/(png|jpe?g|webp);base64,/).max(14_000_000),
         prompt: z.string().max(2000).optional(),
+        title: z.string().max(120).optional(),
+        description: z.string().max(500).optional(),
+        category: z.string().max(60).optional(),
+        tags: z.array(z.string().max(30)).max(8).optional(),
       })
       .parse(input),
   )
@@ -183,6 +190,10 @@ export const shareGenerationImage = createServerFn({ method: "POST" })
       .upload(path, bytes, { contentType: `image/${match[1]}`, upsert: false });
     if (upErr) throw new Error(upErr.message);
 
+    const title = data.title?.trim() || data.toolTitle;
+    const baseSlug = title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 60);
+    const uniqueSlug = `${baseSlug}-${crypto.randomUUID().slice(0, 6)}`;
+
     const { data: row, error } = await context.supabase
       .from("generations")
       .insert({
@@ -192,10 +203,15 @@ export const shareGenerationImage = createServerFn({ method: "POST" })
         output: path,
         prompt: data.prompt ?? null,
         kind: "image",
+        title,
+        description: data.description ?? null,
+        category: data.category ?? data.toolSlug,
+        tags: data.tags ?? [],
+        slug: uniqueSlug,
       })
-      .select("id")
+      .select("id, slug")
       .single();
     if (error) throw new Error(error.message);
-    return { id: row!.id };
+    return { id: row!.id, slug: row!.slug };
   });
 

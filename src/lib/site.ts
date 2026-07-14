@@ -11,7 +11,7 @@ export const NAV_LINKS = [
   { to: "/ideas", label: "Ideas" },
   { to: "/for", label: "For You" },
   { to: "/categories", label: "Categories" },
-  { to: "/feed", label: "Feed" },
+  { to: "/community", label: "Community" },
   { to: "/blog", label: "Blog" },
 ] as const;
 

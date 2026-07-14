@@ -29,6 +29,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as ToolsIndexRouteImport } from './routes/tools.index'
 import { Route as IdeasIndexRouteImport } from './routes/ideas.index'
 import { Route as ForIndexRouteImport } from './routes/for.index'
+import { Route as CommunityIndexRouteImport } from './routes/community.index'
 import { Route as CollectionsIndexRouteImport } from './routes/collections.index'
 import { Route as CategoriesIndexRouteImport } from './routes/categories.index'
 import { Route as BlogIndexRouteImport } from './routes/blog.index'
@@ -37,6 +38,8 @@ import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as ToolsSlugRouteImport } from './routes/tools.$slug'
 import { Route as IdeasSlugRouteImport } from './routes/ideas.$slug'
 import { Route as ForSlugRouteImport } from './routes/for.$slug'
+import { Route as CreatorHandleRouteImport } from './routes/creator.$handle'
+import { Route as CommunitySlugRouteImport } from './routes/community.$slug'
 import { Route as CollectionsSlugRouteImport } from './routes/collections.$slug'
 import { Route as CategoriesSlugRouteImport } from './routes/categories.$slug'
 import { Route as BlogSlugRouteImport } from './routes/blog.$slug'
@@ -157,6 +160,11 @@ const ForIndexRoute = ForIndexRouteImport.update({
   path: '/for/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CommunityIndexRoute = CommunityIndexRouteImport.update({
+  id: '/community/',
+  path: '/community/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const CollectionsIndexRoute = CollectionsIndexRouteImport.update({
   id: '/collections/',
   path: '/collections/',
@@ -195,6 +203,16 @@ const IdeasSlugRoute = IdeasSlugRouteImport.update({
 const ForSlugRoute = ForSlugRouteImport.update({
   id: '/for/$slug',
   path: '/for/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CreatorHandleRoute = CreatorHandleRouteImport.update({
+  id: '/creator/$handle',
+  path: '/creator/$handle',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CommunitySlugRoute = CommunitySlugRouteImport.update({
+  id: '/community/$slug',
+  path: '/community/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CollectionsSlugRoute = CollectionsSlugRouteImport.update({
@@ -326,6 +344,8 @@ export interface FileRoutesByFullPath {
   '/blog/$slug': typeof BlogSlugRoute
   '/categories/$slug': typeof CategoriesSlugRoute
   '/collections/$slug': typeof CollectionsSlugRoute
+  '/community/$slug': typeof CommunitySlugRoute
+  '/creator/$handle': typeof CreatorHandleRoute
   '/for/$slug': typeof ForSlugRoute
   '/ideas/$slug': typeof IdeasSlugRoute
   '/tools/$slug': typeof ToolsSlugRoute
@@ -334,6 +354,7 @@ export interface FileRoutesByFullPath {
   '/blog/': typeof BlogIndexRoute
   '/categories/': typeof CategoriesIndexRoute
   '/collections/': typeof CollectionsIndexRoute
+  '/community/': typeof CommunityIndexRoute
   '/for/': typeof ForIndexRoute
   '/ideas/': typeof IdeasIndexRoute
   '/tools/': typeof ToolsIndexRoute
@@ -373,6 +394,8 @@ export interface FileRoutesByTo {
   '/blog/$slug': typeof BlogSlugRoute
   '/categories/$slug': typeof CategoriesSlugRoute
   '/collections/$slug': typeof CollectionsSlugRoute
+  '/community/$slug': typeof CommunitySlugRoute
+  '/creator/$handle': typeof CreatorHandleRoute
   '/for/$slug': typeof ForSlugRoute
   '/ideas/$slug': typeof IdeasSlugRoute
   '/tools/$slug': typeof ToolsSlugRoute
@@ -381,6 +404,7 @@ export interface FileRoutesByTo {
   '/blog': typeof BlogIndexRoute
   '/categories': typeof CategoriesIndexRoute
   '/collections': typeof CollectionsIndexRoute
+  '/community': typeof CommunityIndexRoute
   '/for': typeof ForIndexRoute
   '/ideas': typeof IdeasIndexRoute
   '/tools': typeof ToolsIndexRoute
@@ -423,6 +447,8 @@ export interface FileRoutesById {
   '/blog/$slug': typeof BlogSlugRoute
   '/categories/$slug': typeof CategoriesSlugRoute
   '/collections/$slug': typeof CollectionsSlugRoute
+  '/community/$slug': typeof CommunitySlugRoute
+  '/creator/$handle': typeof CreatorHandleRoute
   '/for/$slug': typeof ForSlugRoute
   '/ideas/$slug': typeof IdeasSlugRoute
   '/tools/$slug': typeof ToolsSlugRoute
@@ -431,6 +457,7 @@ export interface FileRoutesById {
   '/blog/': typeof BlogIndexRoute
   '/categories/': typeof CategoriesIndexRoute
   '/collections/': typeof CollectionsIndexRoute
+  '/community/': typeof CommunityIndexRoute
   '/for/': typeof ForIndexRoute
   '/ideas/': typeof IdeasIndexRoute
   '/tools/': typeof ToolsIndexRoute
@@ -474,6 +501,8 @@ export interface FileRouteTypes {
     | '/blog/$slug'
     | '/categories/$slug'
     | '/collections/$slug'
+    | '/community/$slug'
+    | '/creator/$handle'
     | '/for/$slug'
     | '/ideas/$slug'
     | '/tools/$slug'
@@ -482,6 +511,7 @@ export interface FileRouteTypes {
     | '/blog/'
     | '/categories/'
     | '/collections/'
+    | '/community/'
     | '/for/'
     | '/ideas/'
     | '/tools/'
@@ -521,6 +551,8 @@ export interface FileRouteTypes {
     | '/blog/$slug'
     | '/categories/$slug'
     | '/collections/$slug'
+    | '/community/$slug'
+    | '/creator/$handle'
     | '/for/$slug'
     | '/ideas/$slug'
     | '/tools/$slug'
@@ -529,6 +561,7 @@ export interface FileRouteTypes {
     | '/blog'
     | '/categories'
     | '/collections'
+    | '/community'
     | '/for'
     | '/ideas'
     | '/tools'
@@ -570,6 +603,8 @@ export interface FileRouteTypes {
     | '/blog/$slug'
     | '/categories/$slug'
     | '/collections/$slug'
+    | '/community/$slug'
+    | '/creator/$handle'
     | '/for/$slug'
     | '/ideas/$slug'
     | '/tools/$slug'
@@ -578,6 +613,7 @@ export interface FileRouteTypes {
     | '/blog/'
     | '/categories/'
     | '/collections/'
+    | '/community/'
     | '/for/'
     | '/ideas/'
     | '/tools/'
@@ -610,6 +646,8 @@ export interface RootRouteChildren {
   BlogSlugRoute: typeof BlogSlugRoute
   CategoriesSlugRoute: typeof CategoriesSlugRoute
   CollectionsSlugRoute: typeof CollectionsSlugRoute
+  CommunitySlugRoute: typeof CommunitySlugRoute
+  CreatorHandleRoute: typeof CreatorHandleRoute
   ForSlugRoute: typeof ForSlugRoute
   IdeasSlugRoute: typeof IdeasSlugRoute
   ToolsSlugRoute: typeof ToolsSlugRoute
@@ -617,6 +655,7 @@ export interface RootRouteChildren {
   BlogIndexRoute: typeof BlogIndexRoute
   CategoriesIndexRoute: typeof CategoriesIndexRoute
   CollectionsIndexRoute: typeof CollectionsIndexRoute
+  CommunityIndexRoute: typeof CommunityIndexRoute
   ForIndexRoute: typeof ForIndexRoute
   IdeasIndexRoute: typeof IdeasIndexRoute
   ToolsIndexRoute: typeof ToolsIndexRoute
@@ -767,6 +806,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ForIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/community/': {
+      id: '/community/'
+      path: '/community'
+      fullPath: '/community/'
+      preLoaderRoute: typeof CommunityIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/collections/': {
       id: '/collections/'
       path: '/collections'
@@ -821,6 +867,20 @@ declare module '@tanstack/react-router' {
       path: '/for/$slug'
       fullPath: '/for/$slug'
       preLoaderRoute: typeof ForSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/creator/$handle': {
+      id: '/creator/$handle'
+      path: '/creator/$handle'
+      fullPath: '/creator/$handle'
+      preLoaderRoute: typeof CreatorHandleRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/community/$slug': {
+      id: '/community/$slug'
+      path: '/community/$slug'
+      fullPath: '/community/$slug'
+      preLoaderRoute: typeof CommunitySlugRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/collections/$slug': {
@@ -1025,6 +1085,8 @@ const rootRouteChildren: RootRouteChildren = {
   BlogSlugRoute: BlogSlugRoute,
   CategoriesSlugRoute: CategoriesSlugRoute,
   CollectionsSlugRoute: CollectionsSlugRoute,
+  CommunitySlugRoute: CommunitySlugRoute,
+  CreatorHandleRoute: CreatorHandleRoute,
   ForSlugRoute: ForSlugRoute,
   IdeasSlugRoute: IdeasSlugRoute,
   ToolsSlugRoute: ToolsSlugRoute,
@@ -1032,6 +1094,7 @@ const rootRouteChildren: RootRouteChildren = {
   BlogIndexRoute: BlogIndexRoute,
   CategoriesIndexRoute: CategoriesIndexRoute,
   CollectionsIndexRoute: CollectionsIndexRoute,
+  CommunityIndexRoute: CommunityIndexRoute,
   ForIndexRoute: ForIndexRoute,
   IdeasIndexRoute: IdeasIndexRoute,
   ToolsIndexRoute: ToolsIndexRoute,
@@ -1042,13 +1105,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
