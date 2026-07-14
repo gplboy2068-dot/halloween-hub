@@ -142,6 +142,8 @@ function ToolPage() {
           <p className="mt-4 text-lg text-muted-foreground max-w-2xl mx-auto">{tool.description}</p>
         </header>
 
+        <TrustBar reviewer={authorForCategory(tool.category)} updatedAt={TOOL_LAST_UPDATED} />
+
         {/* Tool interface */}
         {(() => {
           const ToolComponent = getToolComponent(tool.slug);
