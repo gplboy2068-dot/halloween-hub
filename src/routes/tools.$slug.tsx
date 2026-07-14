@@ -10,7 +10,15 @@ import {
   articleToRelated,
 } from "@/lib/related";
 import { getRelatedArticlesForContext } from "@/lib/related.functions";
-import { RelatedSection, RelatedMixSection } from "@/components/RelatedGrid";
+import { RelatedSection } from "@/components/RelatedGrid";
+import { getToolContent, howToJsonLd, faqJsonLd } from "@/lib/tool-content";
+import {
+  ToolFeatures,
+  ToolHowTo,
+  ToolUseCases,
+  ToolTips,
+  ToolFaqs,
+} from "@/components/ToolContentSections";
 
 const relatedArticlesQuery = (slug: string, title: string, description: string, category: string) =>
   queryOptions({
@@ -36,6 +44,7 @@ export const Route = createFileRoute("/tools/$slug")({
   head: ({ loaderData, params }) => {
     if (!loaderData) return { meta: [{ title: "Not found" }, { name: "robots", content: "noindex" }] };
     const title = `${loaderData.title} — Free Halloween Tool`;
+    const content = getToolContent(loaderData);
     return {
       meta: [
         { title },
@@ -71,8 +80,9 @@ export const Route = createFileRoute("/tools/$slug")({
             ],
           }),
         },
+        { type: "application/ld+json", children: JSON.stringify(howToJsonLd(loaderData, content)) },
+        { type: "application/ld+json", children: JSON.stringify(faqJsonLd(content)) },
       ],
-
     };
   },
   component: ToolPage,
@@ -92,6 +102,7 @@ export const Route = createFileRoute("/tools/$slug")({
 
 function ToolPage() {
   const tool = Route.useLoaderData();
+  const content = getToolContent(tool);
   const related = TOOLS.filter((t) => t.slug !== tool.slug && t.category === tool.category).slice(0, 8);
   const ctx = {
     title: tool.title,
@@ -143,13 +154,15 @@ function ToolPage() {
 
         {/* About */}
         <section className="mt-12">
-          <h2 className="font-display text-2xl font-bold">About this tool</h2>
-          <p className="mt-3 text-muted-foreground leading-relaxed">
-            The {tool.title} is a free, browser-based Halloween utility built for creators, families,
-            teachers and party hosts. Whether you're planning a spooky bash or crafting content for social,
-            this tool is designed to make your Halloween prep faster, easier and more fun.
-          </p>
+          <h2 className="font-display text-2xl font-bold">About the {tool.title}</h2>
+          <p className="mt-3 text-muted-foreground leading-relaxed">{content.intro}</p>
         </section>
+
+        <ToolFeatures features={content.features} />
+        <ToolHowTo steps={content.howTo} toolTitle={tool.title} />
+        <ToolUseCases useCases={content.useCases} />
+        <ToolTips tips={content.tips} />
+        <ToolFaqs faqs={content.faqs} />
 
         {/* Related tools */}
         {related.length > 0 && (
