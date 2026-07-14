@@ -45,6 +45,7 @@ export const ENTITY_CONFIGS: Record<string, EntityConfig> = {
       { key: "slug", label: "Slug", type: "slug", required: true },
       { key: "excerpt", label: "Excerpt", type: "textarea", required: true },
       { key: "content", label: "Content (Markdown)", type: "textarea" },
+      { key: "internalLinks", label: "Internal links", type: "internal-links", targetKey: "content", help: "Search and insert markdown links to your tools, articles, or categories." },
       { key: "categoryId", label: "Category", type: "category" },
       { key: "readingTime", label: "Reading time (min)", type: "number" },
     ],

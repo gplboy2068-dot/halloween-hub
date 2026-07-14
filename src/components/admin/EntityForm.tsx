@@ -3,15 +3,17 @@ import { Link } from "@tanstack/react-router";
 import { ArrowLeft, Save, Trash2 } from "lucide-react";
 import type { BaseEntity, Status, CategoryEntity } from "@/lib/admin-store";
 import { useEntityList } from "@/lib/admin-store";
+import { InternalLinkPicker } from "@/components/admin/InternalLinkPicker";
 
 export type Field = {
   key: string;
   label: string;
-  type: "text" | "textarea" | "number" | "select" | "checkbox" | "datetime" | "slug" | "category";
+  type: "text" | "textarea" | "number" | "select" | "checkbox" | "datetime" | "slug" | "category" | "internal-links";
   options?: { value: string; label: string }[];
   placeholder?: string;
   required?: boolean;
   help?: string;
+  targetKey?: string; // for internal-links: which field to insert markdown into
 };
 
 export function EntityForm<T extends BaseEntity & Record<string, unknown>>({
@@ -47,9 +49,25 @@ export function EntityForm<T extends BaseEntity & Record<string, unknown>>({
         <h2 className="font-display text-2xl font-bold">{title}</h2>
 
         <div className="rounded-2xl border border-border bg-card p-6 space-y-5">
-          {fields.map((f) => (
-            <FormField key={f.key} field={f} value={values[f.key] as never} onChange={(v) => set(f.key as keyof T, v as T[keyof T])} />
-          ))}
+          {fields.map((f) => {
+            if (f.type === "internal-links") {
+              const targetKey = (f.targetKey ?? "content") as keyof T;
+              return (
+                <InternalLinkPicker
+                  key={f.key}
+                  currentSlug={values.slug as string | undefined}
+                  onInsert={(md) => {
+                    const current = (values[targetKey] as string) ?? "";
+                    const next = current ? `${current}\n\n${md}` : md;
+                    set(targetKey, next as T[keyof T]);
+                  }}
+                />
+              );
+            }
+            return (
+              <FormField key={f.key} field={f} value={values[f.key] as never} onChange={(v) => set(f.key as keyof T, v as T[keyof T])} />
+            );
+          })}
         </div>
       </div>
 
