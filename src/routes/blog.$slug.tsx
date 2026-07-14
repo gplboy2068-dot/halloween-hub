@@ -189,6 +189,10 @@ function ArticlePage() {
                 <img
                   src={article.author.avatarUrl}
                   alt={article.author.displayName}
+                  loading="lazy"
+                  decoding="async"
+                  width={24}
+                  height={24}
                   className="w-6 h-6 rounded-full object-cover"
                 />
               ) : (
