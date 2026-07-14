@@ -48,6 +48,7 @@ import { Route as AdminLogsRouteImport } from './routes/admin.logs'
 import { Route as AdminLinkingRouteImport } from './routes/admin.linking'
 import { Route as AdminAnalyticsRouteImport } from './routes/admin.analytics'
 import { Route as AdminEntityRouteImport } from './routes/admin.$entity'
+import { Route as AdminEntityIndexRouteImport } from './routes/admin.$entity.index'
 import { Route as BlogTagSlugRouteImport } from './routes/blog.tag.$slug'
 import { Route as BlogCategorySlugRouteImport } from './routes/blog.category.$slug'
 import { Route as AdminEntityIdRouteImport } from './routes/admin.$entity.$id'
@@ -247,6 +248,11 @@ const AdminEntityRoute = AdminEntityRouteImport.update({
   path: '/$entity',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminEntityIndexRoute = AdminEntityIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AdminEntityRoute,
+} as any)
 const BlogTagSlugRoute = BlogTagSlugRouteImport.update({
   id: '/blog/tag/$slug',
   path: '/blog/tag/$slug',
@@ -306,6 +312,7 @@ export interface FileRoutesByFullPath {
   '/admin/$entity/$id': typeof AdminEntityIdRoute
   '/blog/category/$slug': typeof BlogCategorySlugRoute
   '/blog/tag/$slug': typeof BlogTagSlugRoute
+  '/admin/$entity/': typeof AdminEntityIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -323,7 +330,6 @@ export interface FileRoutesByTo {
   '/sitemap': typeof SitemapRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
-  '/admin/$entity': typeof AdminEntityRouteWithChildren
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/linking': typeof AdminLinkingRoute
   '/admin/logs': typeof AdminLogsRoute
@@ -349,6 +355,7 @@ export interface FileRoutesByTo {
   '/admin/$entity/$id': typeof AdminEntityIdRoute
   '/blog/category/$slug': typeof BlogCategorySlugRoute
   '/blog/tag/$slug': typeof BlogTagSlugRoute
+  '/admin/$entity': typeof AdminEntityIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -394,6 +401,7 @@ export interface FileRoutesById {
   '/admin/$entity/$id': typeof AdminEntityIdRoute
   '/blog/category/$slug': typeof BlogCategorySlugRoute
   '/blog/tag/$slug': typeof BlogTagSlugRoute
+  '/admin/$entity/': typeof AdminEntityIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -440,6 +448,7 @@ export interface FileRouteTypes {
     | '/admin/$entity/$id'
     | '/blog/category/$slug'
     | '/blog/tag/$slug'
+    | '/admin/$entity/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -457,7 +466,6 @@ export interface FileRouteTypes {
     | '/sitemap'
     | '/sitemap.xml'
     | '/terms'
-    | '/admin/$entity'
     | '/admin/analytics'
     | '/admin/linking'
     | '/admin/logs'
@@ -483,6 +491,7 @@ export interface FileRouteTypes {
     | '/admin/$entity/$id'
     | '/blog/category/$slug'
     | '/blog/tag/$slug'
+    | '/admin/$entity'
   id:
     | '__root__'
     | '/'
@@ -527,6 +536,7 @@ export interface FileRouteTypes {
     | '/admin/$entity/$id'
     | '/blog/category/$slug'
     | '/blog/tag/$slug'
+    | '/admin/$entity/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -839,6 +849,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminEntityRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/$entity/': {
+      id: '/admin/$entity/'
+      path: '/'
+      fullPath: '/admin/$entity/'
+      preLoaderRoute: typeof AdminEntityIndexRouteImport
+      parentRoute: typeof AdminEntityRoute
+    }
     '/blog/tag/$slug': {
       id: '/blog/tag/$slug'
       path: '/blog/tag/$slug'
@@ -865,10 +882,12 @@ declare module '@tanstack/react-router' {
 
 interface AdminEntityRouteChildren {
   AdminEntityIdRoute: typeof AdminEntityIdRoute
+  AdminEntityIndexRoute: typeof AdminEntityIndexRoute
 }
 
 const AdminEntityRouteChildren: AdminEntityRouteChildren = {
   AdminEntityIdRoute: AdminEntityIdRoute,
+  AdminEntityIndexRoute: AdminEntityIndexRoute,
 }
 
 const AdminEntityRouteWithChildren = AdminEntityRoute._addFileChildren(
@@ -938,13 +957,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
