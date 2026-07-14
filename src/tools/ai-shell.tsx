@@ -95,12 +95,16 @@ export function AILongTextTool({
 }) {
   const [loading, setLoading] = useState(false);
   const [text, setText] = useState("");
+  const [lastPrompt, setLastPrompt] = useState("");
   const runFn = useServerFn(aiGenerateLongText);
+  const meta = useToolMeta();
 
   const run = async () => {
     setLoading(true);
     try {
-      const res = await runFn({ data: { system, prompt: buildPrompt() } });
+      const prompt = buildPrompt();
+      setLastPrompt(prompt);
+      const res = await runFn({ data: { system, prompt } });
       setText(res.text);
     } catch (e) {
       handleError(e);
@@ -120,8 +124,17 @@ export function AILongTextTool({
       {text ? (
         <div className="mt-6 rounded-xl border border-border bg-background/40 p-5 sm:p-7 relative">
           <p className="whitespace-pre-wrap leading-relaxed text-sm sm:text-base">{text}</p>
-          <div className="mt-4 flex justify-end gap-2">
+          <div className="mt-4 flex flex-wrap justify-end gap-2">
             <CopyButton text={text} label="Copy" />
+            {meta.slug && (
+              <ShareGenerationButton
+                toolSlug={meta.slug}
+                toolTitle={meta.title}
+                output={text}
+                prompt={lastPrompt}
+                kind="long"
+              />
+            )}
             <button type="button" onClick={run} className="px-4 py-1.5 rounded-md border border-primary/40 bg-primary/10 text-primary text-xs font-semibold hover:bg-primary/20 transition">
               🎲 New version
             </button>
@@ -133,6 +146,7 @@ export function AILongTextTool({
     </ToolShell>
   );
 }
+
 
 /**
  * AI image tool: prompt → data URL preview → download.
