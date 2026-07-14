@@ -4,6 +4,7 @@ import { Search } from "lucide-react";
 import { PageShell } from "@/components/PageShell";
 import { ToolCard } from "@/components/ToolCard";
 import { TOOLS, CATEGORIES } from "@/lib/site";
+import { breadcrumbListLd, collectionPageLd, itemListLd } from "@/lib/schema";
 
 export const Route = createFileRoute("/tools/")({
   component: ToolsIndex,
@@ -16,6 +17,41 @@ export const Route = createFileRoute("/tools/")({
       { property: "og:url", content: "/tools" },
     ],
     links: [{ rel: "canonical", href: "/tools" }],
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: JSON.stringify(
+          collectionPageLd({
+            name: "All Halloween Tools",
+            description: "Every free Halloween tool in one place.",
+            url: "/tools",
+            numberOfItems: TOOLS.length,
+          }),
+        ),
+      },
+      {
+        type: "application/ld+json",
+        children: JSON.stringify(
+          itemListLd(
+            TOOLS.map((t) => ({
+              name: t.title,
+              url: `/tools/${t.slug}`,
+              description: t.description,
+            })),
+            { name: "Halloween Tools" },
+          ),
+        ),
+      },
+      {
+        type: "application/ld+json",
+        children: JSON.stringify(
+          breadcrumbListLd([
+            { name: "Home", item: "/" },
+            { name: "Tools", item: "/tools" },
+          ]),
+        ),
+      },
+    ],
   }),
 });
 
