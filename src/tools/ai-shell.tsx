@@ -1,13 +1,24 @@
 import { useState, type ReactNode } from "react";
-import { useServerFn } from "@tanstack/react-start";
+import { useServerFn, useParams } from "@tanstack/react-router";
 import { toast } from "sonner";
 import { aiGenerateText, aiGenerateImage, aiGenerateLongText } from "@/lib/ai.functions";
 import { ToolShell, ToolControls, ResultList, CopyButton, btnPrimary } from "./shell";
+import { ShareGenerationButton } from "@/components/ShareGenerationButton";
+import { TOOLS } from "@/lib/site";
+
+function useToolMeta() {
+  // best-effort: read the current /tools/$slug param; falls back gracefully off-route
+  const params = useParams({ strict: false }) as { slug?: string };
+  const slug = params?.slug ?? "";
+  const tool = TOOLS.find((t) => t.slug === slug);
+  return { slug, title: tool?.title ?? slug };
+}
 
 function handleError(err: unknown) {
   const msg = err instanceof Error ? err.message : "Something went wrong.";
   toast.error(msg);
 }
+
 
 /**
  * AI text list tool: user fills a form, we call aiGenerateText, results appear.
