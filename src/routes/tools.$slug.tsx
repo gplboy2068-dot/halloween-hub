@@ -2,7 +2,7 @@ import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
 import { PageShell } from "@/components/PageShell";
 import { ToolCard } from "@/components/ToolCard";
-import { TOOLS } from "@/lib/site";
+import { TOOLS, CATEGORIES } from "@/lib/site";
 import { getToolComponent } from "@/tools/registry";
 import {
   getRelatedIdeas,
@@ -11,13 +11,18 @@ import {
 } from "@/lib/related";
 import { getRelatedArticlesForContext } from "@/lib/related.functions";
 import { RelatedSection } from "@/components/RelatedGrid";
-import { getToolContent, howToJsonLd, faqJsonLd } from "@/lib/tool-content";
+import { getToolContent, howToJsonLd, faqJsonLd, webPageJsonLd } from "@/lib/tool-content";
 import {
+  ToolAbout,
   ToolFeatures,
+  ToolBenefits,
   ToolHowTo,
   ToolUseCases,
   ToolTips,
+  ToolMistakes,
   ToolFaqs,
+  ToolCta,
+  ContinueExploring,
 } from "@/components/ToolContentSections";
 import { authorForCategory, personJsonLd } from "@/lib/authors";
 import { TrustBar } from "@/components/TrustBar";
