@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { track } from "@/lib/analytics";
 
 export function Newsletter() {
   const [email, setEmail] = useState("");
@@ -16,11 +17,24 @@ export function Newsletter() {
           <p className="mt-2 text-sm text-muted-foreground max-w-md mx-auto">
             Weekly Halloween tools, printables & AI drops. No spam, unsubscribe anytime.
           </p>
+          <div className="mt-3 flex items-center justify-center gap-3 text-[11px] text-muted-foreground/80">
+            <span className="inline-flex items-center gap-1">🕯️ 4,200+ readers</span>
+            <span>·</span>
+            <span>1-click unsubscribe</span>
+            <span>·</span>
+            <span>No spam, ever</span>
+          </div>
           {ok ? (
             <p className="mt-6 text-primary font-medium">🎃 You're in! Check your inbox.</p>
           ) : (
             <form
-              onSubmit={(e) => { e.preventDefault(); if (email.includes("@")) setOk(true); }}
+              onSubmit={(e) => {
+                e.preventDefault();
+                if (email.includes("@")) {
+                  track("newsletter_submit", { source: "inline", email_domain: email.split("@")[1] ?? "" });
+                  setOk(true);
+                }
+              }}
               className="mt-6 flex flex-col sm:flex-row gap-2 max-w-md mx-auto"
             >
               <input
@@ -29,6 +43,7 @@ export function Newsletter() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="your@email.com"
+                aria-label="Email address"
                 className="flex-1 h-11 px-4 rounded-lg bg-input border border-border focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30 text-sm"
               />
               <button
@@ -44,3 +59,4 @@ export function Newsletter() {
     </section>
   );
 }
+

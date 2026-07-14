@@ -8,6 +8,9 @@ import { getRelatedTools, getRelatedIdeas, getRelatedAudiences } from "@/lib/rel
 import { RelatedSection } from "@/components/RelatedGrid";
 import { TableOfContents } from "@/components/TableOfContents";
 import { publisherLd, imageObjectLd, speakableLd, wordCountFromHtml } from "@/lib/schema";
+import { ReadingProgress } from "@/components/ReadingProgress";
+import { StickyShareBar } from "@/components/StickyShareBar";
+import { SaveButton } from "@/components/SaveButton";
 
 
 
@@ -156,7 +159,8 @@ function ArticlePage() {
 
   return (
     <PageShell>
-
+      <ReadingProgress />
+      <StickyShareBar title={article.title} />
 
       <article className="mx-auto max-w-3xl px-4 sm:px-6 py-14">
         <nav className="text-xs text-muted-foreground mb-6" aria-label="Breadcrumb">
@@ -188,9 +192,22 @@ function ArticlePage() {
             {article.category.name}
           </Link>
         )}
-        <h1 className="mt-2 font-display text-4xl sm:text-5xl font-bold leading-tight">
-          {article.title}
-        </h1>
+        <div className="mt-2 flex items-start justify-between gap-4">
+          <h1 className="font-display text-4xl sm:text-5xl font-bold leading-tight">
+            {article.title}
+          </h1>
+          <SaveButton
+            variant="pill"
+            item={{
+              kind: "article",
+              slug: article.slug,
+              title: article.title,
+              emoji: "📖",
+              href: `/blog/${article.slug}`,
+            }}
+            className="mt-2 flex-shrink-0"
+          />
+        </div>
         {article.excerpt && (
           <p className="mt-4 text-lg text-muted-foreground leading-relaxed">{article.excerpt}</p>
         )}
