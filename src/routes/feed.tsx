@@ -47,6 +47,7 @@ function FeedCard({ item }: { item: FeedItem }) {
   const { session } = useAuth();
   const reportFn = useServerFn(reportGeneration);
   const [reported, setReported] = useState(false);
+  const [copied, setCopied] = useState(false);
 
   const report = async () => {
     if (!session) {
@@ -63,29 +64,92 @@ function FeedCard({ item }: { item: FeedItem }) {
     }
   };
 
+  const copyText = async () => {
+    try {
+      await navigator.clipboard.writeText(item.output);
+      setCopied(true);
+      toast.success("Copied");
+      setTimeout(() => setCopied(false), 1500);
+    } catch {
+      toast.error("Copy failed");
+    }
+  };
+
+  const downloadImage = async () => {
+    try {
+      const res = await fetch(item.output);
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `${item.tool_slug}-${item.id.slice(0, 8)}.png`;
+      a.click();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+    } catch {
+      toast.error("Download failed");
+    }
+  };
+
+  const isImage = item.kind === "image";
+
   return (
-    <article className="rounded-2xl border border-border bg-card/60 p-5 hover:border-primary/40 transition">
+    <article className="rounded-2xl border border-border bg-card/60 p-5 hover:border-primary/40 transition flex flex-col">
       <div className="flex items-center justify-between gap-2 text-xs text-muted-foreground">
         <Link to="/tools/$slug" params={{ slug: item.tool_slug }} className="hover:text-primary font-semibold">
           {item.tool_title}
         </Link>
         <span>{timeAgo(item.created_at)}</span>
       </div>
-      <p className="mt-3 whitespace-pre-wrap text-sm sm:text-base leading-relaxed line-clamp-[12]">{item.output}</p>
-      <div className="mt-4 flex items-center justify-between text-xs">
-        <span className="text-muted-foreground">by {item.author}</span>
-        <button
-          type="button"
-          onClick={report}
-          disabled={reported}
-          className="text-muted-foreground hover:text-destructive disabled:opacity-50"
-        >
-          {reported ? "✓ Reported" : "⚑ Report"}
-        </button>
+
+      {isImage ? (
+        <div className="mt-3 rounded-xl overflow-hidden bg-black/40 aspect-square flex items-center justify-center">
+          <img
+            src={item.output}
+            alt={item.prompt ?? item.tool_title}
+            loading="lazy"
+            className="w-full h-full object-contain"
+          />
+        </div>
+      ) : (
+        <p className="mt-3 whitespace-pre-wrap text-sm sm:text-base leading-relaxed line-clamp-[12] flex-1">
+          {item.output}
+        </p>
+      )}
+
+      <div className="mt-4 flex items-center justify-between gap-2 text-xs">
+        <span className="text-muted-foreground truncate">by {item.author}</span>
+        <div className="flex items-center gap-1.5">
+          {isImage ? (
+            <button
+              type="button"
+              onClick={downloadImage}
+              className="px-2.5 py-1 rounded-md border border-border bg-background/60 hover:border-primary/40 hover:text-primary transition"
+            >
+              ⬇️ Download
+            </button>
+          ) : (
+            <button
+              type="button"
+              onClick={copyText}
+              className="px-2.5 py-1 rounded-md border border-border bg-background/60 hover:border-primary/40 hover:text-primary transition"
+            >
+              {copied ? "✓ Copied" : "📋 Copy"}
+            </button>
+          )}
+          <button
+            type="button"
+            onClick={report}
+            disabled={reported}
+            className="px-2.5 py-1 rounded-md text-muted-foreground hover:text-destructive disabled:opacity-50"
+          >
+            {reported ? "✓" : "⚑"}
+          </button>
+        </div>
       </div>
     </article>
   );
 }
+
 
 function FeedPage() {
   const { data } = useSuspenseQuery(feedQuery);
