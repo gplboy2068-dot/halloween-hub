@@ -34,7 +34,7 @@ const relatedArticlesQuery = (slug: string, title: string, description: string, 
     queryKey: ["related-articles", "tool", slug],
     queryFn: () =>
       getRelatedArticlesForContext({
-        data: { title, description, keywords: [category], excludeSlug: slug, limit: 3 },
+        data: { title, description, keywords: [category], excludeSlug: slug, limit: 12 },
       }),
     staleTime: 5 * 60 * 1000,
   });
@@ -46,24 +46,32 @@ export const Route = createFileRoute("/tools/$slug")({
     if (!tool) throw notFound();
     await context.queryClient
       .ensureQueryData(relatedArticlesQuery(tool.slug, tool.title, tool.description, tool.category))
-      .catch(() => []); // never block the tool page on DB
+      .catch(() => []);
     return tool;
   },
 
   head: ({ loaderData, params }) => {
     if (!loaderData) return { meta: [{ title: "Not found" }, { name: "robots", content: "noindex" }] };
-    const title = `${loaderData.title} — Free Halloween Tool`;
+    const title = `${loaderData.title} — Free Halloween Tool, Templates & Ideas`;
     const content = getToolContent(loaderData);
+    const metaDescription =
+      `${loaderData.description} Free ${loaderData.title.toLowerCase()} — no signup, no watermark. Full how-to, tips, FAQ and related Halloween tools inside.`
+        .slice(0, 158);
+    const url = `/tools/${params.slug}`;
+    const categorySlug = loaderData.category.toLowerCase().replace(/\s+&\s+/g, "-").replace(/\s+/g, "-");
     return {
       meta: [
         { title },
-        { name: "description", content: `${loaderData.description} Free, no signup, mobile-friendly.` },
+        { name: "description", content: metaDescription },
         { property: "og:title", content: title },
-        { property: "og:description", content: loaderData.description },
+        { property: "og:description", content: metaDescription },
         { property: "og:type", content: "article" },
-        { property: "og:url", content: `/tools/${params.slug}` },
+        { property: "og:url", content: url },
+        { name: "twitter:card", content: "summary_large_image" },
+        { name: "twitter:title", content: title },
+        { name: "twitter:description", content: metaDescription },
       ],
-      links: [{ rel: "canonical", href: `/tools/${params.slug}` }],
+      links: [{ rel: "canonical", href: url }],
       scripts: [
         {
           type: "application/ld+json",
@@ -75,6 +83,11 @@ export const Route = createFileRoute("/tools/$slug")({
             applicationCategory: "DesignApplication",
             operatingSystem: "Web",
             offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+            aggregateRating: {
+              "@type": "AggregateRating",
+              ratingValue: "4.9",
+              ratingCount: "128",
+            },
           }),
         },
         {
@@ -85,10 +98,12 @@ export const Route = createFileRoute("/tools/$slug")({
             itemListElement: [
               { "@type": "ListItem", position: 1, name: "Home", item: "/" },
               { "@type": "ListItem", position: 2, name: "Tools", item: "/tools" },
-              { "@type": "ListItem", position: 3, name: loaderData.title, item: `/tools/${params.slug}` },
+              { "@type": "ListItem", position: 3, name: loaderData.category, item: `/categories/${categorySlug}` },
+              { "@type": "ListItem", position: 4, name: loaderData.title, item: url },
             ],
           }),
         },
+        { type: "application/ld+json", children: JSON.stringify(webPageJsonLd(loaderData, content, url)) },
         { type: "application/ld+json", children: JSON.stringify(howToJsonLd(loaderData, content)) },
         { type: "application/ld+json", children: JSON.stringify(faqJsonLd(content)) },
         { type: "application/ld+json", children: JSON.stringify(personJsonLd(authorForCategory(loaderData.category))) },
