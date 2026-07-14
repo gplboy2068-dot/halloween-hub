@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import { Link } from "@tanstack/react-router";
-import { createGeneration } from "@/lib/generations.functions";
+import { createGeneration, shareGenerationImage } from "@/lib/generations.functions";
 import { useAuth } from "@/hooks/use-auth";
 
 export function ShareGenerationButton({
