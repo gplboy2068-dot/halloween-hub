@@ -1,4 +1,6 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
+import { z } from "zod";
+import { RemixBanner, ToolCommunityStrip } from "@/components/CommunityWidgets";
 import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
 import { PageShell } from "@/components/PageShell";
 import { ToolCard } from "@/components/ToolCard";
@@ -41,6 +43,7 @@ const relatedArticlesQuery = (slug: string, title: string, description: string, 
 
 
 export const Route = createFileRoute("/tools/$slug")({
+  validateSearch: (s) => z.object({ remix: z.string().optional().catch(undefined) }).parse(s),
   loader: async ({ params, context }) => {
     const tool = TOOLS.find((t) => t.slug === params.slug);
     if (!tool) throw notFound();
@@ -127,6 +130,7 @@ export const Route = createFileRoute("/tools/$slug")({
 
 function ToolPage() {
   const tool = Route.useLoaderData();
+  const { remix } = Route.useSearch();
   const content = getToolContent(tool);
 
   // Related tools: same-category first, then popular fill-in — capped at 12.
@@ -181,6 +185,8 @@ function ToolPage() {
 
         <TrustBar reviewer={authorForCategory(tool.category)} updatedAt={TOOL_LAST_UPDATED} />
 
+        {remix && <RemixBanner generationId={remix} />}
+
         {/* Interactive tool — stays at the top */}
         {(() => {
           const ToolComponent = getToolComponent(tool.slug);
@@ -195,6 +201,10 @@ function ToolPage() {
             </div>
           );
         })()}
+
+        {/* Community creations made with this tool */}
+        <ToolCommunityStrip toolSlug={tool.slug} />
+
 
         {/* 1. About */}
         <ToolAbout toolTitle={tool.title} about={content.about} />

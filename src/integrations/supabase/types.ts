@@ -226,6 +226,24 @@ export type Database = {
         }
         Relationships: []
       }
+      creator_follows: {
+        Row: {
+          created_at: string
+          creator_id: string
+          follower_id: string
+        }
+        Insert: {
+          created_at?: string
+          creator_id: string
+          follower_id: string
+        }
+        Update: {
+          created_at?: string
+          creator_id?: string
+          follower_id?: string
+        }
+        Relationships: []
+      }
       faqs: {
         Row: {
           answer: string
@@ -287,6 +305,58 @@ export type Database = {
           },
         ]
       }
+      generation_bookmarks: {
+        Row: {
+          created_at: string
+          generation_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          generation_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          generation_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "generation_bookmarks_generation_id_fkey"
+            columns: ["generation_id"]
+            isOneToOne: false
+            referencedRelation: "generations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      generation_likes: {
+        Row: {
+          created_at: string
+          generation_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          generation_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          generation_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "generation_likes_generation_id_fkey"
+            columns: ["generation_id"]
+            isOneToOne: false
+            referencedRelation: "generations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       generation_reports: {
         Row: {
           created_at: string
@@ -321,40 +391,76 @@ export type Database = {
       }
       generations: {
         Row: {
+          category: string | null
           created_at: string
+          description: string | null
+          editor_pick: boolean
           hidden: boolean
           id: string
           kind: string
+          likes_count: number
+          moderation_reason: string | null
+          moderation_status: string
           output: string
           prompt: string | null
           report_count: number
+          share_count: number
+          slug: string | null
+          tags: string[]
+          title: string | null
           tool_slug: string
           tool_title: string
+          updated_at: string
           user_id: string
+          views_count: number
         }
         Insert: {
+          category?: string | null
           created_at?: string
+          description?: string | null
+          editor_pick?: boolean
           hidden?: boolean
           id?: string
           kind?: string
+          likes_count?: number
+          moderation_reason?: string | null
+          moderation_status?: string
           output: string
           prompt?: string | null
           report_count?: number
+          share_count?: number
+          slug?: string | null
+          tags?: string[]
+          title?: string | null
           tool_slug: string
           tool_title: string
+          updated_at?: string
           user_id: string
+          views_count?: number
         }
         Update: {
+          category?: string | null
           created_at?: string
+          description?: string | null
+          editor_pick?: boolean
           hidden?: boolean
           id?: string
           kind?: string
+          likes_count?: number
+          moderation_reason?: string | null
+          moderation_status?: string
           output?: string
           prompt?: string | null
           report_count?: number
+          share_count?: number
+          slug?: string | null
+          tags?: string[]
+          title?: string | null
           tool_slug?: string
           tool_title?: string
+          updated_at?: string
           user_id?: string
+          views_count?: number
         }
         Relationships: []
       }
@@ -388,6 +494,7 @@ export type Database = {
           bio: string | null
           created_at: string
           display_name: string | null
+          handle: string | null
           id: string
           updated_at: string
         }
@@ -396,6 +503,7 @@ export type Database = {
           bio?: string | null
           created_at?: string
           display_name?: string | null
+          handle?: string | null
           id: string
           updated_at?: string
         }
@@ -404,6 +512,7 @@ export type Database = {
           bio?: string | null
           created_at?: string
           display_name?: string | null
+          handle?: string | null
           id?: string
           updated_at?: string
         }
@@ -627,6 +736,8 @@ export type Database = {
         }
         Returns: boolean
       }
+      increment_generation_view: { Args: { _id: string }; Returns: undefined }
+      slugify: { Args: { txt: string }; Returns: string }
     }
     Enums: {
       app_role: "admin" | "editor" | "user"
