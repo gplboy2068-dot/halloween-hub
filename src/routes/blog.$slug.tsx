@@ -159,7 +159,8 @@ function ArticlePage() {
 
   return (
     <PageShell>
-
+      <ReadingProgress />
+      <StickyShareBar title={article.title} />
 
       <article className="mx-auto max-w-3xl px-4 sm:px-6 py-14">
         <nav className="text-xs text-muted-foreground mb-6" aria-label="Breadcrumb">
