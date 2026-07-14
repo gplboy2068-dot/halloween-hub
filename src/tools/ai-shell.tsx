@@ -1,5 +1,6 @@
 import { useState, type ReactNode } from "react";
-import { useServerFn, useParams } from "@tanstack/react-router";
+import { useServerFn } from "@tanstack/react-start";
+import { useParams } from "@tanstack/react-router";
 import { toast } from "sonner";
 import { aiGenerateText, aiGenerateImage, aiGenerateLongText } from "@/lib/ai.functions";
 import { ToolShell, ToolControls, ResultList, CopyButton, btnPrimary } from "./shell";
