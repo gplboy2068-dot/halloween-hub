@@ -24,7 +24,7 @@ export const listEntities = createServerFn({ method: "POST" })
     z.object({ entity: kindSchema }).parse(input),
   )
   .handler(async ({ data, context }) => {
-    await assertAdmin(context);
+    await assertAdminUser(context);
     const { entity } = data;
     const { data: rows, error } = await context.supabase
       .from(entity)
@@ -45,7 +45,7 @@ export const getEntity = createServerFn({ method: "POST" })
     z.object({ entity: kindSchema, id: z.string().uuid() }).parse(input),
   )
   .handler(async ({ data, context }) => {
-    await assertAdmin(context);
+    await assertAdminUser(context);
     const { data: row, error } = await context.supabase
       .from(data.entity)
       .select("*")
@@ -69,7 +69,7 @@ export const createEntity = createServerFn({ method: "POST" })
       .parse(input),
   )
   .handler(async ({ data, context }) => {
-    await assertAdmin(context);
+    await assertAdminUser(context);
     const patch = { ...defaultsFor(data.entity), ...toDbPatch(data.entity, data.values ?? {}) };
     const { data: row, error } = await context.supabase
       .from(data.entity)
@@ -99,7 +99,7 @@ export const updateEntity = createServerFn({ method: "POST" })
         .parse(input),
   )
   .handler(async ({ data, context }) => {
-    await assertAdmin(context);
+    await assertAdminUser(context);
     const patch = toDbPatch(data.entity, data.values);
     if (Object.keys(patch).length === 0) return { ok: true };
     const { error } = await context.supabase
@@ -122,7 +122,7 @@ export const deleteEntities = createServerFn({ method: "POST" })
     z.object({ entity: kindSchema, ids: z.array(z.string().uuid()).min(1) }).parse(input),
   )
   .handler(async ({ data, context }) => {
-    await assertAdmin(context);
+    await assertAdminUser(context);
     const { error } = await context.supabase
       .from(data.entity)
       .delete()
@@ -169,7 +169,7 @@ export const bulkUpdateStatus = createServerFn({ method: "POST" })
 export const getAdminStats = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
-    await assertAdmin(context);
+    await assertAdminUser(context);
     const [tools, articles, categories, faqs] = await Promise.all([
       context.supabase.from("tools").select("status", { count: "exact" }),
       context.supabase.from("articles").select("status", { count: "exact" }),
@@ -193,7 +193,7 @@ export const getAdminStats = createServerFn({ method: "GET" })
 export const getRecentActivity = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
-    await assertAdmin(context);
+    await assertAdminUser(context);
     const { data, error } = await context.supabase
       .from("activity_logs")
       .select("*")
@@ -239,7 +239,7 @@ export const saveSiteSettings = createServerFn({ method: "POST" })
     z.object({ values: z.record(z.string(), z.any()) }).parse(input),
   )
   .handler(async ({ data, context }) => {
-    await assertAdmin(context);
+    await assertAdminUser(context);
     const rows = Object.entries(data.values).map(([key, value]) => ({
       key,
       value,
@@ -252,3 +252,14 @@ export const saveSiteSettings = createServerFn({ method: "POST" })
     if (error) throw new Error(error.message);
     return { ok: true };
   });
+
+async function assertAdminUser(context: { supabase: any; userId: string }) {
+  const { data, error } = await context.supabase
+    .from("user_roles")
+    .select("id")
+    .eq("user_id", context.userId)
+    .eq("role", "admin")
+    .maybeSingle();
+  if (error) throw new Error(error.message);
+  if (!data) throw new Error("Forbidden: admin role required");
+}
