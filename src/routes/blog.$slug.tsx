@@ -218,6 +218,10 @@ function ArticlePage() {
             <img
               src={article.coverImage}
               alt={article.title}
+              fetchPriority="high"
+              decoding="async"
+              width={1600}
+              height={900}
               className="w-full aspect-[16/9] object-cover"
             />
           </div>
