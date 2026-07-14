@@ -101,14 +101,6 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       {
         rel: "stylesheet",
         href: "https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap",
-        media: "print",
-        // Swap to all after load for non-blocking font delivery
-        onLoad: "this.media='all'",
-      } as unknown as { rel: string; href: string },
-      {
-        rel: "stylesheet",
-        href: "https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap",
-        // noscript fallback via duplicate ensures fonts still load if JS disabled
       },
     ],
     scripts: [
