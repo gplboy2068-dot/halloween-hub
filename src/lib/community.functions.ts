@@ -298,6 +298,17 @@ export const getCreatorByHandle = createServerFn({ method: "GET" })
     const totalLikes = (rows ?? []).reduce((s: number, r: any) => s + (r.likes_count ?? 0), 0);
     const totalViews = (rows ?? []).reduce((s: number, r: any) => s + (r.views_count ?? 0), 0);
 
+    // Favorite categories: top 4 by post count
+    const catCounts = new Map<string, number>();
+    (rows ?? []).forEach((r: any) => {
+      const c = r.category ?? r.tool_slug;
+      if (c) catCounts.set(c, (catCounts.get(c) ?? 0) + 1);
+    });
+    const favorite_categories = [...catCounts.entries()]
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 4)
+      .map(([name, count]) => ({ name, count }));
+
     return {
       creator: {
         id: prof.id,
@@ -312,6 +323,7 @@ export const getCreatorByHandle = createServerFn({ method: "GET" })
           views: totalViews,
           followers: followerCount ?? 0,
         },
+        favorite_categories,
         posts: signed as any[],
       },
     };
