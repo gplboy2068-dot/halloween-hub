@@ -1,46 +1,15 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
-
-const GATEWAY_URL = "https://ai.gateway.lovable.dev/v1/chat/completions";
-
-class RateLimitError extends Error {
-  code = "rate_limit" as const;
-  constructor() {
-    super("Too many requests. Please wait a moment and try again.");
-  }
-}
-class PaymentError extends Error {
-  code = "payment_required" as const;
-  constructor() {
-    super("AI credits exhausted. Please add credits in Settings → Workspace → Usage.");
-  }
-}
-
-async function callGateway(body: Record<string, unknown>) {
-  const apiKey = process.env.LOVABLE_API_KEY;
-  if (!apiKey) throw new Error("AI is not configured. Missing LOVABLE_API_KEY.");
-  const res = await fetch(GATEWAY_URL, {
-    method: "POST",
-    headers: {
-      "content-type": "application/json",
-      Authorization: `Bearer ${apiKey}`,
-    },
-    body: JSON.stringify(body),
-  });
-  if (res.status === 429) throw new RateLimitError();
-  if (res.status === 402) throw new PaymentError();
-  if (!res.ok) {
-    const text = await res.text().catch(() => "");
-    throw new Error(`AI gateway error (${res.status}): ${text.slice(0, 200)}`);
-  }
-  return res.json() as Promise<{
-    choices: Array<{ message: { content?: string | null; images?: Array<{ image_url: { url: string } }> } }>;
-  }>;
-}
+import {
+  aiChatWithFallback,
+  aiImageWithFallback,
+  AiPaymentError,
+  AiRateLimitError,
+} from "./ai-providers.server";
 
 /**
- * Generate multiple short text items (one per line) via Lovable AI.
- * Returns a bounded array of strings, cleaned up.
+ * Generate multiple short text items (one per line).
+ * Uses Lovable AI first, falls back to Gemini direct keys.
  */
 export const aiGenerateText = createServerFn({ method: "POST" })
   .inputValidator((input: { system: string; prompt: string; count?: number; model?: string }) =>
@@ -55,8 +24,9 @@ export const aiGenerateText = createServerFn({ method: "POST" })
   )
   .handler(async ({ data }) => {
     const model = data.model ?? "google/gemini-2.5-flash";
-    const json = await callGateway({
+    const raw = await aiChatWithFallback({
       model,
+      temperature: 0.9,
       messages: [
         {
           role: "system",
@@ -66,9 +36,7 @@ export const aiGenerateText = createServerFn({ method: "POST" })
         },
         { role: "user", content: data.prompt },
       ],
-      temperature: 0.9,
     });
-    const raw = json.choices?.[0]?.message?.content ?? "";
     const lines = raw
       .split(/\r?\n/)
       .map((l) => l.replace(/^\s*(?:[-*•]|\d+[.)])\s*/, "").trim())
@@ -78,7 +46,7 @@ export const aiGenerateText = createServerFn({ method: "POST" })
   });
 
 /**
- * Generate long-form text (a single string) — for stories, articles, essays.
+ * Generate long-form text.
  */
 export const aiGenerateLongText = createServerFn({ method: "POST" })
   .inputValidator((input: { system: string; prompt: string; model?: string }) =>
@@ -91,31 +59,32 @@ export const aiGenerateLongText = createServerFn({ method: "POST" })
       .parse(input),
   )
   .handler(async ({ data }) => {
-    const json = await callGateway({
+    const text = await aiChatWithFallback({
       model: data.model ?? "google/gemini-2.5-flash",
+      temperature: 0.85,
       messages: [
         { role: "system", content: data.system },
         { role: "user", content: data.prompt },
       ],
-      temperature: 0.85,
     });
-    return { text: (json.choices?.[0]?.message?.content ?? "").trim() };
+    return { text: text.trim() };
   });
 
 /**
- * Generate an image via Lovable AI (Gemini image). Returns a base64 data URL.
+ * Generate an image. Returns a base64 data URL.
  */
 export const aiGenerateImage = createServerFn({ method: "POST" })
   .inputValidator((input: { prompt: string }) =>
     z.object({ prompt: z.string().min(3).max(1500) }).parse(input),
   )
   .handler(async ({ data }) => {
-    const json = await callGateway({
-      model: "google/gemini-2.5-flash-image-preview",
-      messages: [{ role: "user", content: data.prompt }],
-      modalities: ["image", "text"],
-    });
-    const url = json.choices?.[0]?.message?.images?.[0]?.image_url?.url ?? null;
-    if (!url) throw new Error("AI did not return an image. Try a different prompt.");
-    return { imageUrl: url };
+    try {
+      const imageUrl = await aiImageWithFallback(data.prompt);
+      return { imageUrl };
+    } catch (err) {
+      if (err instanceof AiRateLimitError || err instanceof AiPaymentError) {
+        throw err;
+      }
+      throw err;
+    }
   });
