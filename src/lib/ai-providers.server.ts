@@ -7,12 +7,20 @@ type ChatMessage = { role: "system" | "user" | "assistant"; content: string };
 
 const LOVABLE_URL = "https://ai.gateway.lovable.dev/v1/chat/completions";
 
-// Map Lovable model IDs to native Gemini model names.
+// Map Lovable model IDs to native Gemini model names (AI Studio free tier).
+// Note: gemini-2.5-flash is deprecated for new AI Studio users; use *-latest aliases.
+const GEMINI_MODEL_MAP: Record<string, string> = {
+  "google/gemini-2.5-flash": "gemini-flash-latest",
+  "google/gemini-2.5-flash-lite": "gemini-flash-lite-latest",
+  "google/gemini-2.5-pro": "gemini-flash-latest",
+  "google/gemini-2.5-flash-image-preview": "gemini-2.5-flash-image",
+  "google/gemini-2.5-flash-image": "gemini-2.5-flash-image",
+};
+
 function toGeminiModel(lovableModel: string): string {
-  const m = lovableModel.replace(/^google\//, "");
-  // strip "-preview" suffix isn't needed — Gemini accepts it as-is.
-  return m;
+  return GEMINI_MODEL_MAP[lovableModel] ?? lovableModel.replace(/^google\//, "");
 }
+
 
 function getGeminiKeys(): string[] {
   return [
