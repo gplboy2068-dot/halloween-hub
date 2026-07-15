@@ -55,6 +55,7 @@ export const Route = createFileRoute("/community/")({
 
 const SORTS: { key: CommunitySort; label: string; emoji: string }[] = [
   { key: "trending", label: "Trending", emoji: "🔥" },
+  { key: "recommended", label: "For You", emoji: "✨" },
   { key: "newest", label: "Newest", emoji: "🆕" },
   { key: "most_liked", label: "Most Liked", emoji: "❤️" },
   { key: "most_viewed", label: "Most Viewed", emoji: "👁" },
