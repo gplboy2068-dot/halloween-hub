@@ -381,34 +381,27 @@ export const toggleBookmark = createServerFn({ method: "POST" })
     return { bookmarked: true };
   });
 
-// ------- AI moderation -------
+// ------- AI moderation (with provider fallback) -------
 async function moderateText(text: string): Promise<{ allow: boolean; reason?: string }> {
-  const key = process.env.LOVABLE_API_KEY;
-  if (!key || !text || text.length < 3) return { allow: true };
+  if (!text || text.length < 3) return { allow: true };
   try {
-    const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-      method: "POST",
-      headers: { "Content-Type": "application/json", "Lovable-API-Key": key },
-      body: JSON.stringify({
-        model: "google/gemini-2.5-flash-lite",
-        messages: [
-          {
-            role: "system",
-            content:
-              'You are a content moderator for a family-friendly Halloween UGC site. Halloween spooky/horror/witchy themes are perfectly fine. REJECT only: sexual content, hate speech, harassment, real-world violence glorification, self-harm, personal data (phone/email/address), spam links, or content unrelated to Halloween. Reply ONLY with strict JSON: {"allow": boolean, "reason": string}.',
-          },
-          { role: "user", content: text.slice(0, 4000) },
-        ],
-        response_format: { type: "json_object" },
-      }),
+    const { aiChatWithFallback } = await import("./ai-providers.server");
+    const raw = await aiChatWithFallback({
+      model: "google/gemini-2.5-flash-lite",
+      jsonMode: true,
+      messages: [
+        {
+          role: "system",
+          content:
+            'You are a content moderator for a family-friendly Halloween UGC site. Halloween spooky/horror/witchy themes are perfectly fine. REJECT only: sexual content, hate speech, harassment, real-world violence glorification, self-harm, personal data (phone/email/address), spam links, or content unrelated to Halloween. Reply ONLY with strict JSON: {"allow": boolean, "reason": string}.',
+        },
+        { role: "user", content: text.slice(0, 4000) },
+      ],
     });
-    if (!res.ok) return { allow: true }; // fail-open
-    const j: any = await res.json();
-    const raw = j?.choices?.[0]?.message?.content ?? "{}";
-    const parsed = JSON.parse(raw);
+    const parsed = JSON.parse(raw || "{}");
     return { allow: !!parsed.allow, reason: parsed.reason };
   } catch {
-    return { allow: true };
+    return { allow: true }; // fail-open
   }
 }
 
