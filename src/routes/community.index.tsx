@@ -6,7 +6,7 @@ import { listCommunity, listTopCreators, type CommunitySort } from "@/lib/commun
 import { CATEGORIES, TOOLS } from "@/lib/site";
 
 const searchSchema = z.object({
-  sort: z.enum(["trending", "newest", "most_liked", "most_viewed", "editors_picks"]).catch("trending"),
+  sort: z.enum(["trending", "recommended", "newest", "most_liked", "most_viewed", "editors_picks"]).catch("trending"),
   tool: z.string().optional().catch(undefined),
   category: z.string().optional().catch(undefined),
   tag: z.string().optional().catch(undefined),
