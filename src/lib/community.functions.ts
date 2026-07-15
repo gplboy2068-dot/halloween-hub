@@ -120,6 +120,10 @@ export const listCommunity = createServerFn({ method: "GET" })
       case "editors_picks":
         q = q.order("created_at", { ascending: false });
         break;
+      case "recommended":
+        // Recommended: editor picks + trending mix — fetch wide, score client-side
+        q = q.order("created_at", { ascending: false }).limit(Math.max(data.limit * 3, 60));
+        break;
       case "trending":
       default:
         // simple trending: weighted score client-side after fetch
