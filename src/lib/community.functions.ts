@@ -58,7 +58,7 @@ export type CommunityCard = {
   };
 };
 
-export type CommunitySort = "trending" | "newest" | "most_liked" | "most_viewed" | "editors_picks";
+export type CommunitySort = "trending" | "newest" | "most_liked" | "most_viewed" | "editors_picks" | "recommended";
 
 /** Public feed with filters — anyone can view non-hidden entries. */
 export const listCommunity = createServerFn({ method: "GET" })
