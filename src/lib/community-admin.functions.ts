@@ -15,12 +15,17 @@ async function assertAdmin(supabase: any, userId: string) {
 
 export type AdminFeedItem = {
   id: string;
+  slug: string | null;
   tool_slug: string;
   tool_title: string;
+  title: string | null;
   kind: string;
   prompt: string | null;
   output: string;
   hidden: boolean;
+  editor_pick: boolean;
+  moderation_status: string | null;
+  moderation_reason: string | null;
   created_at: string;
   user_id: string;
   author: string;
@@ -28,11 +33,13 @@ export type AdminFeedItem = {
   image_url?: string | null;
 };
 
+export type AdminFilter = "all" | "pending" | "reported" | "hidden" | "editor_picks";
+
 export const adminListGenerations = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: { showHidden?: boolean; limit?: number } | undefined) =>
+  .inputValidator((input: { filter?: AdminFilter; limit?: number } | undefined) =>
     z.object({
-      showHidden: z.boolean().default(true),
+      filter: z.enum(["all", "pending", "reported", "hidden", "editor_picks"]).default("all"),
       limit: z.number().int().min(1).max(200).default(100),
     }).parse(input ?? {}),
   )
@@ -42,31 +49,25 @@ export const adminListGenerations = createServerFn({ method: "GET" })
 
     let q = supabaseAdmin
       .from("generations")
-      .select("id, tool_slug, tool_title, kind, prompt, output, hidden, created_at, user_id")
+      .select("id, slug, tool_slug, tool_title, title, kind, prompt, output, hidden, editor_pick, moderation_status, moderation_reason, report_count, created_at, user_id")
       .order("created_at", { ascending: false })
       .limit(data.limit);
-    if (!data.showHidden) q = q.eq("hidden", false);
+
+    if (data.filter === "pending") q = q.eq("moderation_status", "pending");
+    else if (data.filter === "reported") q = q.gt("report_count", 0);
+    else if (data.filter === "hidden") q = q.eq("hidden", true);
+    else if (data.filter === "editor_picks") q = q.eq("editor_pick", true);
+
     const { data: rows, error } = await q;
     if (error) throw new Error(error.message);
 
-    const ids = (rows ?? []).map((r) => r.id);
     const userIds = Array.from(new Set((rows ?? []).map((r) => r.user_id)));
-
-    const [profRes, repRes] = await Promise.all([
-      userIds.length
-        ? supabaseAdmin.from("profiles").select("id, display_name").in("id", userIds)
-        : Promise.resolve({ data: [] as any[] }),
-      ids.length
-        ? supabaseAdmin.from("generation_reports").select("generation_id").in("generation_id", ids)
-        : Promise.resolve({ data: [] as any[] }),
-    ]);
+    const profRes = userIds.length
+      ? await supabaseAdmin.from("profiles").select("id, display_name").in("id", userIds)
+      : { data: [] as any[] };
     const names: Record<string, string> = Object.fromEntries(
       ((profRes as any).data ?? []).map((p: any) => [p.id, p.display_name ?? "Guest"]),
     );
-    const counts: Record<string, number> = {};
-    ((repRes as any).data ?? []).forEach((r: any) => {
-      counts[r.generation_id] = (counts[r.generation_id] ?? 0) + 1;
-    });
 
     const imagePaths = (rows ?? []).filter((r) => r.kind === "image").map((r) => r.output);
     const signed: Record<string, string> = {};
@@ -80,21 +81,42 @@ export const adminListGenerations = createServerFn({ method: "GET" })
     }
 
     return {
-      items: (rows ?? []).map((r) => ({
+      items: (rows ?? []).map((r: any) => ({
         id: r.id,
+        slug: r.slug,
         tool_slug: r.tool_slug,
         tool_title: r.tool_title,
+        title: r.title,
         kind: r.kind,
         prompt: r.prompt,
         output: r.output,
         hidden: r.hidden,
+        editor_pick: r.editor_pick,
+        moderation_status: r.moderation_status,
+        moderation_reason: r.moderation_reason,
+        report_count: r.report_count ?? 0,
         created_at: r.created_at,
         user_id: r.user_id,
         author: names[r.user_id] ?? "Guest",
-        report_count: counts[r.id] ?? 0,
         image_url: r.kind === "image" ? signed[r.output] ?? null : null,
       })),
     };
+  });
+
+export const adminSetEditorPick = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: { id: string; editor_pick: boolean }) =>
+    z.object({ id: z.string().uuid(), editor_pick: z.boolean() }).parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    await assertAdmin(context.supabase, context.userId);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { error } = await supabaseAdmin
+      .from("generations")
+      .update({ editor_pick: data.editor_pick })
+      .eq("id", data.id);
+    if (error) throw new Error(error.message);
+    return { ok: true };
   });
 
 export const adminSetHidden = createServerFn({ method: "POST" })

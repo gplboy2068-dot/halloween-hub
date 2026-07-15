@@ -6,7 +6,7 @@ import { listCommunity, listTopCreators, type CommunitySort } from "@/lib/commun
 import { CATEGORIES, TOOLS } from "@/lib/site";
 
 const searchSchema = z.object({
-  sort: z.enum(["trending", "newest", "most_liked", "most_viewed", "editors_picks"]).catch("trending"),
+  sort: z.enum(["trending", "recommended", "newest", "most_liked", "most_viewed", "editors_picks"]).catch("trending"),
   tool: z.string().optional().catch(undefined),
   category: z.string().optional().catch(undefined),
   tag: z.string().optional().catch(undefined),
@@ -55,6 +55,7 @@ export const Route = createFileRoute("/community/")({
 
 const SORTS: { key: CommunitySort; label: string; emoji: string }[] = [
   { key: "trending", label: "Trending", emoji: "🔥" },
+  { key: "recommended", label: "For You", emoji: "✨" },
   { key: "newest", label: "Newest", emoji: "🆕" },
   { key: "most_liked", label: "Most Liked", emoji: "❤️" },
   { key: "most_viewed", label: "Most Viewed", emoji: "👁" },

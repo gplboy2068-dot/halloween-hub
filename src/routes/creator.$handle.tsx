@@ -87,6 +87,21 @@ function CreatorPage() {
               <span><b>{c.stats.views}</b> <span className="text-muted-foreground">views</span></span>
               <span><b>{c.stats.followers}</b> <span className="text-muted-foreground">followers</span></span>
             </div>
+            {c.favorite_categories && c.favorite_categories.length > 0 && (
+              <div className="mt-3 flex flex-wrap gap-1.5 justify-center sm:justify-start">
+                <span className="text-xs text-muted-foreground mr-1">Favorite categories:</span>
+                {c.favorite_categories.map((cat: { name: string; count: number }) => (
+                  <Link
+                    key={cat.name}
+                    to="/community"
+                    search={{ category: cat.name } as any}
+                    className="px-2 py-0.5 rounded-full text-xs bg-primary/10 border border-primary/30 text-primary hover:bg-primary/20"
+                  >
+                    {cat.name} · {cat.count}
+                  </Link>
+                ))}
+              </div>
+            )}
           </div>
         </header>
 

@@ -392,6 +392,7 @@ export type Database = {
       generations: {
         Row: {
           category: string | null
+          content_hash: string | null
           created_at: string
           description: string | null
           editor_pick: boolean
@@ -416,6 +417,7 @@ export type Database = {
         }
         Insert: {
           category?: string | null
+          content_hash?: string | null
           created_at?: string
           description?: string | null
           editor_pick?: boolean
@@ -440,6 +442,7 @@ export type Database = {
         }
         Update: {
           category?: string | null
+          content_hash?: string | null
           created_at?: string
           description?: string | null
           editor_pick?: boolean

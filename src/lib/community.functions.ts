@@ -58,7 +58,7 @@ export type CommunityCard = {
   };
 };
 
-export type CommunitySort = "trending" | "newest" | "most_liked" | "most_viewed" | "editors_picks";
+export type CommunitySort = "trending" | "newest" | "most_liked" | "most_viewed" | "editors_picks" | "recommended";
 
 /** Public feed with filters — anyone can view non-hidden entries. */
 export const listCommunity = createServerFn({ method: "GET" })
@@ -73,7 +73,7 @@ export const listCommunity = createServerFn({ method: "GET" })
     } | undefined) =>
       z
         .object({
-          sort: z.enum(["trending", "newest", "most_liked", "most_viewed", "editors_picks"]).default("trending"),
+          sort: z.enum(["trending", "newest", "most_liked", "most_viewed", "editors_picks", "recommended"]).default("trending"),
           tool: z.string().max(120).optional(),
           category: z.string().max(120).optional(),
           tag: z.string().max(60).optional(),
@@ -120,6 +120,10 @@ export const listCommunity = createServerFn({ method: "GET" })
       case "editors_picks":
         q = q.order("created_at", { ascending: false });
         break;
+      case "recommended":
+        // Recommended: editor picks + trending mix — fetch wide, score client-side
+        q = q.order("created_at", { ascending: false }).limit(Math.max(data.limit * 3, 60));
+        break;
       case "trending":
       default:
         // simple trending: weighted score client-side after fetch
@@ -131,13 +135,15 @@ export const listCommunity = createServerFn({ method: "GET" })
     if (error) throw new Error(error.message);
     let list = rows ?? [];
 
-    if (data.sort === "trending") {
+    if (data.sort === "trending" || data.sort === "recommended") {
+      const editorBonus = data.sort === "recommended" ? 20 : 0;
       list = [...list]
         .map((r) => ({
           ...r,
           _score:
             r.likes_count * 3 +
             r.views_count * 0.2 +
+            (r.editor_pick ? editorBonus : 0) +
             Math.max(0, 72 - (Date.now() - new Date(r.created_at).getTime()) / 3_600_000),
         }))
         .sort((a: any, b: any) => b._score - a._score)
@@ -292,6 +298,17 @@ export const getCreatorByHandle = createServerFn({ method: "GET" })
     const totalLikes = (rows ?? []).reduce((s: number, r: any) => s + (r.likes_count ?? 0), 0);
     const totalViews = (rows ?? []).reduce((s: number, r: any) => s + (r.views_count ?? 0), 0);
 
+    // Favorite categories: top 4 by post count
+    const catCounts = new Map<string, number>();
+    (rows ?? []).forEach((r: any) => {
+      const c = r.category ?? r.tool_slug;
+      if (c) catCounts.set(c, (catCounts.get(c) ?? 0) + 1);
+    });
+    const favorite_categories = [...catCounts.entries()]
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 4)
+      .map(([name, count]) => ({ name, count }));
+
     return {
       creator: {
         id: prof.id,
@@ -306,6 +323,7 @@ export const getCreatorByHandle = createServerFn({ method: "GET" })
           views: totalViews,
           followers: followerCount ?? 0,
         },
+        favorite_categories,
         posts: signed as any[],
       },
     };
@@ -405,6 +423,32 @@ async function moderateText(text: string): Promise<{ allow: boolean; reason?: st
   }
 }
 
+// ------- Spam / duplicate helpers -------
+async function sha256Hex(input: string): Promise<string> {
+  const buf = new TextEncoder().encode(input);
+  const digest = await crypto.subtle.digest("SHA-256", buf);
+  return Array.from(new Uint8Array(digest))
+    .map((b) => b.toString(16).padStart(2, "0"))
+    .join("");
+}
+
+function countUrls(text: string): number {
+  if (!text) return 0;
+  return (text.match(/https?:\/\/\S+/gi) ?? []).length;
+}
+
+function detectSpam(fields: { title?: string; description?: string; prompt?: string; output?: string; kind: string }): { spam: boolean; reason?: string } {
+  const combined = [fields.title, fields.description, fields.prompt, fields.kind !== "image" ? fields.output : ""].filter(Boolean).join(" ");
+  const urls = countUrls(combined);
+  if (urls > 2) return { spam: true, reason: "Too many links in submission." };
+  // Excessive repetition (same char >20 in a row)
+  if (/(.)\1{20,}/.test(combined)) return { spam: true, reason: "Repetitive spam pattern detected." };
+  // ALL CAPS shouting > 200 chars
+  const letters = combined.replace(/[^a-zA-Z]/g, "");
+  if (letters.length > 200 && letters === letters.toUpperCase()) return { spam: true, reason: "Please avoid all-caps." };
+  return { spam: false };
+}
+
 const CommunitySubmitInput = z.object({
   toolSlug: z.string().min(1).max(120),
   toolTitle: z.string().min(1).max(200),
@@ -417,12 +461,40 @@ const CommunitySubmitInput = z.object({
   tags: z.array(z.string().max(30)).max(8).optional(),
 });
 
-/** Signed-in — publish a generation to Community with metadata + AI moderation. */
+/** Signed-in — publish a generation to Community with metadata + AI moderation + spam/dup checks. */
 export const submitToCommunity = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: z.infer<typeof CommunitySubmitInput>) => CommunitySubmitInput.parse(input))
   .handler(async ({ data, context }) => {
-    // AI moderation on text-like fields
+    // 1. Rate limit: max 5 posts per hour per user
+    const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000).toISOString();
+    const { count: recentCount } = await context.supabase
+      .from("generations")
+      .select("id", { count: "exact", head: true })
+      .eq("user_id", context.userId)
+      .gte("created_at", oneHourAgo);
+    if ((recentCount ?? 0) >= 5) {
+      throw new Error("Rate limit: you can publish up to 5 posts per hour. Try again later.");
+    }
+
+    // 2. Spam heuristic
+    const spam = detectSpam({ ...data });
+    if (spam.spam) throw new Error(`Rejected as spam: ${spam.reason}`);
+
+    // 3. Duplicate detection via content hash
+    const hashInput = [data.kind, data.toolSlug, data.prompt ?? "", data.output].join("|");
+    const contentHash = await sha256Hex(hashInput);
+    const { data: dup } = await context.supabase
+      .from("generations")
+      .select("id, slug")
+      .eq("user_id", context.userId)
+      .eq("content_hash", contentHash)
+      .maybeSingle();
+    if (dup) {
+      return { id: dup.id, slug: dup.slug, allowed: true, duplicate: true, reason: "You already published this." };
+    }
+
+    // 4. AI moderation on text-like fields
     const textForMod = [data.title, data.description, data.prompt, data.kind !== "image" ? data.output : ""]
       .filter(Boolean)
       .join("\n");
@@ -446,6 +518,7 @@ export const submitToCommunity = createServerFn({ method: "POST" })
         category: data.category ?? data.toolSlug,
         tags: data.tags ?? [],
         slug: uniqueSlug,
+        content_hash: contentHash,
         moderation_status: mod.allow ? "approved" : "rejected",
         moderation_reason: mod.reason ?? null,
         hidden: !mod.allow,
