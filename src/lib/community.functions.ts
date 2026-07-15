@@ -411,6 +411,32 @@ async function moderateText(text: string): Promise<{ allow: boolean; reason?: st
   }
 }
 
+// ------- Spam / duplicate helpers -------
+async function sha256Hex(input: string): Promise<string> {
+  const buf = new TextEncoder().encode(input);
+  const digest = await crypto.subtle.digest("SHA-256", buf);
+  return Array.from(new Uint8Array(digest))
+    .map((b) => b.toString(16).padStart(2, "0"))
+    .join("");
+}
+
+function countUrls(text: string): number {
+  if (!text) return 0;
+  return (text.match(/https?:\/\/\S+/gi) ?? []).length;
+}
+
+function detectSpam(fields: { title?: string; description?: string; prompt?: string; output?: string; kind: string }): { spam: boolean; reason?: string } {
+  const combined = [fields.title, fields.description, fields.prompt, fields.kind !== "image" ? fields.output : ""].filter(Boolean).join(" ");
+  const urls = countUrls(combined);
+  if (urls > 2) return { spam: true, reason: "Too many links in submission." };
+  // Excessive repetition (same char >20 in a row)
+  if (/(.)\1{20,}/.test(combined)) return { spam: true, reason: "Repetitive spam pattern detected." };
+  // ALL CAPS shouting > 200 chars
+  const letters = combined.replace(/[^a-zA-Z]/g, "");
+  if (letters.length > 200 && letters === letters.toUpperCase()) return { spam: true, reason: "Please avoid all-caps." };
+  return { spam: false };
+}
+
 const CommunitySubmitInput = z.object({
   toolSlug: z.string().min(1).max(120),
   toolTitle: z.string().min(1).max(200),
@@ -423,12 +449,40 @@ const CommunitySubmitInput = z.object({
   tags: z.array(z.string().max(30)).max(8).optional(),
 });
 
-/** Signed-in — publish a generation to Community with metadata + AI moderation. */
+/** Signed-in — publish a generation to Community with metadata + AI moderation + spam/dup checks. */
 export const submitToCommunity = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: z.infer<typeof CommunitySubmitInput>) => CommunitySubmitInput.parse(input))
   .handler(async ({ data, context }) => {
-    // AI moderation on text-like fields
+    // 1. Rate limit: max 5 posts per hour per user
+    const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000).toISOString();
+    const { count: recentCount } = await context.supabase
+      .from("generations")
+      .select("id", { count: "exact", head: true })
+      .eq("user_id", context.userId)
+      .gte("created_at", oneHourAgo);
+    if ((recentCount ?? 0) >= 5) {
+      throw new Error("Rate limit: you can publish up to 5 posts per hour. Try again later.");
+    }
+
+    // 2. Spam heuristic
+    const spam = detectSpam({ ...data });
+    if (spam.spam) throw new Error(`Rejected as spam: ${spam.reason}`);
+
+    // 3. Duplicate detection via content hash
+    const hashInput = [data.kind, data.toolSlug, data.prompt ?? "", data.output].join("|");
+    const contentHash = await sha256Hex(hashInput);
+    const { data: dup } = await context.supabase
+      .from("generations")
+      .select("id, slug")
+      .eq("user_id", context.userId)
+      .eq("content_hash", contentHash)
+      .maybeSingle();
+    if (dup) {
+      return { id: dup.id, slug: dup.slug, allowed: true, duplicate: true, reason: "You already published this." };
+    }
+
+    // 4. AI moderation on text-like fields
     const textForMod = [data.title, data.description, data.prompt, data.kind !== "image" ? data.output : ""]
       .filter(Boolean)
       .join("\n");
@@ -452,6 +506,7 @@ export const submitToCommunity = createServerFn({ method: "POST" })
         category: data.category ?? data.toolSlug,
         tags: data.tags ?? [],
         slug: uniqueSlug,
+        content_hash: contentHash,
         moderation_status: mod.allow ? "approved" : "rejected",
         moderation_reason: mod.reason ?? null,
         hidden: !mod.allow,
