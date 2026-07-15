@@ -135,13 +135,15 @@ export const listCommunity = createServerFn({ method: "GET" })
     if (error) throw new Error(error.message);
     let list = rows ?? [];
 
-    if (data.sort === "trending") {
+    if (data.sort === "trending" || data.sort === "recommended") {
+      const editorBonus = data.sort === "recommended" ? 20 : 0;
       list = [...list]
         .map((r) => ({
           ...r,
           _score:
             r.likes_count * 3 +
             r.views_count * 0.2 +
+            (r.editor_pick ? editorBonus : 0) +
             Math.max(0, 72 - (Date.now() - new Date(r.created_at).getTime()) / 3_600_000),
         }))
         .sort((a: any, b: any) => b._score - a._score)
