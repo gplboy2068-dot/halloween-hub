@@ -73,7 +73,7 @@ export const listCommunity = createServerFn({ method: "GET" })
     } | undefined) =>
       z
         .object({
-          sort: z.enum(["trending", "newest", "most_liked", "most_viewed", "editors_picks"]).default("trending"),
+          sort: z.enum(["trending", "newest", "most_liked", "most_viewed", "editors_picks", "recommended"]).default("trending"),
           tool: z.string().max(120).optional(),
           category: z.string().max(120).optional(),
           tag: z.string().max(60).optional(),
