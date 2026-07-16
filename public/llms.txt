@@ -21,6 +21,11 @@
 - [Envelope Liner Generator](/tools/envelope-liner-generator)
 - [Halloween Ticket Generator](/tools/halloween-ticket-generator)
 - [Costume Award Certificate Generator](/tools/award-certificate-generator)
+- [Halloween Bingo Card Generator](/tools/halloween-bingo-generator)
+- [Halloween Countdown Printable](/tools/halloween-countdown-printable)
+- [Trick-or-Treat Door Sign Generator](/tools/trick-or-treat-poster-generator)
+- [Pumpkin Guessing Game Sheet](/tools/pumpkin-guessing-game-generator)
+- [Halloween Scavenger Hunt Card Generator](/tools/halloween-scavenger-hunt-generator)
 
 ## Legal
 - [Privacy Policy](/privacy)

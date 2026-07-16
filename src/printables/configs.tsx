@@ -659,7 +659,385 @@ export const awardCertificateConfig: PrintableConfig = {
   },
 };
 
+/* ------------------------------------------------------------------ */
+/* 11. HALLOWEEN BINGO CARD — auto-shuffled 5x5 grid                  */
+/* ------------------------------------------------------------------ */
+const BINGO_POOL = [
+  "Pumpkin","Ghost","Bat","Witch","Spider","Cauldron","Skull","Candy","Moon","Tomb",
+  "Black Cat","Web","Broom","Mummy","Vampire","Zombie","Werewolf","Cobweb","Coffin","Cape",
+  "Fog","Owl","Potion","Wand","Crow","Scarecrow","Haunted House","Candy Corn","Fangs","Cauldron",
+  "Boo","Trick","Treat","Lantern","Frankenstein",
+];
+function seededShuffle<T>(arr: T[], seed: string): T[] {
+  let h = 2166136261;
+  for (let i = 0; i < seed.length; i++) { h ^= seed.charCodeAt(i); h = Math.imul(h, 16777619); }
+  const rng = () => { h = Math.imul(h ^ (h >>> 15), 2246822507); h = Math.imul(h ^ (h >>> 13), 3266489909); h ^= h >>> 16; return (h >>> 0) / 4294967296; };
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(rng() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; }
+  return a;
+}
+export const bingoCardConfig: PrintableConfig = {
+  toolSlug: "halloween-bingo-generator",
+  title: "Halloween Bingo Card",
+  widthMm: 190, heightMm: 240,
+  paperSize: "letter", orientation: "portrait",
+  primaryText: "HALLOWEEN BINGO",
+  secondaryText: "First to five in a row wins a treat!",
+  variants: [
+    { id: "classic", name: "Classic 5×5" },
+    { id: "kids", name: "Kids Party" },
+    { id: "words", name: "Words Only" },
+    { id: "icons", name: "Icons Only" },
+  ],
+  defaultVariant: "classic",
+  allowIcons: true,
+  render: (s) => {
+    const w = 190, h = 240;
+    const words = (s.secondaryText.split(",").map(x => x.trim()).filter(Boolean).length >= 24
+      ? s.secondaryText.split(",").map(x => x.trim()).filter(Boolean)
+      : BINGO_POOL);
+    const shuffled = seededShuffle(words, s.primaryText + s.variant + s.icon);
+    const cells: string[] = [];
+    for (let i = 0; i < 25; i++) {
+      if (i === 12) cells.push("FREE");
+      else cells.push(shuffled[i % shuffled.length]);
+    }
+    const gridX = 10, gridY = 60, gridW = w - 20, cell = gridW / 5;
+    return (
+      <>
+        <rect x={4} y={4} width={w - 8} height={h - 8} rx={3}
+          fill={s.theme.bg} stroke={s.theme.accent} strokeWidth={1.2} />
+        <text x={w / 2} y={26} textAnchor="middle" fontFamily={s.font.css} fontSize={14}
+          fill={s.theme.accent} fontWeight={900}>{s.primaryText.slice(0, 30)}</text>
+        {/* B I N G O header */}
+        {"BINGO".split("").map((ch, i) => (
+          <g key={ch}>
+            <rect x={gridX + i * cell + 1} y={gridY - 12} width={cell - 2} height={10} rx={1}
+              fill={s.theme.accent} />
+            <text x={gridX + i * cell + cell / 2} y={gridY - 4} textAnchor="middle"
+              fontFamily={s.font.css} fontSize={7} fill={s.theme.bg} fontWeight={900}>{ch}</text>
+          </g>
+        ))}
+        {/* grid */}
+        {Array.from({ length: 25 }).map((_, i) => {
+          const r = Math.floor(i / 5), c = i % 5;
+          const x = gridX + c * cell, y = gridY + r * cell;
+          const isFree = i === 12;
+          const label = cells[i];
+          return (
+            <g key={i}>
+              <rect x={x} y={y} width={cell} height={cell}
+                fill={isFree ? s.theme.accent : s.theme.bg}
+                stroke={s.theme.fg} strokeWidth={0.4} />
+              {(s.variant === "icons" || (s.variant !== "words" && !isFree)) && (
+                <g opacity={s.variant === "icons" ? 1 : 0.35}>
+                  <IconAt state={s} x={x + cell / 2} y={y + cell / 2 - (s.variant === "icons" ? 0 : 2)} size={cell * (s.variant === "icons" ? 0.6 : 0.55)} />
+                </g>
+              )}
+              {s.variant !== "icons" && (
+                <text x={x + cell / 2} y={y + cell - 4} textAnchor="middle"
+                  fontFamily={s.font.css} fontSize={cell * 0.11}
+                  fill={isFree ? s.theme.bg : s.theme.fg} fontWeight={isFree ? 900 : 600}>
+                  {label.slice(0, 14)}
+                </text>
+              )}
+            </g>
+          );
+        })}
+        <text x={w / 2} y={h - 12} textAnchor="middle" fontFamily={s.font.css}
+          fontSize={5} fill={s.theme.muted}>
+          {s.secondaryText.length > 0 && s.secondaryText.split(",").length < 24
+            ? s.secondaryText.slice(0, 80)
+            : "First to five in a row wins a treat!"} · HalloweenTools.com
+        </text>
+      </>
+    );
+  },
+};
+
+/* ------------------------------------------------------------------ */
+/* 12. COUNTDOWN TO HALLOWEEN — 31-day advent calendar                */
+/* ------------------------------------------------------------------ */
+export const countdownCalendarConfig: PrintableConfig = {
+  toolSlug: "halloween-countdown-printable",
+  title: "Halloween Countdown Calendar",
+  widthMm: 215.9, heightMm: 279.4,
+  paperSize: "letter", orientation: "portrait",
+  primaryText: "COUNTDOWN TO HALLOWEEN",
+  secondaryText: "Cross off a day. Feel the spookiness grow.",
+  variants: [
+    { id: "advent", name: "Advent Grid" },
+    { id: "activities", name: "Daily Activities" },
+    { id: "kids", name: "Kids Countdown" },
+    { id: "minimal", name: "Minimal" },
+  ],
+  defaultVariant: "advent",
+  allowIcons: true,
+  render: (s) => {
+    const w = 215.9, h = 279.4;
+    const startX = 15, startY = 90, cols = 5, cell = (w - startX * 2) / cols;
+    return (
+      <>
+        <rect x={6} y={6} width={w - 12} height={h - 12} rx={3}
+          fill={s.theme.bg} stroke={s.theme.accent} strokeWidth={1.2} />
+        <IconAt state={s} x={w / 2} y={40} size={30} />
+        <text x={w / 2} y={68} textAnchor="middle" fontFamily={s.font.css}
+          fontSize={14} fill={s.theme.accent} fontWeight={900}>
+          {s.primaryText.slice(0, 34)}
+        </text>
+        <text x={w / 2} y={78} textAnchor="middle" fontFamily={s.font.css}
+          fontSize={5} fill={s.theme.muted}>{s.secondaryText.slice(0, 70)}</text>
+        {Array.from({ length: 31 }).map((_, i) => {
+          const day = i + 1;
+          const r = Math.floor(i / cols), c = i % cols;
+          const x = startX + c * cell, y = startY + r * cell;
+          const isHalloween = day === 31;
+          return (
+            <g key={i}>
+              <rect x={x + 1} y={y + 1} width={cell - 2} height={cell - 2} rx={2}
+                fill={isHalloween ? s.theme.accent : s.theme.bg}
+                stroke={s.theme.accent} strokeWidth={0.6} />
+              <text x={x + cell / 2} y={y + cell / 2 + 2} textAnchor="middle"
+                fontFamily={s.font.css} fontSize={cell * 0.35}
+                fill={isHalloween ? s.theme.bg : s.theme.fg} fontWeight={800}>
+                {day}
+              </text>
+              {isHalloween && (
+                <text x={x + cell / 2} y={y + cell - 3} textAnchor="middle"
+                  fontFamily={s.font.css} fontSize={3} fill={s.theme.bg} fontWeight={700}>
+                  🎃 BOO!
+                </text>
+              )}
+            </g>
+          );
+        })}
+        <text x={w / 2} y={h - 10} textAnchor="middle" fontFamily={s.font.css}
+          fontSize={4} fill={s.theme.muted}>
+          Cross off a box each day of October · HalloweenTools.com
+        </text>
+      </>
+    );
+  },
+};
+
+/* ------------------------------------------------------------------ */
+/* 13. TRICK-OR-TREAT DOOR SIGN / POSTER                              */
+/* ------------------------------------------------------------------ */
+export const trickOrTreatSignConfig: PrintableConfig = {
+  toolSlug: "trick-or-treat-poster-generator",
+  title: "Trick-or-Treat Door Sign",
+  widthMm: 215.9, heightMm: 279.4,
+  paperSize: "letter", orientation: "portrait",
+  primaryText: "OUT OF CANDY",
+  secondaryText: "Help yourself — one per ghoul, please!",
+  variants: [
+    { id: "out", name: "Out of Candy" },
+    { id: "help", name: "Help Yourself" },
+    { id: "welcome", name: "Welcome Trick-or-Treaters" },
+    { id: "closed", name: "Sorry, Closed" },
+    { id: "allergy", name: "Allergy-Friendly Stop" },
+    { id: "kids", name: "Kids Only" },
+    { id: "teal", name: "Teal Pumpkin Project" },
+  ],
+  defaultVariant: "out",
+  allowIcons: true,
+  render: (s) => {
+    const w = 215.9, h = 279.4;
+    return (
+      <>
+        <rect x={0} y={0} width={w} height={h} fill={s.theme.bg} />
+        <rect x={10} y={10} width={w - 20} height={h - 20} rx={4}
+          fill="none" stroke={s.theme.accent} strokeWidth={1.5} />
+        <rect x={16} y={16} width={w - 32} height={h - 32} rx={2}
+          fill="none" stroke={s.theme.accent} strokeWidth={0.3} strokeDasharray="3 2" />
+        <IconAt state={s} x={w / 2} y={70} size={70} />
+        <text x={w / 2} y={140} textAnchor="middle" fontFamily={s.font.css}
+          fontSize={30} fill={s.theme.accent} fontWeight={900}>
+          {s.primaryText.slice(0, 24)}
+        </text>
+        <line x1={w / 2 - 45} y1={150} x2={w / 2 + 45} y2={150}
+          stroke={s.theme.accent} strokeWidth={0.8} />
+        <text x={w / 2} y={172} textAnchor="middle" fontFamily={s.font.css}
+          fontSize={11} fill={s.theme.fg}>
+          {s.secondaryText.slice(0, 40)}
+        </text>
+        {s.variant === "teal" && (
+          <text x={w / 2} y={195} textAnchor="middle" fontFamily={s.font.css}
+            fontSize={7} fill={s.theme.muted}>
+            Non-food treats available — allergy-friendly stop 💙
+          </text>
+        )}
+        <g transform={`translate(${w / 2}, ${h - 60})`}>
+          <text x={0} y={0} textAnchor="middle" fontFamily={s.font.css}
+            fontSize={6} fill={s.theme.muted} letterSpacing="2">
+            HAPPY HALLOWEEN
+          </text>
+        </g>
+        <text x={w / 2} y={h - 18} textAnchor="middle" fontFamily={s.font.css}
+          fontSize={4} fill={s.theme.muted}>
+          Free printable door sign · HalloweenTools.com
+        </text>
+      </>
+    );
+  },
+};
+
+/* ------------------------------------------------------------------ */
+/* 14. PUMPKIN GUESSING GAME SHEET                                    */
+/* ------------------------------------------------------------------ */
+export const pumpkinGuessConfig: PrintableConfig = {
+  toolSlug: "pumpkin-guessing-game-generator",
+  title: "Pumpkin Guessing Game Sheet",
+  widthMm: 215.9, heightMm: 279.4,
+  paperSize: "letter", orientation: "portrait",
+  primaryText: "GUESS THE PUMPKIN'S WEIGHT",
+  secondaryText: "Closest guess wins the pumpkin!",
+  variants: [
+    { id: "weight", name: "Guess the Weight" },
+    { id: "seeds", name: "Guess the Seeds" },
+    { id: "candy", name: "Guess the Candy Count" },
+    { id: "circumference", name: "Guess the Circumference" },
+  ],
+  defaultVariant: "weight",
+  allowIcons: true,
+  render: (s) => {
+    const w = 215.9, h = 279.4;
+    const unit =
+      s.variant === "weight" ? "lbs" :
+      s.variant === "seeds" ? "seeds" :
+      s.variant === "candy" ? "candies" : "inches";
+    const rows = 20;
+    const rowY0 = 100, rowH = (h - rowY0 - 30) / rows;
+    return (
+      <>
+        <rect x={6} y={6} width={w - 12} height={h - 12} rx={3}
+          fill={s.theme.bg} stroke={s.theme.accent} strokeWidth={1.2} />
+        <IconAt state={s} x={30} y={34} size={22} />
+        <IconAt state={s} x={w - 30} y={34} size={22} />
+        <text x={w / 2} y={38} textAnchor="middle" fontFamily={s.font.css}
+          fontSize={13} fill={s.theme.accent} fontWeight={900}>
+          {s.primaryText.slice(0, 34)}
+        </text>
+        <text x={w / 2} y={52} textAnchor="middle" fontFamily={s.font.css}
+          fontSize={6} fill={s.theme.fg}>
+          {s.secondaryText.slice(0, 70)}
+        </text>
+        <text x={w / 2} y={62} textAnchor="middle" fontFamily={s.font.css}
+          fontSize={4.5} fill={s.theme.muted}>
+          Write your name and your best guess in {unit}. Closest without going over wins!
+        </text>
+        {/* header row */}
+        <rect x={12} y={rowY0 - 10} width={w - 24} height={9}
+          fill={s.theme.accent} />
+        <text x={20} y={rowY0 - 3} fontFamily={s.font.css} fontSize={5}
+          fill={s.theme.bg} fontWeight={800}>#</text>
+        <text x={40} y={rowY0 - 3} fontFamily={s.font.css} fontSize={5}
+          fill={s.theme.bg} fontWeight={800}>NAME</text>
+        <text x={w - 60} y={rowY0 - 3} fontFamily={s.font.css} fontSize={5}
+          fill={s.theme.bg} fontWeight={800}>GUESS ({unit})</text>
+        {Array.from({ length: rows }).map((_, i) => {
+          const y = rowY0 + i * rowH;
+          return (
+            <g key={i}>
+              <line x1={12} y1={y + rowH} x2={w - 12} y2={y + rowH}
+                stroke={s.theme.muted} strokeWidth={0.3} />
+              <line x1={30} y1={y} x2={30} y2={y + rowH}
+                stroke={s.theme.muted} strokeWidth={0.3} />
+              <line x1={w - 70} y1={y} x2={w - 70} y2={y + rowH}
+                stroke={s.theme.muted} strokeWidth={0.3} />
+              <text x={20} y={y + rowH * 0.65} textAnchor="middle"
+                fontFamily={s.font.css} fontSize={4.5} fill={s.theme.muted}>
+                {i + 1}
+              </text>
+            </g>
+          );
+        })}
+        <text x={w / 2} y={h - 12} textAnchor="middle" fontFamily={s.font.css}
+          fontSize={4} fill={s.theme.muted}>
+          Free printable party game · HalloweenTools.com
+        </text>
+      </>
+    );
+  },
+};
+
+/* ------------------------------------------------------------------ */
+/* 15. SCAVENGER HUNT CARD                                            */
+/* ------------------------------------------------------------------ */
+const SCAVENGER_ITEMS = [
+  "A carved pumpkin","A house with orange lights","A black cat","A spider web",
+  "A skeleton","A ghost decoration","A witch costume","A superhero costume",
+  "A princess costume","A pirate","A house with fog","A tombstone",
+  "A bat decoration","A jack-o'-lantern smiling","A full-size candy bar","A neighbor's dog in costume",
+  "Purple string lights","A haunted mailbox","Candy corn","A scarecrow",
+];
+export const scavengerHuntConfig: PrintableConfig = {
+  toolSlug: "halloween-scavenger-hunt-generator",
+  title: "Halloween Scavenger Hunt Card",
+  widthMm: 140, heightMm: 200,
+  paperSize: "letter", orientation: "portrait",
+  primaryText: "HALLOWEEN SCAVENGER HUNT",
+  secondaryText: "Check each spooky sight you find tonight!",
+  variants: [
+    { id: "trick-or-treat", name: "Trick-or-Treat Hunt" },
+    { id: "neighborhood", name: "Neighborhood Hunt" },
+    { id: "classroom", name: "Classroom Hunt" },
+    { id: "party", name: "Party Hunt" },
+  ],
+  defaultVariant: "trick-or-treat",
+  allowIcons: true,
+  tilesPerSheet: 2,
+  render: (s) => {
+    const w = 140, h = 200;
+    const userItems = s.secondaryText
+      .split("\n").map(x => x.trim()).filter(Boolean);
+    const items = userItems.length >= 8
+      ? userItems.slice(0, 14)
+      : seededShuffle(SCAVENGER_ITEMS, s.primaryText + s.variant).slice(0, 14);
+    const listY0 = 55;
+    const rowH = (h - listY0 - 18) / items.length;
+    return (
+      <>
+        <rect x={3} y={3} width={w - 6} height={h - 6} rx={3}
+          fill={s.theme.bg} stroke={s.theme.accent} strokeWidth={1} />
+        <IconAt state={s} x={14} y={20} size={16} />
+        <IconAt state={s} x={w - 14} y={20} size={16} />
+        <text x={w / 2} y={22} textAnchor="middle" fontFamily={s.font.css}
+          fontSize={9} fill={s.theme.accent} fontWeight={900}>
+          {s.primaryText.slice(0, 30)}
+        </text>
+        <text x={w / 2} y={32} textAnchor="middle" fontFamily={s.font.css}
+          fontSize={4.5} fill={s.theme.muted}>
+          {userItems.length >= 8
+            ? "Check each item you find:"
+            : "Check each spooky sight you find tonight!"}
+        </text>
+        <line x1={20} y1={40} x2={w - 20} y2={40}
+          stroke={s.theme.accent} strokeWidth={0.4} />
+        {items.map((it, i) => {
+          const y = listY0 + i * rowH;
+          return (
+            <g key={i}>
+              <rect x={10} y={y} width={5} height={5} rx={0.5}
+                fill="none" stroke={s.theme.fg} strokeWidth={0.5} />
+              <text x={20} y={y + 4.5} fontFamily={s.font.css} fontSize={5}
+                fill={s.theme.fg}>{it.slice(0, 40)}</text>
+            </g>
+          );
+        })}
+        <rect x={10} y={h - 14} width={w - 20} height={8} rx={1}
+          fill={s.theme.accent} />
+        <text x={w / 2} y={h - 8} textAnchor="middle" fontFamily={s.font.css}
+          fontSize={4} fill={s.theme.bg} fontWeight={700}>
+          HalloweenTools.com · Free Printable
+        </text>
+      </>
+    );
+  },
+};
+
 export const ALL_PRINTABLES: PrintableConfig[] = [
   bannerConfig, cupcakeTopperConfig, giftTagConfig, labelConfig, treatBagConfig, partySignConfig,
   candyBarWrapperConfig, envelopeLinerConfig, ticketConfig, awardCertificateConfig,
+  bingoCardConfig, countdownCalendarConfig, trickOrTreatSignConfig, pumpkinGuessConfig, scavengerHuntConfig,
 ];

@@ -30,6 +30,8 @@ import {
   PrintableBanner, PrintableCupcakeTopper, PrintableGiftTag,
   PrintableLabel, PrintableTreatBag, PrintablePartySign,
   PrintableCandyBarWrapper, PrintableEnvelopeLiner, PrintableTicket, PrintableAwardCertificate,
+  PrintableBingoCard, PrintableCountdownCalendar, PrintableTrickOrTreatSign,
+  PrintablePumpkinGuess, PrintableScavengerHunt,
 } from "@/printables/tools";
 
 export const TOOL_REGISTRY: Record<string, ComponentType> = {
@@ -77,6 +79,11 @@ export const TOOL_REGISTRY: Record<string, ComponentType> = {
   "envelope-liner-generator": PrintableEnvelopeLiner,
   "halloween-ticket-generator": PrintableTicket,
   "award-certificate-generator": PrintableAwardCertificate,
+  "halloween-bingo-generator": PrintableBingoCard,
+  "halloween-countdown-printable": PrintableCountdownCalendar,
+  "trick-or-treat-poster-generator": PrintableTrickOrTreatSign,
+  "pumpkin-guessing-game-generator": PrintablePumpkinGuess,
+  "halloween-scavenger-hunt-generator": PrintableScavengerHunt,
 };
 
 export function getToolComponent(slug: string): ComponentType | null {
