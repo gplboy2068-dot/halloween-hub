@@ -699,6 +699,32 @@ const OVERRIDES: Partial<Record<string, Partial<ToolContent>>> = {
   "name-generator": { ctaSlug: "scary-story-generator" },
   "party-name-generator": { ctaSlug: "party-planner" },
   "ai-prompt-generator": { ctaSlug: "wallpaper-generator" },
+
+  // Printable design tools — chain them together for internal linking
+  "printable-banner-generator": {
+    intro: "Design a printable Halloween banner in your browser — pick a phrase, a theme, and a font, and download a print-ready PDF, PNG, JPG, or SVG in seconds.",
+    ctaSlug: "party-sign-generator",
+  },
+  "cupcake-topper-generator": {
+    intro: "Print twelve custom Halloween cupcake toppers on a single sheet — round, square, hex, or scalloped — ready to cut and glue onto toothpicks.",
+    ctaSlug: "treat-bag-generator",
+  },
+  "gift-tag-generator": {
+    intro: "Halloween gift, name, favor and teacher-appreciation tags — eight per sheet, print at home, punch a hole, tie with twine.",
+    ctaSlug: "label-generator",
+  },
+  "label-generator": {
+    intro: "Printable Halloween labels for candy jars, bottles, mason jars, food platters, and decorations — six per sheet, ready to stick.",
+    ctaSlug: "treat-bag-generator",
+  },
+  "treat-bag-generator": {
+    intro: "Foldable Halloween treat-bag toppers and party favor labels — four per sheet, ready to fold, staple, and hand out.",
+    ctaSlug: "gift-tag-generator",
+  },
+  "party-sign-generator": {
+    intro: "Print Welcome, Bathroom, Candy Bar, Photo Booth, Exit and custom Halloween signs on Letter or A4 in seconds.",
+    ctaSlug: "printable-banner-generator",
+  },
 };
 
 // Fallback if a category isn't found in the template map.
