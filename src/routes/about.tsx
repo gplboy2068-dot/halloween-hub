@@ -1,28 +1,20 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { StaticPage } from "@/components/StaticPage";
+import { LegalDoc, LegalNotFound, legalHead } from "@/components/LegalDoc";
+import { getLegalPage } from "@/lib/legal.functions";
+
+const SLUG = "about";
+const PATH = "/about";
 
 export const Route = createFileRoute("/about")({
-  component: About,
-  head: () => ({
-    meta: [
-      { title: "About — HalloweenTools" },
-      { name: "description", content: "The mission and story behind HalloweenTools.com — the internet's biggest Halloween toolkit." },
-      { property: "og:title", content: "About HalloweenTools" },
-      { property: "og:url", content: "/about" },
-    ],
-    links: [{ rel: "canonical", href: "/about" }],
-  }),
+  loader: () => getLegalPage({ data: { slug: SLUG } }),
+  head: ({ loaderData }) => legalHead(loaderData, PATH),
+  component: AboutPage,
+  errorComponent: () => <LegalNotFound title="About" />,
+  notFoundComponent: () => <LegalNotFound title="About" />,
 });
 
-function About() {
-  return (
-    <StaticPage title="About HalloweenTools" lead="We're building the internet's biggest, most useful, most fun Halloween platform.">
-      <h2>Our mission</h2>
-      <p>HalloweenTools.com exists to make Halloween easier and more magical for everyone — from parents planning trick-or-treat to creators shipping content to teachers running classroom activities.</p>
-      <h2>What you'll find here</h2>
-      <p>Free interactive tools, AI generators, printable packs, party planners, pumpkin templates, wishes, quotes, guides and more — all free, all mobile-first, all built for the modern web.</p>
-      <h2>The team</h2>
-      <p>A small crew of makers, designers and Halloween obsessives. Say hi on our <a href="/contact">contact page</a>.</p>
-    </StaticPage>
-  );
+function AboutPage() {
+  const page = Route.useLoaderData();
+  if (!page) return <LegalNotFound title="About" />;
+  return <LegalDoc page={page} path={PATH} />;
 }

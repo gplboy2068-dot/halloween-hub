@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as UgcPolicyRouteImport } from './routes/ugc-policy'
 import { Route as TermsRouteImport } from './routes/terms'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as SitemapRouteImport } from './routes/sitemap'
@@ -19,11 +20,15 @@ import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as FeedRouteImport } from './routes/feed'
 import { Route as EditorialPolicyRouteImport } from './routes/editorial-policy'
+import { Route as DmcaRouteImport } from './routes/dmca'
 import { Route as DisclaimerRouteImport } from './routes/disclaimer'
 import { Route as CookiesRouteImport } from './routes/cookies'
 import { Route as ContactRouteImport } from './routes/contact'
+import { Route as CommunityGuidelinesRouteImport } from './routes/community-guidelines'
 import { Route as AuthRouteImport } from './routes/auth'
+import { Route as AiContentPolicyRouteImport } from './routes/ai-content-policy'
 import { Route as AdminRouteImport } from './routes/admin'
+import { Route as AccessibilityRouteImport } from './routes/accessibility'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ToolsIndexRouteImport } from './routes/tools.index'
@@ -51,15 +56,22 @@ import { Route as AdminSchemaRouteImport } from './routes/admin.schema'
 import { Route as AdminMediaRouteImport } from './routes/admin.media'
 import { Route as AdminLogsRouteImport } from './routes/admin.logs'
 import { Route as AdminLinkingRouteImport } from './routes/admin.linking'
+import { Route as AdminLegalRouteImport } from './routes/admin.legal'
 import { Route as AdminCommunityRouteImport } from './routes/admin.community'
 import { Route as AdminAnalyticsRouteImport } from './routes/admin.analytics'
 import { Route as AdminEntityRouteImport } from './routes/admin.$entity'
 import { Route as AdminEntityIndexRouteImport } from './routes/admin.$entity.index'
 import { Route as BlogTagSlugRouteImport } from './routes/blog.tag.$slug'
 import { Route as BlogCategorySlugRouteImport } from './routes/blog.category.$slug'
+import { Route as AdminLegalSlugRouteImport } from './routes/admin.legal.$slug'
 import { Route as AdminEntityIdRouteImport } from './routes/admin.$entity.$id'
 import { Route as ApiPublicArticleImageSplatRouteImport } from './routes/api/public/article-image.$'
 
+const UgcPolicyRoute = UgcPolicyRouteImport.update({
+  id: '/ugc-policy',
+  path: '/ugc-policy',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const TermsRoute = TermsRouteImport.update({
   id: '/terms',
   path: '/terms',
@@ -110,6 +122,11 @@ const EditorialPolicyRoute = EditorialPolicyRouteImport.update({
   path: '/editorial-policy',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DmcaRoute = DmcaRouteImport.update({
+  id: '/dmca',
+  path: '/dmca',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DisclaimerRoute = DisclaimerRouteImport.update({
   id: '/disclaimer',
   path: '/disclaimer',
@@ -125,14 +142,29 @@ const ContactRoute = ContactRouteImport.update({
   path: '/contact',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CommunityGuidelinesRoute = CommunityGuidelinesRouteImport.update({
+  id: '/community-guidelines',
+  path: '/community-guidelines',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
   path: '/auth',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AiContentPolicyRoute = AiContentPolicyRouteImport.update({
+  id: '/ai-content-policy',
+  path: '/ai-content-policy',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AdminRoute = AdminRouteImport.update({
   id: '/admin',
   path: '/admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AccessibilityRoute = AccessibilityRouteImport.update({
+  id: '/accessibility',
+  path: '/accessibility',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AboutRoute = AboutRouteImport.update({
@@ -270,6 +302,11 @@ const AdminLinkingRoute = AdminLinkingRouteImport.update({
   path: '/linking',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminLegalRoute = AdminLegalRouteImport.update({
+  id: '/legal',
+  path: '/legal',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminCommunityRoute = AdminCommunityRouteImport.update({
   id: '/community',
   path: '/community',
@@ -300,6 +337,11 @@ const BlogCategorySlugRoute = BlogCategorySlugRouteImport.update({
   path: '/blog/category/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminLegalSlugRoute = AdminLegalSlugRouteImport.update({
+  id: '/$slug',
+  path: '/$slug',
+  getParentRoute: () => AdminLegalRoute,
+} as any)
 const AdminEntityIdRoute = AdminEntityIdRouteImport.update({
   id: '/$id',
   path: '/$id',
@@ -315,11 +357,15 @@ const ApiPublicArticleImageSplatRoute =
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/accessibility': typeof AccessibilityRoute
   '/admin': typeof AdminRouteWithChildren
+  '/ai-content-policy': typeof AiContentPolicyRoute
   '/auth': typeof AuthRoute
+  '/community-guidelines': typeof CommunityGuidelinesRoute
   '/contact': typeof ContactRoute
   '/cookies': typeof CookiesRoute
   '/disclaimer': typeof DisclaimerRoute
+  '/dmca': typeof DmcaRoute
   '/editorial-policy': typeof EditorialPolicyRoute
   '/feed': typeof FeedRoute
   '/privacy': typeof PrivacyRoute
@@ -330,9 +376,11 @@ export interface FileRoutesByFullPath {
   '/sitemap': typeof SitemapRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
+  '/ugc-policy': typeof UgcPolicyRoute
   '/admin/$entity': typeof AdminEntityRouteWithChildren
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/community': typeof AdminCommunityRoute
+  '/admin/legal': typeof AdminLegalRouteWithChildren
   '/admin/linking': typeof AdminLinkingRoute
   '/admin/logs': typeof AdminLogsRoute
   '/admin/media': typeof AdminMediaRoute
@@ -359,6 +407,7 @@ export interface FileRoutesByFullPath {
   '/ideas/': typeof IdeasIndexRoute
   '/tools/': typeof ToolsIndexRoute
   '/admin/$entity/$id': typeof AdminEntityIdRoute
+  '/admin/legal/$slug': typeof AdminLegalSlugRoute
   '/blog/category/$slug': typeof BlogCategorySlugRoute
   '/blog/tag/$slug': typeof BlogTagSlugRoute
   '/admin/$entity/': typeof AdminEntityIndexRoute
@@ -367,10 +416,14 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/accessibility': typeof AccessibilityRoute
+  '/ai-content-policy': typeof AiContentPolicyRoute
   '/auth': typeof AuthRoute
+  '/community-guidelines': typeof CommunityGuidelinesRoute
   '/contact': typeof ContactRoute
   '/cookies': typeof CookiesRoute
   '/disclaimer': typeof DisclaimerRoute
+  '/dmca': typeof DmcaRoute
   '/editorial-policy': typeof EditorialPolicyRoute
   '/feed': typeof FeedRoute
   '/privacy': typeof PrivacyRoute
@@ -381,8 +434,10 @@ export interface FileRoutesByTo {
   '/sitemap': typeof SitemapRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
+  '/ugc-policy': typeof UgcPolicyRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/community': typeof AdminCommunityRoute
+  '/admin/legal': typeof AdminLegalRouteWithChildren
   '/admin/linking': typeof AdminLinkingRoute
   '/admin/logs': typeof AdminLogsRoute
   '/admin/media': typeof AdminMediaRoute
@@ -409,6 +464,7 @@ export interface FileRoutesByTo {
   '/ideas': typeof IdeasIndexRoute
   '/tools': typeof ToolsIndexRoute
   '/admin/$entity/$id': typeof AdminEntityIdRoute
+  '/admin/legal/$slug': typeof AdminLegalSlugRoute
   '/blog/category/$slug': typeof BlogCategorySlugRoute
   '/blog/tag/$slug': typeof BlogTagSlugRoute
   '/admin/$entity': typeof AdminEntityIndexRoute
@@ -418,11 +474,15 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/accessibility': typeof AccessibilityRoute
   '/admin': typeof AdminRouteWithChildren
+  '/ai-content-policy': typeof AiContentPolicyRoute
   '/auth': typeof AuthRoute
+  '/community-guidelines': typeof CommunityGuidelinesRoute
   '/contact': typeof ContactRoute
   '/cookies': typeof CookiesRoute
   '/disclaimer': typeof DisclaimerRoute
+  '/dmca': typeof DmcaRoute
   '/editorial-policy': typeof EditorialPolicyRoute
   '/feed': typeof FeedRoute
   '/privacy': typeof PrivacyRoute
@@ -433,9 +493,11 @@ export interface FileRoutesById {
   '/sitemap': typeof SitemapRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
+  '/ugc-policy': typeof UgcPolicyRoute
   '/admin/$entity': typeof AdminEntityRouteWithChildren
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/community': typeof AdminCommunityRoute
+  '/admin/legal': typeof AdminLegalRouteWithChildren
   '/admin/linking': typeof AdminLinkingRoute
   '/admin/logs': typeof AdminLogsRoute
   '/admin/media': typeof AdminMediaRoute
@@ -462,6 +524,7 @@ export interface FileRoutesById {
   '/ideas/': typeof IdeasIndexRoute
   '/tools/': typeof ToolsIndexRoute
   '/admin/$entity/$id': typeof AdminEntityIdRoute
+  '/admin/legal/$slug': typeof AdminLegalSlugRoute
   '/blog/category/$slug': typeof BlogCategorySlugRoute
   '/blog/tag/$slug': typeof BlogTagSlugRoute
   '/admin/$entity/': typeof AdminEntityIndexRoute
@@ -472,11 +535,15 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/about'
+    | '/accessibility'
     | '/admin'
+    | '/ai-content-policy'
     | '/auth'
+    | '/community-guidelines'
     | '/contact'
     | '/cookies'
     | '/disclaimer'
+    | '/dmca'
     | '/editorial-policy'
     | '/feed'
     | '/privacy'
@@ -487,9 +554,11 @@ export interface FileRouteTypes {
     | '/sitemap'
     | '/sitemap.xml'
     | '/terms'
+    | '/ugc-policy'
     | '/admin/$entity'
     | '/admin/analytics'
     | '/admin/community'
+    | '/admin/legal'
     | '/admin/linking'
     | '/admin/logs'
     | '/admin/media'
@@ -516,6 +585,7 @@ export interface FileRouteTypes {
     | '/ideas/'
     | '/tools/'
     | '/admin/$entity/$id'
+    | '/admin/legal/$slug'
     | '/blog/category/$slug'
     | '/blog/tag/$slug'
     | '/admin/$entity/'
@@ -524,10 +594,14 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/about'
+    | '/accessibility'
+    | '/ai-content-policy'
     | '/auth'
+    | '/community-guidelines'
     | '/contact'
     | '/cookies'
     | '/disclaimer'
+    | '/dmca'
     | '/editorial-policy'
     | '/feed'
     | '/privacy'
@@ -538,8 +612,10 @@ export interface FileRouteTypes {
     | '/sitemap'
     | '/sitemap.xml'
     | '/terms'
+    | '/ugc-policy'
     | '/admin/analytics'
     | '/admin/community'
+    | '/admin/legal'
     | '/admin/linking'
     | '/admin/logs'
     | '/admin/media'
@@ -566,6 +642,7 @@ export interface FileRouteTypes {
     | '/ideas'
     | '/tools'
     | '/admin/$entity/$id'
+    | '/admin/legal/$slug'
     | '/blog/category/$slug'
     | '/blog/tag/$slug'
     | '/admin/$entity'
@@ -574,11 +651,15 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/about'
+    | '/accessibility'
     | '/admin'
+    | '/ai-content-policy'
     | '/auth'
+    | '/community-guidelines'
     | '/contact'
     | '/cookies'
     | '/disclaimer'
+    | '/dmca'
     | '/editorial-policy'
     | '/feed'
     | '/privacy'
@@ -589,9 +670,11 @@ export interface FileRouteTypes {
     | '/sitemap'
     | '/sitemap.xml'
     | '/terms'
+    | '/ugc-policy'
     | '/admin/$entity'
     | '/admin/analytics'
     | '/admin/community'
+    | '/admin/legal'
     | '/admin/linking'
     | '/admin/logs'
     | '/admin/media'
@@ -618,6 +701,7 @@ export interface FileRouteTypes {
     | '/ideas/'
     | '/tools/'
     | '/admin/$entity/$id'
+    | '/admin/legal/$slug'
     | '/blog/category/$slug'
     | '/blog/tag/$slug'
     | '/admin/$entity/'
@@ -627,11 +711,15 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
+  AccessibilityRoute: typeof AccessibilityRoute
   AdminRoute: typeof AdminRouteWithChildren
+  AiContentPolicyRoute: typeof AiContentPolicyRoute
   AuthRoute: typeof AuthRoute
+  CommunityGuidelinesRoute: typeof CommunityGuidelinesRoute
   ContactRoute: typeof ContactRoute
   CookiesRoute: typeof CookiesRoute
   DisclaimerRoute: typeof DisclaimerRoute
+  DmcaRoute: typeof DmcaRoute
   EditorialPolicyRoute: typeof EditorialPolicyRoute
   FeedRoute: typeof FeedRoute
   PrivacyRoute: typeof PrivacyRoute
@@ -642,6 +730,7 @@ export interface RootRouteChildren {
   SitemapRoute: typeof SitemapRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   TermsRoute: typeof TermsRoute
+  UgcPolicyRoute: typeof UgcPolicyRoute
   AuthorsSlugRoute: typeof AuthorsSlugRoute
   BlogSlugRoute: typeof BlogSlugRoute
   CategoriesSlugRoute: typeof CategoriesSlugRoute
@@ -666,6 +755,13 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/ugc-policy': {
+      id: '/ugc-policy'
+      path: '/ugc-policy'
+      fullPath: '/ugc-policy'
+      preLoaderRoute: typeof UgcPolicyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/terms': {
       id: '/terms'
       path: '/terms'
@@ -736,6 +832,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EditorialPolicyRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/dmca': {
+      id: '/dmca'
+      path: '/dmca'
+      fullPath: '/dmca'
+      preLoaderRoute: typeof DmcaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/disclaimer': {
       id: '/disclaimer'
       path: '/disclaimer'
@@ -757,6 +860,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ContactRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/community-guidelines': {
+      id: '/community-guidelines'
+      path: '/community-guidelines'
+      fullPath: '/community-guidelines'
+      preLoaderRoute: typeof CommunityGuidelinesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/auth': {
       id: '/auth'
       path: '/auth'
@@ -764,11 +874,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/ai-content-policy': {
+      id: '/ai-content-policy'
+      path: '/ai-content-policy'
+      fullPath: '/ai-content-policy'
+      preLoaderRoute: typeof AiContentPolicyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/admin': {
       id: '/admin'
       path: '/admin'
       fullPath: '/admin'
       preLoaderRoute: typeof AdminRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/accessibility': {
+      id: '/accessibility'
+      path: '/accessibility'
+      fullPath: '/accessibility'
+      preLoaderRoute: typeof AccessibilityRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/about': {
@@ -960,6 +1084,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminLinkingRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/legal': {
+      id: '/admin/legal'
+      path: '/legal'
+      fullPath: '/admin/legal'
+      preLoaderRoute: typeof AdminLegalRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/community': {
       id: '/admin/community'
       path: '/community'
@@ -1002,6 +1133,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof BlogCategorySlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/legal/$slug': {
+      id: '/admin/legal/$slug'
+      path: '/$slug'
+      fullPath: '/admin/legal/$slug'
+      preLoaderRoute: typeof AdminLegalSlugRouteImport
+      parentRoute: typeof AdminLegalRoute
+    }
     '/admin/$entity/$id': {
       id: '/admin/$entity/$id'
       path: '/$id'
@@ -1033,10 +1171,23 @@ const AdminEntityRouteWithChildren = AdminEntityRoute._addFileChildren(
   AdminEntityRouteChildren,
 )
 
+interface AdminLegalRouteChildren {
+  AdminLegalSlugRoute: typeof AdminLegalSlugRoute
+}
+
+const AdminLegalRouteChildren: AdminLegalRouteChildren = {
+  AdminLegalSlugRoute: AdminLegalSlugRoute,
+}
+
+const AdminLegalRouteWithChildren = AdminLegalRoute._addFileChildren(
+  AdminLegalRouteChildren,
+)
+
 interface AdminRouteChildren {
   AdminEntityRoute: typeof AdminEntityRouteWithChildren
   AdminAnalyticsRoute: typeof AdminAnalyticsRoute
   AdminCommunityRoute: typeof AdminCommunityRoute
+  AdminLegalRoute: typeof AdminLegalRouteWithChildren
   AdminLinkingRoute: typeof AdminLinkingRoute
   AdminLogsRoute: typeof AdminLogsRoute
   AdminMediaRoute: typeof AdminMediaRoute
@@ -1051,6 +1202,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminEntityRoute: AdminEntityRouteWithChildren,
   AdminAnalyticsRoute: AdminAnalyticsRoute,
   AdminCommunityRoute: AdminCommunityRoute,
+  AdminLegalRoute: AdminLegalRouteWithChildren,
   AdminLinkingRoute: AdminLinkingRoute,
   AdminLogsRoute: AdminLogsRoute,
   AdminMediaRoute: AdminMediaRoute,
@@ -1066,11 +1218,15 @@ const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
+  AccessibilityRoute: AccessibilityRoute,
   AdminRoute: AdminRouteWithChildren,
+  AiContentPolicyRoute: AiContentPolicyRoute,
   AuthRoute: AuthRoute,
+  CommunityGuidelinesRoute: CommunityGuidelinesRoute,
   ContactRoute: ContactRoute,
   CookiesRoute: CookiesRoute,
   DisclaimerRoute: DisclaimerRoute,
+  DmcaRoute: DmcaRoute,
   EditorialPolicyRoute: EditorialPolicyRoute,
   FeedRoute: FeedRoute,
   PrivacyRoute: PrivacyRoute,
@@ -1081,6 +1237,7 @@ const rootRouteChildren: RootRouteChildren = {
   SitemapRoute: SitemapRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   TermsRoute: TermsRoute,
+  UgcPolicyRoute: UgcPolicyRoute,
   AuthorsSlugRoute: AuthorsSlugRoute,
   BlogSlugRoute: BlogSlugRoute,
   CategoriesSlugRoute: CategoriesSlugRoute,

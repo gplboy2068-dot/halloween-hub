@@ -118,9 +118,14 @@ function HtmlSitemap() {
             { href: "/contact", label: "Contact" },
             { href: "/editorial-policy", label: "Editorial Policy" },
             { href: "/privacy", label: "Privacy Policy" },
-            { href: "/terms", label: "Terms of Service" },
+            { href: "/terms", label: "Terms and Conditions" },
             { href: "/disclaimer", label: "Disclaimer" },
             { href: "/cookies", label: "Cookie Policy" },
+            { href: "/dmca", label: "DMCA Policy" },
+            { href: "/community-guidelines", label: "Community Guidelines" },
+            { href: "/ai-content-policy", label: "AI Content Policy" },
+            { href: "/ugc-policy", label: "UGC Policy" },
+            { href: "/accessibility", label: "Accessibility Statement" },
           ]} />
         </Section>
       </div>

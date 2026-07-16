@@ -467,6 +467,95 @@ export type Database = {
         }
         Relationships: []
       }
+      legal_page_versions: {
+        Row: {
+          content: string
+          created_at: string
+          created_by: string | null
+          id: string
+          lead: string | null
+          meta_description: string
+          meta_title: string
+          slug: string
+          title: string
+          version: number
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          lead?: string | null
+          meta_description: string
+          meta_title: string
+          slug: string
+          title: string
+          version: number
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          lead?: string | null
+          meta_description?: string
+          meta_title?: string
+          slug?: string
+          title?: string
+          version?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "legal_page_versions_slug_fkey"
+            columns: ["slug"]
+            isOneToOne: false
+            referencedRelation: "legal_pages"
+            referencedColumns: ["slug"]
+          },
+        ]
+      }
+      legal_pages: {
+        Row: {
+          content: string
+          created_at: string
+          lead: string | null
+          meta_description: string
+          meta_title: string
+          published: boolean
+          slug: string
+          title: string
+          updated_at: string
+          updated_by: string | null
+          version: number
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          lead?: string | null
+          meta_description: string
+          meta_title: string
+          published?: boolean
+          slug: string
+          title: string
+          updated_at?: string
+          updated_by?: string | null
+          version?: number
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          lead?: string | null
+          meta_description?: string
+          meta_title?: string
+          published?: boolean
+          slug?: string
+          title?: string
+          updated_at?: string
+          updated_by?: string | null
+          version?: number
+        }
+        Relationships: []
+      }
       newsletter_subscribers: {
         Row: {
           confirmed: boolean

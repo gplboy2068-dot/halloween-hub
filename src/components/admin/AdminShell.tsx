@@ -3,7 +3,7 @@ import { useState, type ReactNode } from "react";
 import {
   LayoutDashboard, Wrench, FileText, FolderTree, Tags, Image as ImageIcon,
   HelpCircle, Search, Code2, Users, BarChart3, Settings, ScrollText,
-  ArrowRightLeft, Link2, Menu, X, ExternalLink, MessagesSquare,
+  ArrowRightLeft, Link2, Menu, X, ExternalLink, MessagesSquare, Scale,
 } from "lucide-react";
 
 type NavItem = { to: string; label: string; icon: typeof LayoutDashboard; exact?: boolean };
@@ -20,6 +20,7 @@ const NAV: NavGroup[] = [
     { to: "/admin/faqs", label: "FAQs", icon: HelpCircle },
     { to: "/admin/media", label: "Media Library", icon: ImageIcon },
     { to: "/admin/community", label: "Community Feed", icon: MessagesSquare },
+    { to: "/admin/legal", label: "Legal Pages", icon: Scale },
   ]},
   { section: "SEO", items: [
     { to: "/admin/seo", label: "SEO", icon: Search },
