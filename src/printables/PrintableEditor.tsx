@@ -246,7 +246,7 @@ const PrintableSvg = ({
 }: {
   config: PrintableConfig;
   state: PrintableState;
-  ref: React.RefObject<SVGSVGElement | null>;
+  ref: RefObject<SVGSVGElement | null>;
 }) => {
   // Load font stylesheets once at first render (client-side).
   useEffect(() => {
