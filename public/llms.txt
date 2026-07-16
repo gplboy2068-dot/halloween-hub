@@ -20,3 +20,7 @@
 - [AI Content Policy](/ai-content-policy)
 - [User Generated Content Policy](/ugc-policy)
 - [Accessibility Statement](/accessibility)
+- [Affiliate Disclosure](/affiliate-disclosure)
+- [AI Transparency Policy](/ai-transparency)
+- [Report Abuse](/report-abuse)
+- [Advertise With Us](/advertise)
