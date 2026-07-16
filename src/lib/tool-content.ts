@@ -733,6 +733,22 @@ const OVERRIDES: Partial<Record<string, Partial<ToolContent>>> = {
     intro: "Print Welcome, Bathroom, Candy Bar, Photo Booth, Exit and custom Halloween signs on Letter or A4 in seconds.",
     ctaSlug: "printable-banner-generator",
   },
+  "candy-bar-wrapper-generator": {
+    intro: "Design your own Halloween candy bar wrappers sized for standard 1.55oz chocolate — two per sheet, ready to wrap and hand out.",
+    ctaSlug: "gift-tag-generator",
+  },
+  "envelope-liner-generator": {
+    intro: "Print Halloween envelope liners for A7 and A2 invitation envelopes — coordinating patterns, fold guides, and sticker seals.",
+    ctaSlug: "invitation-maker",
+  },
+  "halloween-ticket-generator": {
+    intro: "Perforated Halloween tickets with tear-off stubs — event tickets, raffles, VIP passes and Admit One — five per sheet.",
+    ctaSlug: "award-certificate-generator",
+  },
+  "award-certificate-generator": {
+    intro: "Print Best Costume, Scariest, Funniest, Group, Kids and DIY award certificates on Letter — fits a $2 frame.",
+    ctaSlug: "halloween-ticket-generator",
+  },
 };
 
 // Fallback if a category isn't found in the template map.
