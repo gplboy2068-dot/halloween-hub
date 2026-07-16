@@ -66,10 +66,10 @@ export const TOOLS: ToolCard[] = [
 export const CATEGORIES = [
   { slug: "design", name: "Design", emoji: "🎨", description: "Cards, posters, flyers & more" },
   { slug: "ai", name: "AI Generators", emoji: "🪄", description: "Names, captions, stories" },
+  { slug: "printables", name: "Printables", emoji: "🖨️", description: "Banners, tags, labels, signs" },
   { slug: "pumpkin", name: "Pumpkin", emoji: "🎃", description: "Templates, stencils, faces" },
   { slug: "party", name: "Party", emoji: "🥳", description: "Planners & invitations" },
   { slug: "images", name: "Images", emoji: "🖼️", description: "Wallpapers & stickers" },
-  { slug: "printables", name: "Printables", emoji: "🖨️", description: "Coloring pages & activities" },
   { slug: "social", name: "Social", emoji: "📱", description: "Captions, hashtags, memes" },
   { slug: "wishes", name: "Wishes & Quotes", emoji: "🌙", description: "Messages that spark joy" },
 ];
