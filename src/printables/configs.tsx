@@ -320,6 +320,346 @@ export const partySignConfig: PrintableConfig = {
   },
 };
 
+/* ------------------------------------------------------------------ */
+/* 7. CANDY BAR WRAPPER — standard 1.55oz Hershey size                */
+/*    Full flat wrapper ~ 5.75" x 5.5" = 146 x 140 mm                 */
+/* ------------------------------------------------------------------ */
+export const candyBarWrapperConfig: PrintableConfig = {
+  toolSlug: "candy-bar-wrapper-generator",
+  title: "Halloween Candy Bar Wrapper",
+  widthMm: 146,
+  heightMm: 140,
+  paperSize: "letter",
+  orientation: "portrait",
+  primaryText: "TRICK OR TREAT",
+  secondaryText: "Happy Halloween",
+  variants: [
+    { id: "classic", name: "Classic Wrapper" },
+    { id: "kids", name: "Kids Party" },
+    { id: "spooky", name: "Spooky Deluxe" },
+    { id: "thankyou", name: "Thank You Favor" },
+  ],
+  defaultVariant: "classic",
+  allowIcons: true,
+  tilesPerSheet: 2,
+  render: (s) => {
+    const w = 146, h = 140;
+    // Back panel (top ~35mm)
+    // Wrap-around center label (middle ~70mm) — main design
+    // Front panel (bottom ~35mm) — flipped
+    return (
+      <>
+        {/* background */}
+        <rect x={0} y={0} width={w} height={h} fill={s.theme.bg} />
+        {/* back panel */}
+        <rect x={0} y={0} width={w} height={35} fill={s.theme.bg} stroke={s.theme.muted} strokeWidth={0.3} strokeDasharray="1 1" />
+        <text x={w / 2} y={20} textAnchor="middle" fontFamily={s.font.css} fontSize={5} fill={s.theme.muted}>
+          Nutrition: 100% pure Halloween magic
+        </text>
+        {/* fold lines */}
+        <line x1={0} y1={35} x2={w} y2={35} stroke={s.theme.muted} strokeDasharray="2 1.5" strokeWidth={0.3} />
+        <line x1={0} y1={105} x2={w} y2={105} stroke={s.theme.muted} strokeDasharray="2 1.5" strokeWidth={0.3} />
+        <text x={w - 2} y={34} textAnchor="end" fontSize={2} fill={s.theme.muted}>FOLD</text>
+        <text x={w - 2} y={104} textAnchor="end" fontSize={2} fill={s.theme.muted}>FOLD</text>
+
+        {/* center label — the main visible panel */}
+        <rect x={0} y={35} width={w} height={70} fill={s.theme.accent} />
+        <rect x={6} y={41} width={w - 12} height={58} rx={2}
+          fill="none" stroke={s.theme.bg} strokeWidth={0.6} strokeDasharray="2 1" />
+        <IconAt state={s} x={w / 2} y={58} size={22} />
+        <text x={w / 2} y={82} textAnchor="middle"
+          fontFamily={s.font.css} fontSize={12} fill={s.theme.bg} fontWeight={900}>
+          {s.primaryText.slice(0, 22)}
+        </text>
+        <text x={w / 2} y={93} textAnchor="middle"
+          fontFamily={s.font.css} fontSize={5} fill={s.theme.bg}>
+          {s.secondaryText.slice(0, 40)}
+        </text>
+
+        {/* front panel */}
+        <rect x={0} y={105} width={w} height={35} fill={s.theme.bg} stroke={s.theme.muted} strokeWidth={0.3} strokeDasharray="1 1" />
+        <text x={w / 2} y={125} textAnchor="middle" fontFamily={s.font.css} fontSize={6} fill={s.theme.fg}>
+          HalloweenTools.com
+        </text>
+        {/* crop marks */}
+        <line x1={0} y1={0} x2={4} y2={0} stroke={s.theme.fg} strokeWidth={0.3} />
+        <line x1={w - 4} y1={0} x2={w} y2={0} stroke={s.theme.fg} strokeWidth={0.3} />
+        <line x1={0} y1={h} x2={4} y2={h} stroke={s.theme.fg} strokeWidth={0.3} />
+        <line x1={w - 4} y1={h} x2={w} y2={h} stroke={s.theme.fg} strokeWidth={0.3} />
+      </>
+    );
+  },
+};
+
+/* ------------------------------------------------------------------ */
+/* 8. ENVELOPE LINER — A7 (5x7 invite) liner                          */
+/*    A7 envelope ~ 133x184mm; liner insert ~ 130x175mm with V-flap   */
+/* ------------------------------------------------------------------ */
+export const envelopeLinerConfig: PrintableConfig = {
+  toolSlug: "envelope-liner-generator",
+  title: "Halloween Envelope Liner",
+  widthMm: 130,
+  heightMm: 175,
+  paperSize: "letter",
+  orientation: "portrait",
+  primaryText: "You're Invited",
+  secondaryText: "Halloween Night",
+  variants: [
+    { id: "liner-a7", name: "A7 Liner (5×7)" },
+    { id: "liner-a2", name: "A2 Liner (4.25×5.5)" },
+    { id: "envelope", name: "Full Envelope" },
+    { id: "seal", name: "Sticker Seals" },
+  ],
+  defaultVariant: "liner-a7",
+  allowIcons: true,
+  render: (s) => {
+    const w = 130, h = 175;
+    // V-flap shape at top for envelope liner
+    const flapY = 55;
+    return (
+      <>
+        {/* liner outline — V-flap top */}
+        <path
+          d={`M 2 ${flapY} L ${w / 2} 4 L ${w - 2} ${flapY} L ${w - 2} ${h - 2} L 2 ${h - 2} Z`}
+          fill={s.theme.bg}
+          stroke={s.theme.accent}
+          strokeWidth={0.6}
+        />
+        {/* inner cut guide */}
+        <path
+          d={`M 6 ${flapY + 2} L ${w / 2} 8 L ${w - 6} ${flapY + 2} L ${w - 6} ${h - 6} L 6 ${h - 6} Z`}
+          fill="none"
+          stroke={s.theme.muted}
+          strokeWidth={0.3}
+          strokeDasharray="1 1"
+        />
+        {/* fold line at flap base */}
+        <line x1={2} y1={flapY} x2={w - 2} y2={flapY}
+          stroke={s.theme.muted} strokeDasharray="2 1.5" strokeWidth={0.3} />
+        <text x={w - 4} y={flapY - 1} textAnchor="end" fontSize={2} fill={s.theme.muted}>FOLD</text>
+
+        {/* pattern in the flap */}
+        <g opacity={0.6}>
+          <IconAt state={s} x={w / 2} y={32} size={18} />
+        </g>
+
+        {/* main liner interior — repeating pattern */}
+        {Array.from({ length: 5 }).map((_, r) =>
+          Array.from({ length: 4 }).map((_, c) => {
+            const x = 18 + c * 32;
+            const y = 75 + r * 22;
+            return <IconAt key={`${r}-${c}`} state={s} x={x} y={y} size={10} />;
+          }),
+        )}
+
+        {/* accent stripe */}
+        <rect x={6} y={h - 30} width={w - 12} height={12} fill={s.theme.accent} rx={1} />
+        <text x={w / 2} y={h - 22} textAnchor="middle"
+          fontFamily={s.font.css} fontSize={6} fill={s.theme.bg} fontWeight={700}>
+          {s.primaryText.slice(0, 30)}
+        </text>
+        <text x={w / 2} y={h - 10} textAnchor="middle"
+          fontFamily={s.font.css} fontSize={4} fill={s.theme.fg}>
+          {s.secondaryText.slice(0, 40)}
+        </text>
+      </>
+    );
+  },
+};
+
+/* ------------------------------------------------------------------ */
+/* 9. HALLOWEEN TICKET — 6"x2" perforated ticket with stub            */
+/* ------------------------------------------------------------------ */
+export const ticketConfig: PrintableConfig = {
+  toolSlug: "halloween-ticket-generator",
+  title: "Halloween Ticket",
+  widthMm: 152,
+  heightMm: 51,
+  paperSize: "letter",
+  orientation: "portrait",
+  primaryText: "MONSTER MASH",
+  secondaryText: "Oct 31 · 8:00 PM",
+  variants: [
+    { id: "event", name: "Event Ticket" },
+    { id: "raffle", name: "Raffle Ticket" },
+    { id: "vip", name: "VIP Pass" },
+    { id: "admit", name: "Admit One" },
+  ],
+  defaultVariant: "event",
+  allowIcons: true,
+  tilesPerSheet: 5,
+  render: (s) => {
+    const w = 152, h = 51;
+    const stubW = 38;
+    const perfX = w - stubW;
+    // perforation dots
+    const perfDots = Array.from({ length: 25 }, (_, i) => (
+      <circle key={i} cx={perfX} cy={2 + i * 2} r={0.4} fill={s.theme.bg} />
+    ));
+    return (
+      <>
+        {/* outer border */}
+        <rect x={1} y={1} width={w - 2} height={h - 2} rx={3}
+          fill={s.theme.accent} stroke={s.theme.fg} strokeWidth={0.4} />
+        {/* inner frame */}
+        <rect x={4} y={4} width={w - 8} height={h - 8} rx={2}
+          fill="none" stroke={s.theme.bg} strokeWidth={0.4} strokeDasharray="2 1" />
+
+        {/* main body */}
+        <IconAt state={s} x={16} y={h / 2} size={22} />
+        <text x={32} y={20} fontFamily={s.font.css} fontSize={11} fill={s.theme.bg} fontWeight={900}>
+          {s.primaryText.slice(0, 22)}
+        </text>
+        <text x={32} y={30} fontFamily={s.font.css} fontSize={5} fill={s.theme.bg}>
+          {s.secondaryText.slice(0, 40)}
+        </text>
+        <text x={32} y={40} fontFamily={s.font.css} fontSize={3.5} fill={s.theme.bg} opacity={0.9}>
+          {s.variant === "vip" ? "VIP ACCESS · ALL ACCESS" :
+           s.variant === "raffle" ? "KEEP THIS STUB · WINNER DRAWN OCT 31" :
+           s.variant === "admit" ? "ADMIT ONE · NON-REFUNDABLE" :
+           "ADMIT ONE · HALLOWEEN NIGHT"}
+        </text>
+
+        {/* perforation */}
+        <line x1={perfX} y1={2} x2={perfX} y2={h - 2}
+          stroke={s.theme.bg} strokeDasharray="1 1" strokeWidth={0.3} />
+        {perfDots}
+
+        {/* stub */}
+        <text x={perfX + stubW / 2} y={12} textAnchor="middle"
+          fontFamily={s.font.css} fontSize={3} fill={s.theme.bg} opacity={0.85}>
+          KEEP STUB
+        </text>
+        <text x={perfX + stubW / 2} y={25} textAnchor="middle"
+          fontFamily={s.font.css} fontSize={7} fill={s.theme.bg} fontWeight={900}>
+          {s.variant === "raffle" ? "No.001" : "ADMIT"}
+        </text>
+        <text x={perfX + stubW / 2} y={35} textAnchor="middle"
+          fontFamily={s.font.css} fontSize={7} fill={s.theme.bg} fontWeight={900}>
+          {s.variant === "raffle" ? "" : "ONE"}
+        </text>
+        <text x={perfX + stubW / 2} y={44} textAnchor="middle"
+          fontFamily={s.font.css} fontSize={2.5} fill={s.theme.bg} opacity={0.85}>
+          HalloweenTools.com
+        </text>
+      </>
+    );
+  },
+};
+
+/* ------------------------------------------------------------------ */
+/* 10. COSTUME CONTEST AWARD CERTIFICATE — Letter landscape           */
+/* ------------------------------------------------------------------ */
+export const awardCertificateConfig: PrintableConfig = {
+  toolSlug: "award-certificate-generator",
+  title: "Halloween Costume Award Certificate",
+  widthMm: 279.4,
+  heightMm: 215.9,
+  paperSize: "letter",
+  orientation: "landscape",
+  primaryText: "Jane Doe",
+  secondaryText: "Best Costume 2026",
+  variants: [
+    { id: "best", name: "Best Costume" },
+    { id: "scariest", name: "Scariest Costume" },
+    { id: "funniest", name: "Funniest Costume" },
+    { id: "group", name: "Best Group" },
+    { id: "kids", name: "Best Kid Costume" },
+    { id: "diy", name: "Best DIY" },
+    { id: "custom", name: "Custom Award" },
+  ],
+  defaultVariant: "best",
+  allowIcons: true,
+  render: (s) => {
+    const w = 279.4, h = 215.9;
+    // decorative corner flourish (icon)
+    const cornerIcons = [
+      { x: 24, y: 24 },
+      { x: w - 24, y: 24 },
+      { x: 24, y: h - 24 },
+      { x: w - 24, y: h - 24 },
+    ];
+    return (
+      <>
+        {/* outer border */}
+        <rect x={8} y={8} width={w - 16} height={h - 16} rx={2}
+          fill={s.theme.bg} stroke={s.theme.accent} strokeWidth={2} />
+        <rect x={14} y={14} width={w - 28} height={h - 28} rx={1}
+          fill="none" stroke={s.theme.accent} strokeWidth={0.5} strokeDasharray="2 2" />
+        <rect x={20} y={20} width={w - 40} height={h - 40} rx={1}
+          fill="none" stroke={s.theme.accent} strokeWidth={0.3} />
+
+        {/* corner motifs */}
+        {cornerIcons.map((p, i) => (
+          <g key={i} opacity={0.6}><IconAt state={s} x={p.x} y={p.y} size={16} /></g>
+        ))}
+
+        {/* seal / ribbon on the left */}
+        <g transform={`translate(${w / 2 - 18}, ${h - 60})`}>
+          <circle cx={0} cy={0} r={14} fill={s.theme.accent} />
+          <circle cx={0} cy={0} r={10} fill="none" stroke={s.theme.bg} strokeWidth={0.6} />
+          <text x={0} y={2} textAnchor="middle" fontFamily={s.font.css}
+            fontSize={5} fill={s.theme.bg} fontWeight={900}>2026</text>
+          <polygon points={`-8,12 -12,26 -4,22 0,28 4,22 12,26 8,12`} fill={s.theme.accent} />
+        </g>
+
+        {/* header */}
+        <text x={w / 2} y={44} textAnchor="middle" fontFamily={s.font.css}
+          fontSize={9} fill={s.theme.muted} letterSpacing="4">
+          HALLOWEEN COSTUME CONTEST
+        </text>
+        <line x1={w / 2 - 60} y1={50} x2={w / 2 + 60} y2={50}
+          stroke={s.theme.accent} strokeWidth={0.5} />
+
+        {/* main award title */}
+        <text x={w / 2} y={72} textAnchor="middle" fontFamily={s.font.css}
+          fontSize={22} fill={s.theme.accent} fontWeight={900}>
+          Certificate of Award
+        </text>
+
+        {/* "presented to" */}
+        <text x={w / 2} y={92} textAnchor="middle" fontFamily={s.font.css}
+          fontSize={7} fill={s.theme.muted} letterSpacing="2">
+          THIS AWARD IS PRESENTED TO
+        </text>
+
+        {/* recipient name */}
+        <text x={w / 2} y={116} textAnchor="middle" fontFamily={s.font.css}
+          fontSize={26} fill={s.theme.fg} fontWeight={900}>
+          {s.primaryText.slice(0, 30)}
+        </text>
+        <line x1={w / 2 - 80} y1={124} x2={w / 2 + 80} y2={124}
+          stroke={s.theme.fg} strokeWidth={0.4} />
+
+        {/* category */}
+        <text x={w / 2} y={140} textAnchor="middle" fontFamily={s.font.css}
+          fontSize={9} fill={s.theme.muted}>
+          for winning the category of
+        </text>
+        <text x={w / 2} y={156} textAnchor="middle" fontFamily={s.font.css}
+          fontSize={14} fill={s.theme.accent} fontWeight={700}>
+          {s.secondaryText.slice(0, 40)}
+        </text>
+
+        {/* signature lines */}
+        <line x1={40} y1={h - 32} x2={100} y2={h - 32} stroke={s.theme.fg} strokeWidth={0.4} />
+        <text x={70} y={h - 26} textAnchor="middle" fontFamily={s.font.css}
+          fontSize={4} fill={s.theme.muted}>Date</text>
+
+        <line x1={w - 100} y1={h - 32} x2={w - 40} y2={h - 32} stroke={s.theme.fg} strokeWidth={0.4} />
+        <text x={w - 70} y={h - 26} textAnchor="middle" fontFamily={s.font.css}
+          fontSize={4} fill={s.theme.muted}>Host Signature</text>
+
+        <text x={w / 2} y={h - 22} textAnchor="middle" fontFamily={s.font.css}
+          fontSize={3.5} fill={s.theme.muted}>
+          HalloweenTools.com · Free Printable Award
+        </text>
+      </>
+    );
+  },
+};
+
 export const ALL_PRINTABLES: PrintableConfig[] = [
   bannerConfig, cupcakeTopperConfig, giftTagConfig, labelConfig, treatBagConfig, partySignConfig,
+  candyBarWrapperConfig, envelopeLinerConfig, ticketConfig, awardCertificateConfig,
 ];

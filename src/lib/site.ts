@@ -61,6 +61,10 @@ export const TOOLS: ToolCard[] = [
   { slug: "label-generator", title: "Label Generator", description: "Candy, bottle, jar and food labels in editable Halloween themes.", emoji: "🏷️", category: "Printables", popular: true, isNew: true },
   { slug: "treat-bag-generator", title: "Treat Bag Generator", description: "Foldable treat-bag toppers and party bag labels for trick-or-treaters.", emoji: "🍭", category: "Printables", isNew: true },
   { slug: "party-sign-generator", title: "Party Sign Generator", description: "Welcome, bathroom, candy-bar, exit and photo-booth signs — print in Letter or A4.", emoji: "📜", category: "Printables", isNew: true },
+  { slug: "candy-bar-wrapper-generator", title: "Candy Bar Wrapper Generator", description: "Personalized Halloween candy bar wrappers sized for standard 1.55oz chocolate bars — party favors in minutes.", emoji: "🍫", category: "Printables", featured: true, isNew: true },
+  { slug: "envelope-liner-generator", title: "Envelope Liner Generator", description: "Halloween envelope liners and sticker seals to pair with your invitations — A7 and A2 sizes.", emoji: "📮", category: "Printables", isNew: true },
+  { slug: "halloween-ticket-generator", title: "Halloween Ticket Generator", description: "Perforated event, raffle, VIP and Admit One tickets with tear-off stubs — 5 per sheet.", emoji: "🎟️", category: "Printables", popular: true, isNew: true },
+  { slug: "award-certificate-generator", title: "Costume Award Certificate Generator", description: "Best Costume, Scariest, Funniest and group awards — landscape Letter certificates ready to hand out.", emoji: "🏆", category: "Printables", isNew: true },
 ];
 
 export const CATEGORIES = [

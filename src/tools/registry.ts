@@ -29,6 +29,7 @@ import { NameGenerator } from "./text-generators";
 import {
   PrintableBanner, PrintableCupcakeTopper, PrintableGiftTag,
   PrintableLabel, PrintableTreatBag, PrintablePartySign,
+  PrintableCandyBarWrapper, PrintableEnvelopeLiner, PrintableTicket, PrintableAwardCertificate,
 } from "@/printables/tools";
 
 export const TOOL_REGISTRY: Record<string, ComponentType> = {
@@ -72,6 +73,10 @@ export const TOOL_REGISTRY: Record<string, ComponentType> = {
   "label-generator": PrintableLabel,
   "treat-bag-generator": PrintableTreatBag,
   "party-sign-generator": PrintablePartySign,
+  "candy-bar-wrapper-generator": PrintableCandyBarWrapper,
+  "envelope-liner-generator": PrintableEnvelopeLiner,
+  "halloween-ticket-generator": PrintableTicket,
+  "award-certificate-generator": PrintableAwardCertificate,
 };
 
 export function getToolComponent(slug: string): ComponentType | null {
