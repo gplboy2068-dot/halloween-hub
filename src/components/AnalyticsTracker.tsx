@@ -3,25 +3,41 @@ import { useRouter } from "@tanstack/react-router";
 import { track, installAnalyticsFlush } from "@/lib/analytics";
 
 /**
- * Mounts once at the app root. Emits `pageview` per route change and
- * `scroll_depth` at 25/50/75/100% per page.
+ * Mounts once at the app root. Emits:
+ *  - `pageview` on each route change
+ *  - `scroll_depth` at 25/50/75/100%
+ *  - `page_time` when the user leaves a page (route change / tab hide / unload)
+ *    with `{ ms, path }` so the admin can compute avg time on page, per-tool
+ *    dwell time, session duration, and bounce rate.
  */
 export function AnalyticsTracker() {
   const router = useRouter();
 
   useEffect(() => {
     installAnalyticsFlush();
-    track("pageview", { title: document.title });
 
-    const unsubscribe = router.subscribe("onResolved", ({ toLocation }) => {
-      const path = toLocation.pathname + toLocation.searchStr;
-      track("pageview", { title: document.title, path });
-      lastDepth = 0;
-      firedDepths.clear();
-    });
-
+    let currentPath = window.location.pathname + window.location.search;
+    let enteredAt = Date.now();
     let lastDepth = 0;
     const firedDepths = new Set<number>();
+
+    const emitPageTime = () => {
+      const ms = Date.now() - enteredAt;
+      // Ignore absurd values (tab open for hours w/ no interaction) and near-zero
+      if (ms < 500 || ms > 30 * 60_000) return;
+      track("page_time", { ms, path: currentPath, depth: lastDepth });
+    };
+
+    track("pageview", { title: document.title, path: currentPath });
+
+    const unsubscribe = router.subscribe("onResolved", ({ toLocation }) => {
+      emitPageTime();
+      currentPath = toLocation.pathname + toLocation.searchStr;
+      enteredAt = Date.now();
+      lastDepth = 0;
+      firedDepths.clear();
+      track("pageview", { title: document.title, path: currentPath });
+    });
 
     const onScroll = () => {
       const doc = document.documentElement;
@@ -37,11 +53,21 @@ export function AnalyticsTracker() {
         }
       }
     };
+
+    const onHide = () => {
+      if (document.visibilityState === "hidden") emitPageTime();
+    };
+    const onPageHide = () => emitPageTime();
+
     window.addEventListener("scroll", onScroll, { passive: true });
+    document.addEventListener("visibilitychange", onHide);
+    window.addEventListener("pagehide", onPageHide);
 
     return () => {
       unsubscribe();
       window.removeEventListener("scroll", onScroll);
+      document.removeEventListener("visibilitychange", onHide);
+      window.removeEventListener("pagehide", onPageHide);
     };
   }, [router]);
 
