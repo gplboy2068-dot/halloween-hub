@@ -53,6 +53,14 @@ export const TOOLS: ToolCard[] = [
   { slug: "avatar-generator", title: "Avatar Generator", description: "Custom Halloween avatars.", emoji: "🧟", category: "Images" },
   { slug: "scary-story-generator", title: "Scary Story Generator", description: "AI-crafted horror stories.", emoji: "📖", category: "AI", isNew: true },
   { slug: "meme-generator", title: "Meme Generator", description: "Halloween memes in one click.", emoji: "😂", category: "Social" },
+
+  // Printable design tools
+  { slug: "printable-banner-generator", title: "Printable Banner Generator", description: "Design a Halloween banner with custom letters, icons and colors — print-ready.", emoji: "🏳️", category: "Printables", featured: true, isNew: true },
+  { slug: "cupcake-topper-generator", title: "Cupcake Topper Generator", description: "Print 12 spooky cupcake toppers per sheet in circle, square, hex or scalloped shapes.", emoji: "🧁", category: "Printables", isNew: true },
+  { slug: "gift-tag-generator", title: "Gift Tag Generator", description: "Halloween gift, name and party-favor tags with custom messages.", emoji: "🎁", category: "Printables", isNew: true },
+  { slug: "label-generator", title: "Label Generator", description: "Candy, bottle, jar and food labels in editable Halloween themes.", emoji: "🏷️", category: "Printables", popular: true, isNew: true },
+  { slug: "treat-bag-generator", title: "Treat Bag Generator", description: "Foldable treat-bag toppers and party bag labels for trick-or-treaters.", emoji: "🍭", category: "Printables", isNew: true },
+  { slug: "party-sign-generator", title: "Party Sign Generator", description: "Welcome, bathroom, candy-bar, exit and photo-booth signs — print in Letter or A4.", emoji: "📜", category: "Printables", isNew: true },
 ];
 
 export const CATEGORIES = [
