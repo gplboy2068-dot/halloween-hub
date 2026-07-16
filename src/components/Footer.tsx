@@ -52,12 +52,16 @@ export function Footer() {
             <li><Link to="/privacy" className="hover:text-primary">Privacy Policy</Link></li>
             <li><Link to="/terms" className="hover:text-primary">Terms &amp; Conditions</Link></li>
             <li><Link to="/disclaimer" className="hover:text-primary">Disclaimer</Link></li>
+            <li><Link to="/affiliate-disclosure" className="hover:text-primary">Affiliate Disclosure</Link></li>
             <li><Link to="/cookies" className="hover:text-primary">Cookie Policy</Link></li>
             <li><Link to="/dmca" className="hover:text-primary">DMCA Policy</Link></li>
             <li><Link to="/community-guidelines" className="hover:text-primary">Community Guidelines</Link></li>
             <li><Link to="/ai-content-policy" className="hover:text-primary">AI Content Policy</Link></li>
+            <li><Link to="/ai-transparency" className="hover:text-primary">AI Transparency</Link></li>
             <li><Link to="/ugc-policy" className="hover:text-primary">UGC Policy</Link></li>
             <li><Link to="/accessibility" className="hover:text-primary">Accessibility</Link></li>
+            <li><Link to="/report-abuse" className="hover:text-primary">Report Abuse</Link></li>
+            <li><Link to="/advertise" className="hover:text-primary">Advertise</Link></li>
           </ul>
         </div>
       </div>

@@ -11,7 +11,7 @@ function slugifyHeading(s: string) {
     .replace(/^-+|-+$/g, "");
 }
 
-export function LegalDoc({ page, path }: { page: LegalPage; path: string }) {
+export function LegalDoc({ page, path, children }: { page: LegalPage; path: string; children?: React.ReactNode }) {
   const { html, toc } = useMemo(() => {
     const toc: { id: string; text: string }[] = [];
     const html = page.content.replace(/<h2>([\s\S]*?)<\/h2>/g, (_, inner) => {
@@ -49,6 +49,7 @@ export function LegalDoc({ page, path }: { page: LegalPage; path: string }) {
                 [&_strong]:text-foreground"
               dangerouslySetInnerHTML={{ __html: html }}
             />
+            {children}
           </article>
           {toc.length > 2 && (
             <aside className="hidden lg:block">

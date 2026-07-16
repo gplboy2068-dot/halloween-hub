@@ -14,6 +14,48 @@ export type Database = {
   }
   public: {
     Tables: {
+      abuse_reports: {
+        Row: {
+          created_at: string
+          description: string
+          id: string
+          moderator_notes: string | null
+          reason: string
+          reporter_email: string
+          reporter_name: string
+          status: string
+          target_url: string
+          updated_at: string
+          user_agent: string | null
+        }
+        Insert: {
+          created_at?: string
+          description: string
+          id?: string
+          moderator_notes?: string | null
+          reason: string
+          reporter_email: string
+          reporter_name: string
+          status?: string
+          target_url: string
+          updated_at?: string
+          user_agent?: string | null
+        }
+        Update: {
+          created_at?: string
+          description?: string
+          id?: string
+          moderator_notes?: string | null
+          reason?: string
+          reporter_email?: string
+          reporter_name?: string
+          status?: string
+          target_url?: string
+          updated_at?: string
+          user_agent?: string | null
+        }
+        Relationships: []
+      }
       activity_logs: {
         Row: {
           action: string
