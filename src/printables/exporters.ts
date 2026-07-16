@@ -147,5 +147,5 @@ export async function downloadPdf(
   }
 
   const out = await pdf.save();
-  downloadBlob(new Blob([out], { type: "application/pdf" }), filename);
+  downloadBlob(new Blob([out as BlobPart], { type: "application/pdf" }), filename);
 }
