@@ -17,6 +17,7 @@ import { Route as SearchRouteImport } from './routes/search'
 import { Route as SavedRouteImport } from './routes/saved'
 import { Route as RssDotxmlRouteImport } from './routes/rss[.]xml'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
+import { Route as ReportAbuseRouteImport } from './routes/report-abuse'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as FeedRouteImport } from './routes/feed'
 import { Route as EditorialPolicyRouteImport } from './routes/editorial-policy'
@@ -26,7 +27,10 @@ import { Route as CookiesRouteImport } from './routes/cookies'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as CommunityGuidelinesRouteImport } from './routes/community-guidelines'
 import { Route as AuthRouteImport } from './routes/auth'
+import { Route as AiTransparencyRouteImport } from './routes/ai-transparency'
 import { Route as AiContentPolicyRouteImport } from './routes/ai-content-policy'
+import { Route as AffiliateDisclosureRouteImport } from './routes/affiliate-disclosure'
+import { Route as AdvertiseRouteImport } from './routes/advertise'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AccessibilityRouteImport } from './routes/accessibility'
 import { Route as AboutRouteImport } from './routes/about'
@@ -107,6 +111,11 @@ const ResetPasswordRoute = ResetPasswordRouteImport.update({
   path: '/reset-password',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ReportAbuseRoute = ReportAbuseRouteImport.update({
+  id: '/report-abuse',
+  path: '/report-abuse',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PrivacyRoute = PrivacyRouteImport.update({
   id: '/privacy',
   path: '/privacy',
@@ -152,9 +161,24 @@ const AuthRoute = AuthRouteImport.update({
   path: '/auth',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AiTransparencyRoute = AiTransparencyRouteImport.update({
+  id: '/ai-transparency',
+  path: '/ai-transparency',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AiContentPolicyRoute = AiContentPolicyRouteImport.update({
   id: '/ai-content-policy',
   path: '/ai-content-policy',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AffiliateDisclosureRoute = AffiliateDisclosureRouteImport.update({
+  id: '/affiliate-disclosure',
+  path: '/affiliate-disclosure',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdvertiseRoute = AdvertiseRouteImport.update({
+  id: '/advertise',
+  path: '/advertise',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminRoute = AdminRouteImport.update({
@@ -359,7 +383,10 @@ export interface FileRoutesByFullPath {
   '/about': typeof AboutRoute
   '/accessibility': typeof AccessibilityRoute
   '/admin': typeof AdminRouteWithChildren
+  '/advertise': typeof AdvertiseRoute
+  '/affiliate-disclosure': typeof AffiliateDisclosureRoute
   '/ai-content-policy': typeof AiContentPolicyRoute
+  '/ai-transparency': typeof AiTransparencyRoute
   '/auth': typeof AuthRoute
   '/community-guidelines': typeof CommunityGuidelinesRoute
   '/contact': typeof ContactRoute
@@ -369,6 +396,7 @@ export interface FileRoutesByFullPath {
   '/editorial-policy': typeof EditorialPolicyRoute
   '/feed': typeof FeedRoute
   '/privacy': typeof PrivacyRoute
+  '/report-abuse': typeof ReportAbuseRoute
   '/reset-password': typeof ResetPasswordRoute
   '/rss.xml': typeof RssDotxmlRoute
   '/saved': typeof SavedRoute
@@ -417,7 +445,10 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/accessibility': typeof AccessibilityRoute
+  '/advertise': typeof AdvertiseRoute
+  '/affiliate-disclosure': typeof AffiliateDisclosureRoute
   '/ai-content-policy': typeof AiContentPolicyRoute
+  '/ai-transparency': typeof AiTransparencyRoute
   '/auth': typeof AuthRoute
   '/community-guidelines': typeof CommunityGuidelinesRoute
   '/contact': typeof ContactRoute
@@ -427,6 +458,7 @@ export interface FileRoutesByTo {
   '/editorial-policy': typeof EditorialPolicyRoute
   '/feed': typeof FeedRoute
   '/privacy': typeof PrivacyRoute
+  '/report-abuse': typeof ReportAbuseRoute
   '/reset-password': typeof ResetPasswordRoute
   '/rss.xml': typeof RssDotxmlRoute
   '/saved': typeof SavedRoute
@@ -476,7 +508,10 @@ export interface FileRoutesById {
   '/about': typeof AboutRoute
   '/accessibility': typeof AccessibilityRoute
   '/admin': typeof AdminRouteWithChildren
+  '/advertise': typeof AdvertiseRoute
+  '/affiliate-disclosure': typeof AffiliateDisclosureRoute
   '/ai-content-policy': typeof AiContentPolicyRoute
+  '/ai-transparency': typeof AiTransparencyRoute
   '/auth': typeof AuthRoute
   '/community-guidelines': typeof CommunityGuidelinesRoute
   '/contact': typeof ContactRoute
@@ -486,6 +521,7 @@ export interface FileRoutesById {
   '/editorial-policy': typeof EditorialPolicyRoute
   '/feed': typeof FeedRoute
   '/privacy': typeof PrivacyRoute
+  '/report-abuse': typeof ReportAbuseRoute
   '/reset-password': typeof ResetPasswordRoute
   '/rss.xml': typeof RssDotxmlRoute
   '/saved': typeof SavedRoute
@@ -537,7 +573,10 @@ export interface FileRouteTypes {
     | '/about'
     | '/accessibility'
     | '/admin'
+    | '/advertise'
+    | '/affiliate-disclosure'
     | '/ai-content-policy'
+    | '/ai-transparency'
     | '/auth'
     | '/community-guidelines'
     | '/contact'
@@ -547,6 +586,7 @@ export interface FileRouteTypes {
     | '/editorial-policy'
     | '/feed'
     | '/privacy'
+    | '/report-abuse'
     | '/reset-password'
     | '/rss.xml'
     | '/saved'
@@ -595,7 +635,10 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/accessibility'
+    | '/advertise'
+    | '/affiliate-disclosure'
     | '/ai-content-policy'
+    | '/ai-transparency'
     | '/auth'
     | '/community-guidelines'
     | '/contact'
@@ -605,6 +648,7 @@ export interface FileRouteTypes {
     | '/editorial-policy'
     | '/feed'
     | '/privacy'
+    | '/report-abuse'
     | '/reset-password'
     | '/rss.xml'
     | '/saved'
@@ -653,7 +697,10 @@ export interface FileRouteTypes {
     | '/about'
     | '/accessibility'
     | '/admin'
+    | '/advertise'
+    | '/affiliate-disclosure'
     | '/ai-content-policy'
+    | '/ai-transparency'
     | '/auth'
     | '/community-guidelines'
     | '/contact'
@@ -663,6 +710,7 @@ export interface FileRouteTypes {
     | '/editorial-policy'
     | '/feed'
     | '/privacy'
+    | '/report-abuse'
     | '/reset-password'
     | '/rss.xml'
     | '/saved'
@@ -713,7 +761,10 @@ export interface RootRouteChildren {
   AboutRoute: typeof AboutRoute
   AccessibilityRoute: typeof AccessibilityRoute
   AdminRoute: typeof AdminRouteWithChildren
+  AdvertiseRoute: typeof AdvertiseRoute
+  AffiliateDisclosureRoute: typeof AffiliateDisclosureRoute
   AiContentPolicyRoute: typeof AiContentPolicyRoute
+  AiTransparencyRoute: typeof AiTransparencyRoute
   AuthRoute: typeof AuthRoute
   CommunityGuidelinesRoute: typeof CommunityGuidelinesRoute
   ContactRoute: typeof ContactRoute
@@ -723,6 +774,7 @@ export interface RootRouteChildren {
   EditorialPolicyRoute: typeof EditorialPolicyRoute
   FeedRoute: typeof FeedRoute
   PrivacyRoute: typeof PrivacyRoute
+  ReportAbuseRoute: typeof ReportAbuseRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   RssDotxmlRoute: typeof RssDotxmlRoute
   SavedRoute: typeof SavedRoute
@@ -811,6 +863,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ResetPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/report-abuse': {
+      id: '/report-abuse'
+      path: '/report-abuse'
+      fullPath: '/report-abuse'
+      preLoaderRoute: typeof ReportAbuseRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/privacy': {
       id: '/privacy'
       path: '/privacy'
@@ -874,11 +933,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/ai-transparency': {
+      id: '/ai-transparency'
+      path: '/ai-transparency'
+      fullPath: '/ai-transparency'
+      preLoaderRoute: typeof AiTransparencyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/ai-content-policy': {
       id: '/ai-content-policy'
       path: '/ai-content-policy'
       fullPath: '/ai-content-policy'
       preLoaderRoute: typeof AiContentPolicyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/affiliate-disclosure': {
+      id: '/affiliate-disclosure'
+      path: '/affiliate-disclosure'
+      fullPath: '/affiliate-disclosure'
+      preLoaderRoute: typeof AffiliateDisclosureRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/advertise': {
+      id: '/advertise'
+      path: '/advertise'
+      fullPath: '/advertise'
+      preLoaderRoute: typeof AdvertiseRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin': {
@@ -1220,7 +1300,10 @@ const rootRouteChildren: RootRouteChildren = {
   AboutRoute: AboutRoute,
   AccessibilityRoute: AccessibilityRoute,
   AdminRoute: AdminRouteWithChildren,
+  AdvertiseRoute: AdvertiseRoute,
+  AffiliateDisclosureRoute: AffiliateDisclosureRoute,
   AiContentPolicyRoute: AiContentPolicyRoute,
+  AiTransparencyRoute: AiTransparencyRoute,
   AuthRoute: AuthRoute,
   CommunityGuidelinesRoute: CommunityGuidelinesRoute,
   ContactRoute: ContactRoute,
@@ -1230,6 +1313,7 @@ const rootRouteChildren: RootRouteChildren = {
   EditorialPolicyRoute: EditorialPolicyRoute,
   FeedRoute: FeedRoute,
   PrivacyRoute: PrivacyRoute,
+  ReportAbuseRoute: ReportAbuseRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   RssDotxmlRoute: RssDotxmlRoute,
   SavedRoute: SavedRoute,
