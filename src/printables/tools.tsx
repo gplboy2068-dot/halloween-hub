@@ -2,6 +2,7 @@ import { PrintableEditor } from "./PrintableEditor";
 import {
   bannerConfig, cupcakeTopperConfig, giftTagConfig,
   labelConfig, treatBagConfig, partySignConfig,
+  candyBarWrapperConfig, envelopeLinerConfig, ticketConfig, awardCertificateConfig,
 } from "./configs";
 
 export const PrintableBanner = () => <PrintableEditor config={bannerConfig} />;
@@ -10,3 +11,7 @@ export const PrintableGiftTag = () => <PrintableEditor config={giftTagConfig} />
 export const PrintableLabel = () => <PrintableEditor config={labelConfig} />;
 export const PrintableTreatBag = () => <PrintableEditor config={treatBagConfig} />;
 export const PrintablePartySign = () => <PrintableEditor config={partySignConfig} />;
+export const PrintableCandyBarWrapper = () => <PrintableEditor config={candyBarWrapperConfig} />;
+export const PrintableEnvelopeLiner = () => <PrintableEditor config={envelopeLinerConfig} />;
+export const PrintableTicket = () => <PrintableEditor config={ticketConfig} />;
+export const PrintableAwardCertificate = () => <PrintableEditor config={awardCertificateConfig} />;
