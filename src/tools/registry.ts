@@ -26,6 +26,10 @@ import {
   AIPumpkinTemplateAI,
 } from "./ai-tools";
 import { NameGenerator } from "./text-generators";
+import {
+  PrintableBanner, PrintableCupcakeTopper, PrintableGiftTag,
+  PrintableLabel, PrintableTreatBag, PrintablePartySign,
+} from "@/printables/tools";
 
 export const TOOL_REGISTRY: Record<string, ComponentType> = {
   // AI-powered text tools
