@@ -65,6 +65,11 @@ export const TOOLS: ToolCard[] = [
   { slug: "envelope-liner-generator", title: "Envelope Liner Generator", description: "Halloween envelope liners and sticker seals to pair with your invitations — A7 and A2 sizes.", emoji: "📮", category: "Printables", isNew: true },
   { slug: "halloween-ticket-generator", title: "Halloween Ticket Generator", description: "Perforated event, raffle, VIP and Admit One tickets with tear-off stubs — 5 per sheet.", emoji: "🎟️", category: "Printables", popular: true, isNew: true },
   { slug: "award-certificate-generator", title: "Costume Award Certificate Generator", description: "Best Costume, Scariest, Funniest and group awards — landscape Letter certificates ready to hand out.", emoji: "🏆", category: "Printables", isNew: true },
+  { slug: "halloween-bingo-generator", title: "Halloween Bingo Card Generator", description: "Auto-shuffled 5×5 bingo cards for kids' parties, classrooms and family game night — every card is unique.", emoji: "🃏", category: "Printables", popular: true, isNew: true },
+  { slug: "halloween-countdown-printable", title: "Halloween Countdown Printable", description: "Advent-style 31-day October countdown calendar — cross a box off each day until Halloween night.", emoji: "📅", category: "Printables", isNew: true },
+  { slug: "trick-or-treat-poster-generator", title: "Trick-or-Treat Door Sign Generator", description: '"Out of Candy", "Help Yourself", Teal Pumpkin and custom door signs — full-page Letter posters.', emoji: "🚪", category: "Printables", featured: true, isNew: true },
+  { slug: "pumpkin-guessing-game-generator", title: "Pumpkin Guessing Game Sheet", description: "Guess-the-weight, seeds, candy or circumference party-game sheets with a 20-name entry grid.", emoji: "🎃", category: "Printables", isNew: true },
+  { slug: "halloween-scavenger-hunt-generator", title: "Halloween Scavenger Hunt Card Generator", description: "Printable scavenger hunt cards for trick-or-treat night, classrooms and parties — 2 per sheet.", emoji: "🔍", category: "Printables", isNew: true },
 ];
 
 export const CATEGORIES = [
