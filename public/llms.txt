@@ -17,6 +17,10 @@
 - [Label Generator](/tools/label-generator)
 - [Treat Bag Generator](/tools/treat-bag-generator)
 - [Party Sign Generator](/tools/party-sign-generator)
+- [Candy Bar Wrapper Generator](/tools/candy-bar-wrapper-generator)
+- [Envelope Liner Generator](/tools/envelope-liner-generator)
+- [Halloween Ticket Generator](/tools/halloween-ticket-generator)
+- [Costume Award Certificate Generator](/tools/award-certificate-generator)
 
 ## Legal
 - [Privacy Policy](/privacy)
