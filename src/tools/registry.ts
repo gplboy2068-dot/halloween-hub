@@ -30,6 +30,8 @@ import {
   PrintableBanner, PrintableCupcakeTopper, PrintableGiftTag,
   PrintableLabel, PrintableTreatBag, PrintablePartySign,
   PrintableCandyBarWrapper, PrintableEnvelopeLiner, PrintableTicket, PrintableAwardCertificate,
+  PrintableBingoCard, PrintableCountdownCalendar, PrintableTrickOrTreatSign,
+  PrintablePumpkinGuess, PrintableScavengerHunt,
 } from "@/printables/tools";
 
 export const TOOL_REGISTRY: Record<string, ComponentType> = {
