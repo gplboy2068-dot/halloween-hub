@@ -56,12 +56,14 @@ import { Route as AdminSchemaRouteImport } from './routes/admin.schema'
 import { Route as AdminMediaRouteImport } from './routes/admin.media'
 import { Route as AdminLogsRouteImport } from './routes/admin.logs'
 import { Route as AdminLinkingRouteImport } from './routes/admin.linking'
+import { Route as AdminLegalRouteImport } from './routes/admin.legal'
 import { Route as AdminCommunityRouteImport } from './routes/admin.community'
 import { Route as AdminAnalyticsRouteImport } from './routes/admin.analytics'
 import { Route as AdminEntityRouteImport } from './routes/admin.$entity'
 import { Route as AdminEntityIndexRouteImport } from './routes/admin.$entity.index'
 import { Route as BlogTagSlugRouteImport } from './routes/blog.tag.$slug'
 import { Route as BlogCategorySlugRouteImport } from './routes/blog.category.$slug'
+import { Route as AdminLegalSlugRouteImport } from './routes/admin.legal.$slug'
 import { Route as AdminEntityIdRouteImport } from './routes/admin.$entity.$id'
 import { Route as ApiPublicArticleImageSplatRouteImport } from './routes/api/public/article-image.$'
 
@@ -300,6 +302,11 @@ const AdminLinkingRoute = AdminLinkingRouteImport.update({
   path: '/linking',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminLegalRoute = AdminLegalRouteImport.update({
+  id: '/legal',
+  path: '/legal',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminCommunityRoute = AdminCommunityRouteImport.update({
   id: '/community',
   path: '/community',
@@ -329,6 +336,11 @@ const BlogCategorySlugRoute = BlogCategorySlugRouteImport.update({
   id: '/blog/category/$slug',
   path: '/blog/category/$slug',
   getParentRoute: () => rootRouteImport,
+} as any)
+const AdminLegalSlugRoute = AdminLegalSlugRouteImport.update({
+  id: '/$slug',
+  path: '/$slug',
+  getParentRoute: () => AdminLegalRoute,
 } as any)
 const AdminEntityIdRoute = AdminEntityIdRouteImport.update({
   id: '/$id',
@@ -368,6 +380,7 @@ export interface FileRoutesByFullPath {
   '/admin/$entity': typeof AdminEntityRouteWithChildren
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/community': typeof AdminCommunityRoute
+  '/admin/legal': typeof AdminLegalRouteWithChildren
   '/admin/linking': typeof AdminLinkingRoute
   '/admin/logs': typeof AdminLogsRoute
   '/admin/media': typeof AdminMediaRoute
@@ -394,6 +407,7 @@ export interface FileRoutesByFullPath {
   '/ideas/': typeof IdeasIndexRoute
   '/tools/': typeof ToolsIndexRoute
   '/admin/$entity/$id': typeof AdminEntityIdRoute
+  '/admin/legal/$slug': typeof AdminLegalSlugRoute
   '/blog/category/$slug': typeof BlogCategorySlugRoute
   '/blog/tag/$slug': typeof BlogTagSlugRoute
   '/admin/$entity/': typeof AdminEntityIndexRoute
@@ -423,6 +437,7 @@ export interface FileRoutesByTo {
   '/ugc-policy': typeof UgcPolicyRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/community': typeof AdminCommunityRoute
+  '/admin/legal': typeof AdminLegalRouteWithChildren
   '/admin/linking': typeof AdminLinkingRoute
   '/admin/logs': typeof AdminLogsRoute
   '/admin/media': typeof AdminMediaRoute
@@ -449,6 +464,7 @@ export interface FileRoutesByTo {
   '/ideas': typeof IdeasIndexRoute
   '/tools': typeof ToolsIndexRoute
   '/admin/$entity/$id': typeof AdminEntityIdRoute
+  '/admin/legal/$slug': typeof AdminLegalSlugRoute
   '/blog/category/$slug': typeof BlogCategorySlugRoute
   '/blog/tag/$slug': typeof BlogTagSlugRoute
   '/admin/$entity': typeof AdminEntityIndexRoute
@@ -481,6 +497,7 @@ export interface FileRoutesById {
   '/admin/$entity': typeof AdminEntityRouteWithChildren
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/community': typeof AdminCommunityRoute
+  '/admin/legal': typeof AdminLegalRouteWithChildren
   '/admin/linking': typeof AdminLinkingRoute
   '/admin/logs': typeof AdminLogsRoute
   '/admin/media': typeof AdminMediaRoute
@@ -507,6 +524,7 @@ export interface FileRoutesById {
   '/ideas/': typeof IdeasIndexRoute
   '/tools/': typeof ToolsIndexRoute
   '/admin/$entity/$id': typeof AdminEntityIdRoute
+  '/admin/legal/$slug': typeof AdminLegalSlugRoute
   '/blog/category/$slug': typeof BlogCategorySlugRoute
   '/blog/tag/$slug': typeof BlogTagSlugRoute
   '/admin/$entity/': typeof AdminEntityIndexRoute
@@ -540,6 +558,7 @@ export interface FileRouteTypes {
     | '/admin/$entity'
     | '/admin/analytics'
     | '/admin/community'
+    | '/admin/legal'
     | '/admin/linking'
     | '/admin/logs'
     | '/admin/media'
@@ -566,6 +585,7 @@ export interface FileRouteTypes {
     | '/ideas/'
     | '/tools/'
     | '/admin/$entity/$id'
+    | '/admin/legal/$slug'
     | '/blog/category/$slug'
     | '/blog/tag/$slug'
     | '/admin/$entity/'
@@ -595,6 +615,7 @@ export interface FileRouteTypes {
     | '/ugc-policy'
     | '/admin/analytics'
     | '/admin/community'
+    | '/admin/legal'
     | '/admin/linking'
     | '/admin/logs'
     | '/admin/media'
@@ -621,6 +642,7 @@ export interface FileRouteTypes {
     | '/ideas'
     | '/tools'
     | '/admin/$entity/$id'
+    | '/admin/legal/$slug'
     | '/blog/category/$slug'
     | '/blog/tag/$slug'
     | '/admin/$entity'
@@ -652,6 +674,7 @@ export interface FileRouteTypes {
     | '/admin/$entity'
     | '/admin/analytics'
     | '/admin/community'
+    | '/admin/legal'
     | '/admin/linking'
     | '/admin/logs'
     | '/admin/media'
@@ -678,6 +701,7 @@ export interface FileRouteTypes {
     | '/ideas/'
     | '/tools/'
     | '/admin/$entity/$id'
+    | '/admin/legal/$slug'
     | '/blog/category/$slug'
     | '/blog/tag/$slug'
     | '/admin/$entity/'
@@ -1060,6 +1084,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminLinkingRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/legal': {
+      id: '/admin/legal'
+      path: '/legal'
+      fullPath: '/admin/legal'
+      preLoaderRoute: typeof AdminLegalRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/community': {
       id: '/admin/community'
       path: '/community'
@@ -1102,6 +1133,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof BlogCategorySlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/legal/$slug': {
+      id: '/admin/legal/$slug'
+      path: '/$slug'
+      fullPath: '/admin/legal/$slug'
+      preLoaderRoute: typeof AdminLegalSlugRouteImport
+      parentRoute: typeof AdminLegalRoute
+    }
     '/admin/$entity/$id': {
       id: '/admin/$entity/$id'
       path: '/$id'
@@ -1133,10 +1171,23 @@ const AdminEntityRouteWithChildren = AdminEntityRoute._addFileChildren(
   AdminEntityRouteChildren,
 )
 
+interface AdminLegalRouteChildren {
+  AdminLegalSlugRoute: typeof AdminLegalSlugRoute
+}
+
+const AdminLegalRouteChildren: AdminLegalRouteChildren = {
+  AdminLegalSlugRoute: AdminLegalSlugRoute,
+}
+
+const AdminLegalRouteWithChildren = AdminLegalRoute._addFileChildren(
+  AdminLegalRouteChildren,
+)
+
 interface AdminRouteChildren {
   AdminEntityRoute: typeof AdminEntityRouteWithChildren
   AdminAnalyticsRoute: typeof AdminAnalyticsRoute
   AdminCommunityRoute: typeof AdminCommunityRoute
+  AdminLegalRoute: typeof AdminLegalRouteWithChildren
   AdminLinkingRoute: typeof AdminLinkingRoute
   AdminLogsRoute: typeof AdminLogsRoute
   AdminMediaRoute: typeof AdminMediaRoute
@@ -1151,6 +1202,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminEntityRoute: AdminEntityRouteWithChildren,
   AdminAnalyticsRoute: AdminAnalyticsRoute,
   AdminCommunityRoute: AdminCommunityRoute,
+  AdminLegalRoute: AdminLegalRouteWithChildren,
   AdminLinkingRoute: AdminLinkingRoute,
   AdminLogsRoute: AdminLogsRoute,
   AdminMediaRoute: AdminMediaRoute,

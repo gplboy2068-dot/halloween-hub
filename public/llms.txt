@@ -10,8 +10,13 @@
 - [About](/about): About HalloweenTools
 - [Contact](/contact): Get in touch
 
-## Optional
+## Legal
 - [Privacy Policy](/privacy)
-- [Terms of Service](/terms)
+- [Terms and Conditions](/terms)
 - [Disclaimer](/disclaimer)
 - [Cookie Policy](/cookies)
+- [DMCA Policy](/dmca)
+- [Community Guidelines](/community-guidelines)
+- [AI Content Policy](/ai-content-policy)
+- [User Generated Content Policy](/ugc-policy)
+- [Accessibility Statement](/accessibility)
