@@ -759,6 +759,26 @@ const OVERRIDES: Partial<Record<string, Partial<ToolContent>>> = {
     intro: "Print Best Costume, Scariest, Funniest, Group, Kids and DIY award certificates on Letter — fits a $2 frame.",
     ctaSlug: "halloween-ticket-generator",
   },
+  "halloween-bingo-generator": {
+    intro: "Auto-shuffled 5×5 Halloween bingo cards — every card is unique, print as many as you need for a classroom or party.",
+    ctaSlug: "halloween-scavenger-hunt-generator",
+  },
+  "halloween-countdown-printable": {
+    intro: "31-day advent-style Halloween countdown — pin it to the fridge on October 1 and cross a box off each day.",
+    ctaSlug: "party-planner",
+  },
+  "trick-or-treat-poster-generator": {
+    intro: "Print Out of Candy, Help Yourself, Welcome, Closed, and Teal Pumpkin door signs — full-page Letter posters.",
+    ctaSlug: "party-sign-generator",
+  },
+  "pumpkin-guessing-game-generator": {
+    intro: "Print a Halloween party guessing sheet — weight, seeds, candy or circumference with a 20-name entry grid.",
+    ctaSlug: "halloween-bingo-generator",
+  },
+  "halloween-scavenger-hunt-generator": {
+    intro: "Randomized Halloween scavenger hunt cards — 14 items per card, 2 cards per sheet, print for trick-or-treat night or a classroom.",
+    ctaSlug: "halloween-bingo-generator",
+  },
 };
 
 // Fallback if a category isn't found in the template map.
