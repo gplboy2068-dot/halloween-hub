@@ -77,6 +77,18 @@ const ABOUT: Record<string, string> = {
     "The Scary Story Generator writes original short horror — flash fiction, campfire tales, bedtime-safe kid stories, and longer 'creepy pasta' style narratives — with tunable intensity. You pick the audience (kids, teens, adults), the length (60 seconds, 5 minutes, 15 minutes to read aloud), and the sub-genre (haunted-house classic, cosmic, folk horror, urban legend, cozy-eerie), and get a story with a real setup, escalation, and payoff. Teachers use it for reading exercises, parents use it for sleepover night, camp counselors use it for the last night of camp, and podcasters use it as story-of-the-day material. Every story is generated fresh, so you never get the same one twice.",
   "meme-generator":
     "The Halloween Meme Generator creates image macros, reaction memes, and template-based memes with October captions written for you. Instead of hunting for a template, dragging into an image editor, and trying to write funny copy at 11pm, you describe the situation ('me handing out full-size candy bars', 'when someone asks if you're too old to trick-or-treat') and get a finished, share-ready meme. It's built for group chats, story reposts, brand social calendars, and the person in your friend group who's the designated meme sender.",
+  "printable-banner-generator":
+    "The Printable Banner Generator turns a phrase like BOO, TRICK OR TREAT, or a child's name into a wide-format Halloween banner you can print at home and string across a doorway, mantel, classroom wall, or party arch. Every letter is placed on its own pennant, rectangle, or scalloped card so you cut, punch, and thread onto twine in minutes — no design software, no ordering online, no waiting for shipping. Six themed palettes cover the range of Halloween aesthetics (classic orange, purple witch, blood moon, pastel boo, monochrome ink, neon rave), and six display fonts (Creepster, Nosifer, Bangers, Fredoka, IM Fell English, Special Elite) let you dial the tone from cute to genuinely scary. Teachers use it for classroom door displays, parents use it for kids' Halloween parties, small businesses use it for shopfront windows, and event planners use it for reception backdrops. Files export as high-resolution PDF at exact Letter or A4 dimensions with 300 DPI, plus PNG, JPG, and SVG for digital reuse. Because everything runs in your browser and nothing is stored, you can regenerate ten variations in one sitting and only print the winner.",
+  "cupcake-topper-generator":
+    "The Cupcake Topper Generator prints twelve 2-inch Halloween cupcake toppers on a single sheet, in circle, square, hexagon, or scalloped shapes, ready to cut and glue onto a toothpick. It's the missing piece for anyone hosting a Halloween birthday, a school bake sale, a church harvest event, or an office cupcake decorating contest. Instead of buying pre-made toppers that come in one boring pumpkin design, you design your own — pick an icon (ghost, pumpkin, spider, cauldron, witch), add a short message ('BOO', a name, an age, 'TREAT'), and match your palette to the party theme. The tool renders the toppers at exact 60mm size so what you see on screen is what you cut on paper. Print on regular cardstock or plain paper, cut around the outline with scissors, and tape a toothpick to the back — the whole set of twelve takes less than fifteen minutes to make. Every download is watermark-free and vector-crisp, so if you want to send the SVG to a Cricut for die-cutting, that works too.",
+  "gift-tag-generator":
+    "The Gift Tag Generator produces printable Halloween tags for wrapped gifts, party favors, teacher appreciation treats, candy bags, and hostess presents. Eight tags fit on a single sheet, each sized to the classic 2.5×3.5 inch tag with a hole-punch guide in the corner. You choose the variant — gift tag, name tag, party favor, or teacher gift — and the layout adjusts: gift tags get a large To/From area, name tags feature the name prominently, favor tags include a short thank-you line, and teacher gift tags are formatted to fit inside a mug or on a jar of candy. Six Halloween themes, six fonts, and a Halloween icon of your choice complete the design. The output PDF prints on plain paper or cardstock at exact dimensions, so you punch, thread twine or ribbon, and attach — no measuring, no cropping, no trial and error. Because the tags are ready in seconds and every download is free, you can iterate three or four times before you commit ink to paper.",
+  "label-generator":
+    "The Label Generator creates printable Halloween labels for candy jars, drink bottles, mason jars, food platters, and decoration containers. It solves the problem of parties where every dish and pitcher looks the same — a well-designed label ('Witch's Brew' on the punch, 'Toxic Slime' on the guacamole, 'Zombie Fingers' on the sausages) is what turns a snack table into a themed spread. You pick a size preset (candy, bottle wrap, mason jar, food, decoration), a Halloween theme, and a font, then type the label copy — up to two lines. The tool renders six labels per sheet at 90×40mm so you print on adhesive label paper or plain paper with tape and immediately have a coordinated set. Every export is 300 DPI print-ready in PDF, PNG, JPG, or SVG (for die-cutters like Cricut and Silhouette). Because the tool is designed for real print use, spacing, contrast, and font sizes are all calibrated to be legible from across a party table — not just on a phone screen.",
+  "treat-bag-generator":
+    "The Treat Bag Generator prints foldable toppers and labels for Halloween candy bags, treat sacks, and party favor bags. The topper design folds over the mouth of a plain paper or plastic bag and staples in place, turning a generic bag into a themed party favor. You choose the variant (foldable topper, bag label, candy bag graphic, or party bag design), enter a message ('Trick or Treat', a child's name, a class-wide thank-you), and pick an icon plus theme. The output prints four toppers per sheet at 100×70mm with a clear fold guide and stapling guide, so you don't have to eyeball the crease. Teachers use it for class parties (thirty toppers in ten minutes), parents use it for trick-or-treaters to grab from a bowl, and party hosts use it as coordinated favor packaging that photographs well. High-resolution PDF, PNG, JPG, and SVG are all one-click downloads.",
+  "party-sign-generator":
+    "The Party Sign Generator prints full 8.5×11 (or A4) Halloween signs for events, homes, offices, and businesses. Nine sign presets cover the situations parties actually need: Welcome, Party Rules, Food Station, Candy Bar, Photo Booth, Bathroom, Exit, Parking, and Custom. Instead of writing '↑ Bathroom this way' on a piece of paper with a Sharpie, you generate a matching, themed, printable sign in fifteen seconds. Every sign uses the same theme system as the rest of the printable suite (six palettes, six fonts, twelve icons) so a whole event can share a coordinated visual language — Welcome at the door, Directional signs to the food, Candy Bar over the treat station, Bathroom in the hallway, Exit near the door. Files export as print-ready PDF at exact page dimensions plus PNG, JPG, and SVG. Because the sign scales cleanly, you can print at Letter size for a party wall or send the same PDF to a print shop for a large poster or foam board. No signup, no watermark — the sign is yours to print, tape, laminate, or reuse across multiple years.",
 };
 
 // ---------------------------------------------------------------------------
@@ -687,6 +699,32 @@ const OVERRIDES: Partial<Record<string, Partial<ToolContent>>> = {
   "name-generator": { ctaSlug: "scary-story-generator" },
   "party-name-generator": { ctaSlug: "party-planner" },
   "ai-prompt-generator": { ctaSlug: "wallpaper-generator" },
+
+  // Printable design tools — chain them together for internal linking
+  "printable-banner-generator": {
+    intro: "Design a printable Halloween banner in your browser — pick a phrase, a theme, and a font, and download a print-ready PDF, PNG, JPG, or SVG in seconds.",
+    ctaSlug: "party-sign-generator",
+  },
+  "cupcake-topper-generator": {
+    intro: "Print twelve custom Halloween cupcake toppers on a single sheet — round, square, hex, or scalloped — ready to cut and glue onto toothpicks.",
+    ctaSlug: "treat-bag-generator",
+  },
+  "gift-tag-generator": {
+    intro: "Halloween gift, name, favor and teacher-appreciation tags — eight per sheet, print at home, punch a hole, tie with twine.",
+    ctaSlug: "label-generator",
+  },
+  "label-generator": {
+    intro: "Printable Halloween labels for candy jars, bottles, mason jars, food platters, and decorations — six per sheet, ready to stick.",
+    ctaSlug: "treat-bag-generator",
+  },
+  "treat-bag-generator": {
+    intro: "Foldable Halloween treat-bag toppers and party favor labels — four per sheet, ready to fold, staple, and hand out.",
+    ctaSlug: "gift-tag-generator",
+  },
+  "party-sign-generator": {
+    intro: "Print Welcome, Bathroom, Candy Bar, Photo Booth, Exit and custom Halloween signs on Letter or A4 in seconds.",
+    ctaSlug: "printable-banner-generator",
+  },
 };
 
 // Fallback if a category isn't found in the template map.

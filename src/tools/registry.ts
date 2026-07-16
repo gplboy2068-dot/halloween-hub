@@ -26,6 +26,10 @@ import {
   AIPumpkinTemplateAI,
 } from "./ai-tools";
 import { NameGenerator } from "./text-generators";
+import {
+  PrintableBanner, PrintableCupcakeTopper, PrintableGiftTag,
+  PrintableLabel, PrintableTreatBag, PrintablePartySign,
+} from "@/printables/tools";
 
 export const TOOL_REGISTRY: Record<string, ComponentType> = {
   // AI-powered text tools
@@ -60,6 +64,14 @@ export const TOOL_REGISTRY: Record<string, ComponentType> = {
   "invitation-maker": AIInvitationMaker,
   "banner-maker": AIBannerMaker,
   "flyer-maker": AIFlyerMaker,
+
+  // Printable design tools
+  "printable-banner-generator": PrintableBanner,
+  "cupcake-topper-generator": PrintableCupcakeTopper,
+  "gift-tag-generator": PrintableGiftTag,
+  "label-generator": PrintableLabel,
+  "treat-bag-generator": PrintableTreatBag,
+  "party-sign-generator": PrintablePartySign,
 };
 
 export function getToolComponent(slug: string): ComponentType | null {
