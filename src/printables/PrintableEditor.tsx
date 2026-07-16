@@ -1,8 +1,8 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, type RefObject } from "react";
 import { toast } from "sonner";
 import type { PrintableConfig, PrintableState, IconId } from "./types";
 import { PAPER_MM } from "./types";
-import { PRINTABLE_THEMES, PRINTABLE_FONTS, getTheme, getFont } from "./themes";
+import { PRINTABLE_THEMES, PRINTABLE_FONTS, getFont } from "./themes";
 import { ICON_LIST } from "./icons";
 import { downloadJpg, downloadPdf, downloadPng, downloadSvg } from "./exporters";
 
