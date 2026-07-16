@@ -29,6 +29,7 @@ import { NameGenerator } from "./text-generators";
 import {
   PrintableBanner, PrintableCupcakeTopper, PrintableGiftTag,
   PrintableLabel, PrintableTreatBag, PrintablePartySign,
+  PrintableCandyBarWrapper, PrintableEnvelopeLiner, PrintableTicket, PrintableAwardCertificate,
 } from "@/printables/tools";
 
 export const TOOL_REGISTRY: Record<string, ComponentType> = {
