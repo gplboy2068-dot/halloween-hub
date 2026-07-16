@@ -10,6 +10,14 @@
 - [About](/about): About HalloweenTools
 - [Contact](/contact): Get in touch
 
+## Printable Design Tools
+- [Printable Banner Generator](/tools/printable-banner-generator)
+- [Cupcake Topper Generator](/tools/cupcake-topper-generator)
+- [Gift Tag Generator](/tools/gift-tag-generator)
+- [Label Generator](/tools/label-generator)
+- [Treat Bag Generator](/tools/treat-bag-generator)
+- [Party Sign Generator](/tools/party-sign-generator)
+
 ## Legal
 - [Privacy Policy](/privacy)
 - [Terms and Conditions](/terms)
