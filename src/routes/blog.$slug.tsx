@@ -263,7 +263,7 @@ function ArticlePage() {
 
         {article.contentHtml ? (
           <div
-            className="prose prose-invert prose-headings:font-display prose-a:text-primary hover:prose-a:text-primary-glow prose-img:rounded-xl mt-10 max-w-none"
+            className="article-prose mt-10 max-w-none"
             dangerouslySetInnerHTML={{ __html: article.contentHtml }}
           />
         ) : (
