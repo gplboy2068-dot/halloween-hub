@@ -66,7 +66,7 @@ const THEME_COLLECTIONS: CollectionPage[] = [
     ],
     toolSlugs: TOOLS.filter((tool) => tool.category === "AI").map((tool) => tool.slug),
     faqs: [
-      { q: "Which AI powers these tools?", a: "We use modern large language models via the Lovable AI Gateway. The interface is tuned for Halloween so you don't need to write prompts." },
+      { q: "Which AI powers these tools?", a: "We use modern large language models via our secure AI Gateway. The interface is tuned for Halloween so you don't need to write prompts." },
       { q: "Is the AI output original?", a: "Yes — every generation is fresh. We don't return pre-written lists." },
       { q: "Is there a usage limit?", a: "There is no per-user limit for casual use. Heavy or automated use may hit rate limits shared across visitors." },
     ],

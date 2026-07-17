@@ -60,7 +60,7 @@ function MediaLibrary() {
         </div>
       )}
       <p className="mt-4 text-xs text-muted-foreground">
-        Local preview only. Persistent uploads land in Phase 3 with Lovable Cloud storage.
+        Local preview only. Persistent uploads land in Phase 3 with Cloud storage.
       </p>
     </AdminShell>
   );

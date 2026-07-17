@@ -24,6 +24,7 @@ function toGeminiModel(lovableModel: string): string {
 
 function getGeminiKeys(): string[] {
   return [
+    process.env.GEMINI_API_KEY,
     process.env.GEMINI_API_KEY_1,
     process.env.GEMINI_API_KEY_2,
     process.env.GEMINI_API_KEY_3,
