@@ -32,12 +32,20 @@ export const Route = createFileRoute("/ideas/$slug")({
         ]),
       )
       .catch(() => []);
-    return page;
+    return {
+      slug: page.slug,
+      audience: page.audience,
+      style: page.style,
+      title: page.title,
+      description: page.description,
+      categoryKey: page.category.key,
+    };
   },
 
   head: ({ loaderData, params }) => {
     if (!loaderData) return { meta: [{ title: "Not found" }, { name: "robots", content: "noindex" }] };
-    const items = loaderData.category.items(loaderData.audience, loaderData.style);
+    const category = IDEA_CATEGORIES.find((c) => c.key === loaderData.categoryKey)!;
+    const items = category.items(loaderData.audience, loaderData.style);
     return {
       meta: [
         { title: loaderData.title },
@@ -107,13 +115,23 @@ export const Route = createFileRoute("/ideas/$slug")({
 });
 
 function IdeaPage() {
-  const page = Route.useLoaderData() as IdeaPageType;
-  const items = page.category.items(page.audience, page.style);
+  const loaderData = Route.useLoaderData();
+  const category = IDEA_CATEGORIES.find((c) => c.key === loaderData.categoryKey)!;
+  const page: IdeaPageType = {
+    slug: loaderData.slug,
+    audience: loaderData.audience,
+    style: loaderData.style,
+    title: loaderData.title,
+    description: loaderData.description,
+    category,
+  };
+
+  const items = category.items(page.audience, page.style);
   const tools = resolveToolsForIdea(page);
 
   // Related idea pages: same category, sibling audiences/styles
   const related = allIdeaSlugs()
-    .filter((s: string) => s.startsWith(page.category.key) && s !== page.slug)
+    .filter((s: string) => s.startsWith(category.key) && s !== page.slug)
     .slice(0, 6)
     .map((s: string) => getIdeaPage(s))
     .filter((p): p is IdeaPageType => p !== null);
@@ -121,13 +139,13 @@ function IdeaPage() {
   const relCtx = {
     title: page.title,
     description: page.description,
-    keywords: [page.category.noun, page.audience, page.style],
+    keywords: [category.noun, page.audience, page.style],
     excludeHref: `/ideas/${page.slug}`,
   };
   const relatedAudiences = getRelatedAudiences(relCtx, 3);
   const { data: relArticlesRaw } = useSuspenseQuery(
     ideaRelatedArticlesQuery(page.slug, page.title, page.description, [
-      page.category.noun,
+      category.noun,
       page.audience,
       page.style,
     ]),
