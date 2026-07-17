@@ -19,6 +19,7 @@ import {
   getAdminStats,
   getRecentActivity,
   getSiteSettings,
+  getAdminSiteSettings,
   saveSiteSettings,
 } from "./cms.functions";
 import type { EntityKind, BaseEntity } from "./cms-shared";
@@ -148,7 +149,7 @@ export function useBulkStatus() {
 // --- settings -------------------------------------------------------
 
 export function useSiteSettings<T>(defaults: T) {
-  const load = useServerFn(getSiteSettings);
+  const load = useServerFn(getAdminSiteSettings);
   const { data } = useQuery({
     queryKey: keys.settings(),
     queryFn: () => load(),

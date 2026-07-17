@@ -228,10 +228,27 @@ export const getSiteSettings = createServerFn({ method: "GET" }).handler(async (
   const { data } = await supabase.from("site_settings").select("*");
   const out: Record<string, any> = {};
   (data ?? []).forEach((row: any) => {
+    // SECURITY: Do not leak API keys, secrets, or tokens to the public client
+    const lowerKey = row.key.toLowerCase();
+    if (lowerKey.includes("key") || lowerKey.includes("secret") || lowerKey.includes("token")) {
+      return;
+    }
     out[row.key] = row.value;
   });
   return out;
 });
+
+export const getAdminSiteSettings = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    await assertAdmin(context);
+    const { data } = await context.supabase.from("site_settings").select("*");
+    const out: Record<string, any> = {};
+    (data ?? []).forEach((row: any) => {
+      out[row.key] = row.value;
+    });
+    return out;
+  });
 
 export const saveSiteSettings = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])

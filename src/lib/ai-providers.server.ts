@@ -37,6 +37,73 @@ function isQuotaOrRate(status: number): boolean {
   return status === 429 || status === 402 || status === 403;
 }
 
+let cachedKeys: { gemini?: string; deepseek?: string } | null = null;
+let lastCacheTime = 0;
+
+async function getDynamicApiKeys() {
+  const now = Date.now();
+  if (cachedKeys && now - lastCacheTime < 60_000) {
+    return cachedKeys;
+  }
+  try {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data } = await supabaseAdmin
+      .from("site_settings")
+      .select("key, value")
+      .in("key", ["gemini_api_key", "deepseek_api_key"]);
+
+    const keys: { gemini?: string; deepseek?: string } = {};
+    (data ?? []).forEach((row: any) => {
+      if (row.key === "gemini_api_key" && row.value) keys.gemini = String(row.value).trim();
+      if (row.key === "deepseek_api_key" && row.value) keys.deepseek = String(row.value).trim();
+    });
+
+    cachedKeys = keys;
+    lastCacheTime = now;
+    return keys;
+  } catch (err) {
+    console.error("[ai-fallback] Failed to fetch dynamic API keys:", err);
+    return {};
+  }
+}
+
+// ---------- DeepSeek API ----------
+async function callDeepSeekChat(
+  apiKey: string,
+  model: string,
+  opts: {
+    messages: ChatMessage[];
+    temperature?: number;
+    jsonMode?: boolean;
+  }
+): Promise<{ ok: true; content: string } | { ok: false; status: number; text: string }> {
+  const url = "https://api.deepseek.com/v1/chat/completions";
+  const body: Record<string, unknown> = {
+    model: model === "deepseek-reasoner" ? "deepseek-reasoner" : "deepseek-chat",
+    messages: opts.messages,
+  };
+  if (typeof opts.temperature === "number") body.temperature = opts.temperature;
+  if (opts.jsonMode) body.response_format = { type: "json_object" };
+
+  const res = await fetch(url, {
+    method: "POST",
+    headers: {
+      "content-type": "application/json",
+      "Authorization": `Bearer ${apiKey}`,
+    },
+    body: JSON.stringify(body),
+  });
+
+  if (!res.ok) {
+    const text = await res.text().catch(() => "");
+    return { ok: false, status: res.status, text };
+  }
+
+  const data = await res.json();
+  const content = (data?.choices?.[0]?.message?.content ?? "").trim();
+  return { ok: true, content };
+}
+
 // ---------- Lovable AI Gateway ----------
 async function callLovableChat(body: Record<string, unknown>): Promise<Response | null> {
   const key = process.env.LOVABLE_API_KEY;
@@ -170,23 +237,51 @@ export async function aiChatWithFallback(opts: ChatOptions): Promise<string> {
         const text = await res.text().catch(() => "");
         throw new Error(`Lovable AI error (${res.status}): ${text.slice(0, 200)}`);
       }
-      // else: fall through to Gemini.
-      console.warn(`[ai-fallback] Lovable AI returned ${res.status}; falling back to Gemini.`);
+      // else: fall through.
+      console.warn(`[ai-fallback] Lovable AI returned ${res.status}; falling back.`);
     }
   } catch (err) {
-    // Network error: try Gemini too.
-    console.warn("[ai-fallback] Lovable AI threw; trying Gemini:", (err as Error).message);
+    console.warn("[ai-fallback] Lovable AI threw; trying next:", (err as Error).message);
   }
 
-  // 2. Gemini direct with each key.
-  const keys = getGeminiKeys();
-  if (keys.length === 0) throw new AiPaymentError();
+  // Fetch dynamic database API keys
+  const dynamicKeys = await getDynamicApiKeys();
+
+  // 2. DeepSeek API (if key is configured in settings or env).
+  const deepseekKey = dynamicKeys.deepseek || process.env.DEEPSEEK_API_KEY;
+  if (deepseekKey) {
+    try {
+      console.info("[ai-fallback] Attempting DeepSeek API...");
+      const result = await callDeepSeekChat(deepseekKey, "deepseek-chat", {
+        messages: opts.messages,
+        temperature: opts.temperature,
+        jsonMode: opts.jsonMode,
+      });
+      if (result.ok) {
+        return result.content;
+      }
+      if (!isQuotaOrRate(result.status)) {
+        throw new Error(`DeepSeek error (${result.status}): ${result.text.slice(0, 200)}`);
+      }
+      console.warn(`[ai-fallback] DeepSeek returned quota/rate limit (${result.status}); falling back to Gemini.`);
+    } catch (err) {
+      console.warn("[ai-fallback] DeepSeek call failed; trying Gemini:", (err as Error).message);
+    }
+  }
+
+  // 3. Gemini API (using dynamic key + environment keys).
+  const geminiKeys = [
+    dynamicKeys.gemini,
+    ...getGeminiKeys()
+  ].filter((k): k is string => !!k && k.trim().length > 0);
+
+  if (geminiKeys.length === 0) throw new AiPaymentError();
 
   const geminiModel = toGeminiModel(opts.model);
   let lastStatus = 0;
   let lastText = "";
-  for (let i = 0; i < keys.length; i++) {
-    const key = keys[i];
+  for (let i = 0; i < geminiKeys.length; i++) {
+    const key = geminiKeys[i];
     try {
       const result = await callGeminiOnce(key, geminiModel, {
         messages: opts.messages,
@@ -199,13 +294,11 @@ export async function aiChatWithFallback(opts: ChatOptions): Promise<string> {
       lastStatus = result.status;
       lastText = result.text;
       if (!isQuotaOrRate(result.status)) {
-        // Terminal error on this key — try next only if it looks quota-ish; otherwise throw.
         throw new Error(`Gemini error (${result.status}): ${result.text.slice(0, 200)}`);
       }
       console.warn(`[ai-fallback] Gemini key #${i + 1} quota/rate limited (${result.status}); trying next.`);
     } catch (err) {
       console.warn(`[ai-fallback] Gemini key #${i + 1} threw:`, (err as Error).message);
-      // continue to next key
     }
   }
 
@@ -247,13 +340,18 @@ export async function aiImageWithFallback(prompt: string): Promise<string> {
   }
 
   // 2. Gemini keys
-  const keys = getGeminiKeys();
-  if (keys.length === 0) throw new AiPaymentError();
+  const dynamicKeys = await getDynamicApiKeys();
+  const geminiKeys = [
+    dynamicKeys.gemini,
+    ...getGeminiKeys()
+  ].filter((k): k is string => !!k && k.trim().length > 0);
+
+  if (geminiKeys.length === 0) throw new AiPaymentError();
 
   const geminiModel = toGeminiModel(model);
   let lastStatus = 0;
-  for (let i = 0; i < keys.length; i++) {
-    const key = keys[i];
+  for (let i = 0; i < geminiKeys.length; i++) {
+    const key = geminiKeys[i];
     try {
       const result = await callGeminiOnce(key, geminiModel, {
         messages: [{ role: "user", content: prompt }],
@@ -267,11 +365,11 @@ export async function aiImageWithFallback(prompt: string): Promise<string> {
       }
       lastStatus = result.status;
       if (!isQuotaOrRate(result.status)) {
-        throw new Error(`Gemini image error (${result.status}): ${result.text.slice(0, 200)}`);
+        throw new Error("Gemini image error (" + result.status + "): " + result.text.slice(0, 200));
       }
-      console.warn(`[ai-fallback] Gemini image key #${i + 1} quota/rate (${result.status}); trying next.`);
+      console.warn("[ai-fallback] Gemini image key #" + (i + 1) + " quota/rate (" + result.status + "); trying next.");
     } catch (err) {
-      console.warn(`[ai-fallback] Gemini image key #${i + 1} threw:`, (err as Error).message);
+      console.warn("[ai-fallback] Gemini image key #" + (i + 1) + " threw:", (err as Error).message);
     }
   }
 

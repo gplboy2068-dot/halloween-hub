@@ -13,6 +13,8 @@ type Settings = {
   supportEmail: string;
   adsenseId: string;
   gaId: string;
+  gemini_api_key: string;
+  deepseek_api_key: string;
 };
 
 const DEFAULTS: Settings = {
@@ -23,6 +25,8 @@ const DEFAULTS: Settings = {
   supportEmail: "hello@halloweentools.com",
   adsenseId: "",
   gaId: "",
+  gemini_api_key: "",
+  deepseek_api_key: "",
 };
 
 export const Route = createFileRoute("/admin/settings")({
@@ -52,6 +56,22 @@ function SettingsPage() {
           <Input label="Site name" value={form.siteName} onChange={(v) => setForm({ ...form, siteName: v })} />
           <Input label="Tagline" value={form.tagline} onChange={(v) => setForm({ ...form, tagline: v })} />
           <Input label="Meta description" value={form.description} onChange={(v) => setForm({ ...form, description: v })} textarea />
+        </Section>
+        <Section title="AI Configuration">
+          <Input
+            label="Gemini API Key"
+            value={form.gemini_api_key || ""}
+            onChange={(v) => setForm({ ...form, gemini_api_key: v })}
+            placeholder="AI Studio API Key"
+            type="password"
+          />
+          <Input
+            label="DeepSeek API Key"
+            value={form.deepseek_api_key || ""}
+            onChange={(v) => setForm({ ...form, deepseek_api_key: v })}
+            placeholder="DeepSeek Platform API Key"
+            type="password"
+          />
         </Section>
         <Section title="Social">
           <Input label="Twitter handle" value={form.twitter} onChange={(v) => setForm({ ...form, twitter: v })} />
@@ -85,14 +105,14 @@ function Section({ title, children }: { title: string; children: React.ReactNode
   );
 }
 
-function Input({ label, value, onChange, textarea, placeholder }: { label: string; value: string; onChange: (v: string) => void; textarea?: boolean; placeholder?: string }) {
+function Input({ label, value, onChange, textarea, placeholder, type = "text" }: { label: string; value: string; onChange: (v: string) => void; textarea?: boolean; placeholder?: string; type?: string }) {
   return (
     <label className="block">
       <span className="block text-xs font-medium mb-1.5 text-muted-foreground">{label}</span>
       {textarea ? (
         <textarea value={value} onChange={(e) => onChange(e.target.value)} rows={3} placeholder={placeholder} className="w-full px-3 py-2.5 rounded-lg bg-input border border-border text-sm resize-y" />
       ) : (
-        <input value={value} onChange={(e) => onChange(e.target.value)} placeholder={placeholder} className="w-full h-10 px-3 rounded-lg bg-input border border-border text-sm" />
+        <input type={type} value={value} onChange={(e) => onChange(e.target.value)} placeholder={placeholder} className="w-full h-10 px-3 rounded-lg bg-input border border-border text-sm" />
       )}
     </label>
   );
