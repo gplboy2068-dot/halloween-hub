@@ -118,7 +118,7 @@ export function Header() {
                     </Link>
                   )}
                   <Link
-                    to="/admin"
+                    to="/saved"
                     onClick={() => setMenuOpen(false)}
                     className="flex items-center gap-2 px-4 py-2.5 text-sm hover:bg-muted"
                   >
