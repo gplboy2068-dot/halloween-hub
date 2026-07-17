@@ -4,6 +4,7 @@ import {
   LayoutDashboard, Wrench, FileText, FolderTree, Tags, Image as ImageIcon,
   HelpCircle, Search, Code2, Users, BarChart3, Settings, ScrollText,
   ArrowRightLeft, Link2, Menu, X, ExternalLink, MessagesSquare, Scale,
+  Mail,
 } from "lucide-react";
 
 type NavItem = { to: string; label: string; icon: typeof LayoutDashboard; exact?: boolean };
@@ -21,6 +22,7 @@ const NAV: NavGroup[] = [
     { to: "/admin/media", label: "Media Library", icon: ImageIcon },
     { to: "/admin/community", label: "Community Feed", icon: MessagesSquare },
     { to: "/admin/legal", label: "Legal Pages", icon: Scale },
+    { to: "/admin/newsletter_subscribers", label: "Subscribers", icon: Mail },
   ]},
   { section: "SEO", items: [
     { to: "/admin/seo", label: "SEO", icon: Search },

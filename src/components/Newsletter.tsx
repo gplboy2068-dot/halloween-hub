@@ -28,10 +28,20 @@ export function Newsletter() {
             <p className="mt-6 text-primary font-medium">🎃 You're in! Check your inbox.</p>
           ) : (
             <form
-              onSubmit={(e) => {
+              onSubmit={async (e) => {
                 e.preventDefault();
                 if (email.includes("@")) {
                   track("newsletter_submit", { source: "inline", email_domain: email.split("@")[1] ?? "" });
+                  try {
+                    const { supabase } = await import("@/integrations/supabase/client");
+                    await supabase.from("newsletter_subscribers").insert({
+                      email: email.trim(),
+                      source: "inline",
+                      confirmed: true,
+                    });
+                  } catch (err) {
+                    console.error("Failed to save newsletter subscriber:", err);
+                  }
                   setOk(true);
                 }
               }}

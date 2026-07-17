@@ -97,6 +97,14 @@ export function normalizeRow(entity: EntityKind, row: any, catMap: Map<string, s
         code: row.status_code,
         status: "published" as const,
       };
+    case "newsletter_subscribers":
+      return {
+        ...base,
+        email: row.email,
+        source: row.source ?? "",
+        confirmed: !!row.confirmed,
+        status: "published" as const,
+      };
   }
 }
 
@@ -153,6 +161,12 @@ export function toDbPatch(entity: EntityKind, values: Record<string, any>): Reco
         target_path: v.to,
         status_code: v.code ? Number(v.code) : undefined,
       });
+    case "newsletter_subscribers":
+      return omitUndef({
+        email: v.email,
+        source: v.source,
+        confirmed: v.confirmed,
+      });
   }
 }
 
@@ -162,7 +176,7 @@ export function omitUndef<T extends Record<string, any>>(o: T): T {
 }
 
 export function orderCol(entity: EntityKind) {
-  if (entity === "redirects" || entity === "categories" || entity === "tags") return "created_at";
+  if (entity === "redirects" || entity === "categories" || entity === "tags" || entity === "newsletter_subscribers") return "created_at";
   return "updated_at";
 }
 
@@ -183,5 +197,7 @@ export function defaultsFor(entity: EntityKind): Record<string, any> {
       return { question: "New question", answer: "Answer…", status: "draft" };
     case "redirects":
       return { source_path: "/from", target_path: "/to", status_code: 301 };
+    case "newsletter_subscribers":
+      return { email: "new@subscriber.com", source: "admin", confirmed: true };
   }
 }

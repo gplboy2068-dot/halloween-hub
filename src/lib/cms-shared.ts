@@ -10,6 +10,7 @@ export const ENTITY_KINDS = [
   "tags",
   "faqs",
   "redirects",
+  "newsletter_subscribers",
 ] as const;
 export type EntityKind = (typeof ENTITY_KINDS)[number];
 
@@ -78,10 +79,17 @@ export type RedirectEntity = BaseEntity & {
   code: number;
 };
 
+export type NewsletterSubscriberEntity = BaseEntity & {
+  email: string;
+  source: string;
+  confirmed: boolean;
+};
+
 export type AnyEntity =
   | ToolEntity
   | ArticleEntity
   | CategoryEntity
   | TagEntity
   | FaqEntity
-  | RedirectEntity;
+  | RedirectEntity
+  | NewsletterSubscriberEntity;

@@ -79,10 +79,20 @@ export function ExitIntent() {
           <p className="mt-6 text-center text-primary font-medium">🕯️ You're in. Check your inbox.</p>
         ) : (
           <form
-            onSubmit={(e) => {
+            onSubmit={async (e) => {
               e.preventDefault();
               if (email.includes("@")) {
                 track("exit_intent_submit", { email_domain: email.split("@")[1] ?? "" });
+                try {
+                  const { supabase } = await import("@/integrations/supabase/client");
+                  await supabase.from("newsletter_subscribers").insert({
+                    email: email.trim(),
+                    source: "exit_intent",
+                    confirmed: true,
+                  });
+                } catch (err) {
+                  console.error("Failed to save exit intent subscriber:", err);
+                }
                 setDone(true);
                 window.localStorage.setItem(KEY, String(Date.now()));
               }

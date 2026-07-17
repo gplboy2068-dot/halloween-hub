@@ -111,4 +111,19 @@ export const ENTITY_CONFIGS: Record<string, EntityConfig> = {
       { key: "code", label: "HTTP code", type: "select", options: [{ value: "301", label: "301 (Permanent)" }, { value: "302", label: "302 (Temporary)" }] },
     ],
   },
+  newsletter_subscribers: {
+    name: "newsletter subscribers",
+    singular: "subscriber",
+    primaryKey: "email",
+    columns: [
+      { key: "email", label: "Email" },
+      { key: "source", label: "Source" },
+      { key: "confirmed", label: "Confirmed" },
+    ],
+    fields: [
+      { key: "email", label: "Email Address", type: "text", required: true },
+      { key: "source", label: "Source", type: "text", placeholder: "inline / exit_intent" },
+      { key: "confirmed", label: "Confirmed", type: "checkbox" },
+    ],
+  },
 };
