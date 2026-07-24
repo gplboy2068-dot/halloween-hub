@@ -7,19 +7,19 @@ type ChatMessage = { role: "system" | "user" | "assistant"; content: string };
 
 const LOVABLE_URL = "https://ai.gateway.lovable.dev/v1/chat/completions";
 
-// Map Lovable model IDs to native Gemini model names (AI Studio free tier).
-// Note: gemini-2.5-flash is deprecated for new AI Studio users; use *-latest aliases.
+// Map Lovable model IDs to native Gemini model names.
 const GEMINI_MODEL_MAP: Record<string, string> = {
-  "google/gemini-2.5-flash": "gemini-flash-latest",
-  "google/gemini-2.5-flash-lite": "gemini-flash-lite-latest",
-  "google/gemini-2.5-pro": "gemini-flash-latest",
-  "google/gemini-2.5-flash-image-preview": "gemini-2.5-flash-image",
-  "google/gemini-2.5-flash-image": "gemini-2.5-flash-image",
+  "google/gemini-2.5-flash": "gemini-2.5-flash",
+  "google/gemini-2.5-flash-lite": "gemini-2.5-flash-lite",
+  "google/gemini-2.5-pro": "gemini-2.5-pro",
+  "google/gemini-2.5-flash-image-preview": "gemini-2.5-flash",
+  "google/gemini-2.5-flash-image": "gemini-2.5-flash",
 };
 
 function toGeminiModel(lovableModel: string): string {
   return GEMINI_MODEL_MAP[lovableModel] ?? lovableModel.replace(/^google\//, "");
 }
+
 
 
 function getGeminiKeys(): string[] {
@@ -188,6 +188,23 @@ function extractGeminiImage(data: GeminiResponse): string | null {
   return null;
 }
 
+// ---------- Pollinations AI (Zero-Auth Free Fallback) ----------
+async function callPollinationsImage(prompt: string): Promise<string> {
+  const cleanPrompt = prompt.replace(/[\r\n]+/g, " ").trim();
+  const seed = Math.floor(Math.random() * 1000000);
+  const url = `https://image.pollinations.ai/prompt/${encodeURIComponent(cleanPrompt)}?width=1024&height=1024&nologo=true&seed=${seed}`;
+
+  const res = await fetch(url);
+  if (!res.ok) {
+    throw new Error(`Pollinations API returned status ${res.status}`);
+  }
+  const arrayBuffer = await res.arrayBuffer();
+  const base64 = Buffer.from(arrayBuffer).toString("base64");
+  const contentType = res.headers.get("content-type") || "image/jpeg";
+  return `data:${contentType};base64,${base64}`;
+}
+
+
 // ---------- Public API ----------
 
 export class AiRateLimitError extends Error {
@@ -328,51 +345,52 @@ export async function aiImageWithFallback(prompt: string): Promise<string> {
         };
         const url = j.choices?.[0]?.message?.images?.[0]?.image_url?.url;
         if (url) return url;
-      } else if (!isQuotaOrRate(res.status)) {
-        const text = await res.text().catch(() => "");
-        throw new Error(`Lovable AI image error (${res.status}): ${text.slice(0, 200)}`);
       } else {
-        console.warn(`[ai-fallback] Lovable image returned ${res.status}; falling back to Gemini.`);
+        console.warn(`[ai-fallback] Lovable image returned ${res.status}; trying Gemini/Pollinations.`);
       }
     }
   } catch (err) {
-    console.warn("[ai-fallback] Lovable image threw; trying Gemini:", (err as Error).message);
+    console.warn("[ai-fallback] Lovable image threw; trying Gemini/Pollinations:", (err as Error).message);
   }
 
   // 2. Gemini keys
-  const dynamicKeys = await getDynamicApiKeys();
-  const geminiKeys = [
-    dynamicKeys.gemini,
-    ...getGeminiKeys()
-  ].filter((k): k is string => !!k && k.trim().length > 0);
+  try {
+    const dynamicKeys = await getDynamicApiKeys();
+    const geminiKeys = [
+      dynamicKeys.gemini,
+      ...getGeminiKeys()
+    ].filter((k): k is string => !!k && k.trim().length > 0);
 
-  if (geminiKeys.length === 0) throw new AiPaymentError();
-
-  const geminiModel = toGeminiModel(model);
-  let lastStatus = 0;
-  for (let i = 0; i < geminiKeys.length; i++) {
-    const key = geminiKeys[i];
-    try {
-      const result = await callGeminiOnce(key, geminiModel, {
-        messages: [{ role: "user", content: prompt }],
-        imageMode: true,
-      });
-      if (result.ok) {
-        const url = extractGeminiImage(result.data);
-        if (url) return url;
-        // If ok but no image, treat as terminal.
-        throw new Error("Gemini did not return an image.");
+    if (geminiKeys.length > 0) {
+      const geminiModel = toGeminiModel(model);
+      for (let i = 0; i < geminiKeys.length; i++) {
+        const key = geminiKeys[i];
+        try {
+          const result = await callGeminiOnce(key, geminiModel, {
+            messages: [{ role: "user", content: prompt }],
+            imageMode: true,
+          });
+          if (result.ok) {
+            const url = extractGeminiImage(result.data);
+            if (url) return url;
+          }
+          console.warn(`[ai-fallback] Gemini image key #${i + 1} status ${result.status}; trying next.`);
+        } catch (err) {
+          console.warn(`[ai-fallback] Gemini image key #${i + 1} threw:`, (err as Error).message);
+        }
       }
-      lastStatus = result.status;
-      if (!isQuotaOrRate(result.status)) {
-        throw new Error("Gemini image error (" + result.status + "): " + result.text.slice(0, 200));
-      }
-      console.warn("[ai-fallback] Gemini image key #" + (i + 1) + " quota/rate (" + result.status + "); trying next.");
-    } catch (err) {
-      console.warn("[ai-fallback] Gemini image key #" + (i + 1) + " threw:", (err as Error).message);
     }
+  } catch (err) {
+    console.warn("[ai-fallback] Gemini image step threw:", (err as Error).message);
   }
 
-  if (lastStatus === 429) throw new AiRateLimitError();
-  throw new AiPaymentError();
+  // 3. Robust Free Fallback: Pollinations AI (Flux / SDXL high-quality image generation)
+  try {
+    console.info("[ai-fallback] Generating image via Pollinations AI fallback...");
+    return await callPollinationsImage(prompt);
+  } catch (err) {
+    console.error("[ai-fallback] Pollinations image generation failed:", err);
+  }
+
+  throw new AiRateLimitError();
 }
