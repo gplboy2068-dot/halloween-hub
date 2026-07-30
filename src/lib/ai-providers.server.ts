@@ -438,12 +438,8 @@ export async function aiImageWithFallback(prompt: string): Promise<string> {
             const url = extractGeminiImage(result.data);
             if (url) return url;
           }
-<<<<<<< HEAD
           const statusStr = result.ok ? "no image output" : String(result.status);
           console.warn(`[ai-fallback] Gemini image key #${i + 1} status ${statusStr}; trying next.`);
-=======
-          console.warn(`[ai-fallback] Gemini image key #${i + 1} status ${result.status}; trying next.`);
->>>>>>> bdcba05d86e860b84f1d7c11429aacb4e870995f
         } catch (err) {
           console.warn(`[ai-fallback] Gemini image key #${i + 1} threw:`, (err as Error).message);
         }
