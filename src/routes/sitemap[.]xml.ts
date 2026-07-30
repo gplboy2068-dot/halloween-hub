@@ -6,8 +6,6 @@ import { allCollectionSlugs } from "@/lib/collections";
 import { allAuthorSlugs } from "@/lib/authors";
 import { listArticles, listBlogCategories, listBlogTags } from "@/lib/blog.functions";
 
-const BASE_URL = "";
-
 interface SitemapEntry {
   path: string;
   lastmod?: string;
@@ -18,7 +16,11 @@ interface SitemapEntry {
 export const Route = createFileRoute("/sitemap.xml")({
   server: {
     handlers: {
-      GET: async () => {
+      GET: async ({ request }) => {
+        const reqUrl = new URL(request.url);
+        const host = request?.headers?.get("x-forwarded-host") || reqUrl.host;
+        const proto = request?.headers?.get("x-forwarded-proto") || reqUrl.protocol.replace(":", "");
+        const baseUrl = process.env.SITE_URL ? process.env.SITE_URL.replace(/\/$/, "") : `${proto}://${host}`;
         const [articles, blogCats, blogTags] = await Promise.all([
           listArticles({ data: { limit: 100 } }).catch(() => []),
           listBlogCategories().catch(() => []),
@@ -78,7 +80,7 @@ export const Route = createFileRoute("/sitemap.xml")({
         const urls = entries.map((e) =>
           [
             `  <url>`,
-            `    <loc>${BASE_URL}${e.path}</loc>`,
+            `    <loc>${baseUrl}${e.path}</loc>`,
             e.lastmod ? `    <lastmod>${e.lastmod}</lastmod>` : null,
             e.changefreq ? `    <changefreq>${e.changefreq}</changefreq>` : null,
             e.priority ? `    <priority>${e.priority}</priority>` : null,
