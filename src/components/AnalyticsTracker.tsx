@@ -28,7 +28,17 @@ export function AnalyticsTracker() {
       track("page_time", { ms, path: currentPath, depth: lastDepth });
     };
 
+    const trackGa = (path: string) => {
+      if (typeof window !== "undefined" && typeof (window as any).gtag === "function") {
+        (window as any).gtag("config", "G-GNYQXKH3EE", {
+          page_path: path,
+          page_title: document.title,
+        });
+      }
+    };
+
     track("pageview", { title: document.title, path: currentPath });
+    trackGa(currentPath);
 
     const unsubscribe = router.subscribe("onResolved", ({ toLocation }) => {
       emitPageTime();
@@ -37,6 +47,7 @@ export function AnalyticsTracker() {
       lastDepth = 0;
       firedDepths.clear();
       track("pageview", { title: document.title, path: currentPath });
+      trackGa(currentPath);
     });
 
     const onScroll = () => {
