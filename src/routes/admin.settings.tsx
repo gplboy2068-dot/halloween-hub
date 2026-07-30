@@ -15,6 +15,7 @@ type Settings = {
   gaId: string;
   gemini_api_key: string;
   deepseek_api_key: string;
+  runware_api_key: string;
 };
 
 const DEFAULTS: Settings = {
@@ -27,6 +28,7 @@ const DEFAULTS: Settings = {
   gaId: "",
   gemini_api_key: "",
   deepseek_api_key: "",
+  runware_api_key: "",
 };
 
 export const Route = createFileRoute("/admin/settings")({
@@ -58,6 +60,13 @@ function SettingsPage() {
           <Input label="Meta description" value={form.description} onChange={(v) => setForm({ ...form, description: v })} textarea />
         </Section>
         <Section title="AI Configuration">
+          <Input
+            label="Runware API Key (FLUX.1 Schnell)"
+            value={form.runware_api_key || ""}
+            onChange={(v) => setForm({ ...form, runware_api_key: v })}
+            placeholder="Runware Platform API Key"
+            type="password"
+          />
           <Input
             label="Gemini API Key"
             value={form.gemini_api_key || ""}

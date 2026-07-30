@@ -37,7 +37,7 @@ function isQuotaOrRate(status: number): boolean {
   return status === 429 || status === 402 || status === 403;
 }
 
-let cachedKeys: { gemini?: string; deepseek?: string } | null = null;
+let cachedKeys: { gemini?: string; deepseek?: string; runware?: string } | null = null;
 let lastCacheTime = 0;
 
 async function getDynamicApiKeys() {
@@ -50,12 +50,13 @@ async function getDynamicApiKeys() {
     const { data } = await supabaseAdmin
       .from("site_settings")
       .select("key, value")
-      .in("key", ["gemini_api_key", "deepseek_api_key"]);
+      .in("key", ["gemini_api_key", "deepseek_api_key", "runware_api_key"]);
 
-    const keys: { gemini?: string; deepseek?: string } = {};
+    const keys: { gemini?: string; deepseek?: string; runware?: string } = {};
     (data ?? []).forEach((row: any) => {
       if (row.key === "gemini_api_key" && row.value) keys.gemini = String(row.value).trim();
       if (row.key === "deepseek_api_key" && row.value) keys.deepseek = String(row.value).trim();
+      if (row.key === "runware_api_key" && row.value) keys.runware = String(row.value).trim();
     });
 
     cachedKeys = keys;
@@ -186,6 +187,58 @@ function extractGeminiImage(data: GeminiResponse): string | null {
     }
   }
   return null;
+}
+
+// ---------- Runware AI (FLUX.1 Schnell) ----------
+export async function callRunwareImage(
+  apiKey: string,
+  prompt: string,
+  opts?: { model?: string; width?: number; height?: number }
+): Promise<string> {
+  const url = "https://api.runware.ai/v1";
+  const taskUUID = crypto.randomUUID();
+  const modelId = opts?.model === "flux-1-schnell" || !opts?.model ? "runware:100@1" : opts.model;
+  const body = [
+    {
+      taskType: "imageInference",
+      taskUUID,
+      model: modelId,
+      positivePrompt: prompt,
+      width: opts?.width || 1024,
+      height: opts?.height || 1024,
+      numberResults: 1,
+      outputType: "URL",
+      outputFormat: "PNG",
+    },
+  ];
+
+  const res = await fetch(url, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${apiKey}`,
+    },
+    body: JSON.stringify(body),
+  });
+
+  if (!res.ok) {
+    const text = await res.text().catch(() => "");
+    throw new Error(`Runware API error (${res.status}): ${text.slice(0, 200)}`);
+  }
+
+  const json = await res.json();
+  if (json.error || json.errors) {
+    const errMsg = json.error?.message || JSON.stringify(json.errors || json.error);
+    throw new Error(`Runware API error: ${errMsg}`);
+  }
+
+  const resultItem = json.data?.[0];
+  const imageUrl = resultItem?.imageURL || resultItem?.imageDataURI;
+  if (!imageUrl) {
+    throw new Error("Runware API did not return an image URL");
+  }
+
+  return imageUrl;
 }
 
 // ---------- Pollinations AI (Zero-Auth Free Fallback) ----------
@@ -324,12 +377,24 @@ export async function aiChatWithFallback(opts: ChatOptions): Promise<string> {
 }
 
 /**
- * Image generation with fallback. Returns a data URL.
+ * Image generation with fallback. Returns a data URL or image URL.
  */
 export async function aiImageWithFallback(prompt: string): Promise<string> {
+  // 1. Runware AI (FLUX.1 Schnell)
+  try {
+    const dynamicKeys = await getDynamicApiKeys();
+    const runwareKey = dynamicKeys.runware || process.env.RUNWARE_API_KEY;
+    if (runwareKey) {
+      console.info("[ai-fallback] Generating image via Runware AI (FLUX.1 [schnell])...");
+      return await callRunwareImage(runwareKey, prompt, { model: "runware:100@1" });
+    }
+  } catch (err) {
+    console.warn("[ai-fallback] Runware image call failed; falling back to next provider:", (err as Error).message);
+  }
+
   const model = "google/gemini-2.5-flash-image-preview";
 
-  // 1. Lovable AI
+  // 2. Lovable AI
   try {
     const res = await callLovableChat({
       model,
@@ -374,7 +439,8 @@ export async function aiImageWithFallback(prompt: string): Promise<string> {
             const url = extractGeminiImage(result.data);
             if (url) return url;
           }
-          console.warn(`[ai-fallback] Gemini image key #${i + 1} status ${result.status}; trying next.`);
+          const statusStr = result.ok ? "no image output" : String(result.status);
+          console.warn(`[ai-fallback] Gemini image key #${i + 1} status ${statusStr}; trying next.`);
         } catch (err) {
           console.warn(`[ai-fallback] Gemini image key #${i + 1} threw:`, (err as Error).message);
         }
