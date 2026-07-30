@@ -13,7 +13,10 @@ export const Route = createFileRoute("/categories/$slug")({
   head: ({ loaderData, params }) => {
     if (!loaderData) return { meta: [{ title: "Not found" }, { name: "robots", content: "noindex" }] };
     const url = `/categories/${params.slug}`;
-    const tools = TOOLS.filter((t) => t.category.toLowerCase() === loaderData.name.toLowerCase());
+    const tools = TOOLS.filter((t) => {
+      const tLower = t.category.toLowerCase();
+      return tLower === loaderData.name.toLowerCase() || tLower === loaderData.slug.toLowerCase() || (loaderData.slug === "ai" && (tLower === "ai" || tLower === "ai generators"));
+    });
     return {
       meta: [
         { title: `${loaderData.name} — Halloween Tools & Ideas` },
@@ -71,7 +74,10 @@ export const Route = createFileRoute("/categories/$slug")({
 
 function CategoryPage() {
   const cat = Route.useLoaderData();
-  const tools = TOOLS.filter((t) => t.category.toLowerCase() === cat.name.toLowerCase());
+  const tools = TOOLS.filter((t) => {
+    const tLower = t.category.toLowerCase();
+    return tLower === cat.name.toLowerCase() || tLower === cat.slug.toLowerCase() || (cat.slug === "ai" && (tLower === "ai" || tLower === "ai generators"));
+  });
 
   return (
     <PageShell>

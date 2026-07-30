@@ -120,6 +120,7 @@ export function allAuthorSlugs(): string[] {
 export function authorForCategory(category: string): Author {
   const map: Record<string, string> = {
     AI: "dev-okafor",
+    "AI Generators": "dev-okafor",
     Design: "priya-shah",
     Party: "casey-larsen",
     Printables: "sam-reyes",

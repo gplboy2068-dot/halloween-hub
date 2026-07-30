@@ -56,7 +56,10 @@ function CategoriesIndex() {
 
         <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {CATEGORIES.map((c) => {
-            const count = TOOLS.filter((t) => t.category.toLowerCase() === c.name.toLowerCase()).length;
+            const count = TOOLS.filter((t) => {
+              const tLower = t.category.toLowerCase();
+              return tLower === c.name.toLowerCase() || tLower === c.slug.toLowerCase() || (c.slug === "ai" && (tLower === "ai" || tLower === "ai generators"));
+            }).length;
             return (
               <Link
                 key={c.slug}

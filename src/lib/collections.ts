@@ -64,7 +64,7 @@ const THEME_COLLECTIONS: CollectionPage[] = [
       "Regenerate as many times as you want, free",
       "Copy-paste ready for Instagram, TikTok, texts and group chats",
     ],
-    toolSlugs: TOOLS.filter((tool) => tool.category === "AI").map((tool) => tool.slug),
+    toolSlugs: TOOLS.filter((tool) => tool.category === "AI" || tool.category === "AI Generators").map((tool) => tool.slug),
     faqs: [
       { q: "Which AI powers these tools?", a: "We use modern large language models via our secure AI Gateway. The interface is tuned for Halloween so you don't need to write prompts." },
       { q: "Is the AI output original?", a: "Yes — every generation is fresh. We don't return pre-written lists." },

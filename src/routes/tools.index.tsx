@@ -61,7 +61,14 @@ function ToolsIndex() {
 
   const filtered = useMemo(() => {
     return TOOLS.filter((t) => {
-      if (cat !== "all" && t.category.toLowerCase() !== cat) return false;
+      if (cat !== "all") {
+        const catObj = CATEGORIES.find((c) => c.slug === cat || c.name.toLowerCase() === cat);
+        const tLower = t.category.toLowerCase();
+        const matchesName = tLower === cat;
+        const matchesSlug = catObj ? (tLower === catObj.name.toLowerCase() || tLower === catObj.slug.toLowerCase()) : false;
+        const matchesAi = (cat === "ai" || cat === "ai generators") && (tLower === "ai" || tLower === "ai generators");
+        if (!matchesName && !matchesSlug && !matchesAi) return false;
+      }
       if (q && !`${t.title} ${t.description}`.toLowerCase().includes(q.toLowerCase())) return false;
       return true;
     });
