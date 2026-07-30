@@ -1,0 +1,52 @@
+# HalloweenTools
+
+> The internet's biggest Halloween toolkit — free interactive tools, AI generators, printables, wishes, quotes, pumpkin templates, and party ideas.
+
+HalloweenTools provides browser-based, free tools for spooky season content creation, design, and party planning. No credit card, no signup, no watermarks.
+
+## Core Pages
+- [Home](https://halloweentools.com/): Overview of HalloweenTools and featured tools
+- [All Tools](https://halloweentools.com/tools): Complete catalogue of free Halloween tools
+- [Categories](https://halloweentools.com/categories): Browse tools by category
+- [Blog](https://halloweentools.com/blog): Halloween guides, ideas, and inspiration
+- [Ideas](https://halloweentools.com/ideas): Programmatic Halloween inspiration & lists
+- [Collections](https://halloweentools.com/collections): Tool collection hubs
+- [About](https://halloweentools.com/about): Editorial team & mission
+
+## AI Generators (FLUX.1 Schnell & LLM Powered)
+- [Costume Generator](https://halloweentools.com/tools/costume-generator): AI costume ideas tailored to age, budget & style
+- [Name Generator](https://halloweentools.com/tools/name-generator): Spooky names for characters, pets & Halloween parties
+- [Caption Generator](https://halloweentools.com/tools/caption-generator): Instagram & TikTok ready Halloween captions
+- [AI Prompt Generator](https://halloweentools.com/tools/ai-prompt-generator): Prompts for AI art & horror writing
+- [Scary Story Generator](https://halloweentools.com/tools/scary-story-generator): Short AI-crafted horror & spooky stories
+
+## Design Tools
+- [Halloween Card Maker](https://halloweentools.com/tools/halloween-card-maker): Design greeting cards in seconds
+- [Invitation Maker](https://halloweentools.com/tools/invitation-maker): Party invitation creator
+- [Poster Maker](https://halloweentools.com/tools/poster-maker): Bold Halloween posters
+- [Banner Maker](https://halloweentools.com/tools/banner-maker): Web & social banners
+- [Flyer Maker](https://halloweentools.com/tools/flyer-maker): Print-ready event flyers
+- [Logo Maker](https://halloweentools.com/tools/logo-maker): Instant Halloween logos
+
+## Printable Design Tools
+- [Printable Banner Generator](https://halloweentools.com/tools/printable-banner-generator): Print-ready Halloween letter banners
+- [Cupcake Topper Generator](https://halloweentools.com/tools/cupcake-topper-generator): 12 toppers per sheet
+- [Gift Tag Generator](https://halloweentools.com/tools/gift-tag-generator): Favor & name tags
+- [Label Generator](https://halloweentools.com/tools/label-generator): Candy, bottle & food labels
+- [Treat Bag Generator](https://halloweentools.com/tools/treat-bag-generator): Foldable treat-bag toppers
+- [Party Sign Generator](https://halloweentools.com/tools/party-sign-generator): Welcome & photo-booth signs
+- [Candy Bar Wrapper Generator](https://halloweentools.com/tools/candy-bar-wrapper-generator): Standard 1.55oz wrappers
+- [Envelope Liner Generator](https://halloweentools.com/tools/envelope-liner-generator): A7 and A2 liners
+- [Halloween Ticket Generator](https://halloweentools.com/tools/halloween-ticket-generator): Raffle & event tickets with stubs
+- [Costume Award Certificate Generator](https://halloweentools.com/tools/award-certificate-generator): Best costume award certificates
+- [Halloween Bingo Card Generator](https://halloweentools.com/tools/halloween-bingo-generator): Auto-shuffled 5x5 bingo cards
+- [Halloween Countdown Printable](https://halloweentools.com/tools/halloween-countdown-printable): 31-day October calendar
+- [Trick-or-Treat Door Sign Generator](https://halloweentools.com/tools/trick-or-treat-poster-generator): Teal pumpkin & candy door signs
+- [Pumpkin Guessing Game Sheet](https://halloweentools.com/tools/pumpkin-guessing-game-generator): Party game grids
+- [Halloween Scavenger Hunt Card Generator](https://halloweentools.com/tools/halloween-scavenger-hunt-generator): Scavenger hunt cards
+
+## Legal & Editorial
+- [Privacy Policy](https://halloweentools.com/privacy)
+- [Terms of Service](https://halloweentools.com/terms)
+- [Editorial Policy](https://halloweentools.com/editorial-policy)
+- [AI Content Policy](https://halloweentools.com/ai-content-policy)
