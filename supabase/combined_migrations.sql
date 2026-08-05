@@ -1685,3 +1685,33 @@ BEFORE UPDATE ON public.abuse_reports
 FOR EACH ROW EXECUTE FUNCTION public.set_updated_at();
 
 CREATE INDEX idx_abuse_reports_status_created ON public.abuse_reports (status, created_at DESC);
+
+-- Automatic missing category creation trigger for CSV imports
+CREATE OR REPLACE FUNCTION public.auto_create_missing_category_on_article_import()
+RETURNS trigger
+LANGUAGE plpgsql
+SECURITY DEFINER
+AS $$
+BEGIN
+  IF NEW.category_id IS NOT NULL AND NOT EXISTS (
+    SELECT 1 FROM public.categories WHERE id = NEW.category_id
+  ) THEN
+    INSERT INTO public.categories (id, slug, name, description, icon)
+    VALUES (
+      NEW.category_id,
+      'category-' || SUBSTRING(NEW.category_id::text FROM 1 FOR 8),
+      'Category ' || SUBSTRING(NEW.category_id::text FROM 1 FOR 8),
+      'Auto-created category for imported articles',
+      '📁'
+    )
+    ON CONFLICT (id) DO NOTHING;
+  END IF;
+  RETURN NEW;
+END;
+$$;
+
+DROP TRIGGER IF EXISTS trg_auto_create_missing_category ON public.articles;
+CREATE TRIGGER trg_auto_create_missing_category
+  BEFORE INSERT ON public.articles
+  FOR EACH ROW
+  EXECUTE FUNCTION public.auto_create_missing_category_on_article_import();
