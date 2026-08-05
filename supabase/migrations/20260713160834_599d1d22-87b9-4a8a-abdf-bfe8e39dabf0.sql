@@ -1,14 +1,17 @@
 
 -- Categories
 INSERT INTO public.categories (slug, name, description, icon) VALUES
-  ('design',     'Design',           'Cards, posters, flyers & more',   '🎨'),
-  ('ai',         'AI Generators',    'Names, captions, stories',        '🪄'),
-  ('pumpkin',    'Pumpkin',          'Templates, stencils, faces',      '🎃'),
-  ('party',      'Party',            'Planners & invitations',          '🥳'),
-  ('images',     'Images',           'Wallpapers & stickers',           '🖼️'),
-  ('printables', 'Printables',       'Coloring pages & activities',     '🖨️'),
-  ('social',     'Social',           'Captions, hashtags, memes',       '📱'),
-  ('wishes',     'Wishes & Quotes',  'Messages that spark joy',         '🌙')
+  ('design',     'Design',              'Cards, posters, flyers & more',              '🎨'),
+  ('ai',         'AI Generators',       'Names, captions, stories',                   '🪄'),
+  ('pumpkin',    'Pumpkin',             'Templates, stencils, faces',                 '🎃'),
+  ('party',      'Party',               'Planners & invitations',                     '🥳'),
+  ('images',     'Images',              'Wallpapers & stickers',                      '🖼️'),
+  ('printables', 'Printables',          'Coloring pages & activities',                '🖨️'),
+  ('social',     'Social',              'Captions, hashtags, memes',                  '📱'),
+  ('wishes',     'Wishes & Quotes',     'Messages that spark joy',                    '🌙'),
+  ('ideas',      'Ideas & Inspiration', 'Costumes, themes, and creative ideas',       '💡'),
+  ('history',    'History & Lore',      'Origins, traditions, and Halloween lore',    '📜'),
+  ('safety',     'Safety & Tips',       'Trick-or-treating and family safety guides', '🛡️')
 ON CONFLICT (slug) DO NOTHING;
 
 -- Tools
@@ -47,14 +50,19 @@ FROM (VALUES
 ON CONFLICT (slug) DO NOTHING;
 
 -- Articles
-INSERT INTO public.articles (slug, title, excerpt, read_time_min, status, published_at)
-VALUES
-  ('best-halloween-costume-ideas-2026', '50 Best Halloween Costume Ideas for 2026', 'From classic to trending — costume inspiration for every age and budget.', 9, 'published'::content_status, '2026-07-01'),
-  ('pumpkin-carving-guide',              'The Ultimate Pumpkin Carving Guide',       'Tools, techniques, safety, and 20 free templates.',                          12, 'published'::content_status, '2026-06-28'),
-  ('halloween-party-planning-checklist', 'Halloween Party Planning Checklist',       'The step-by-step guide to hosting the party of the year.',                    8, 'published'::content_status, '2026-06-20'),
-  ('history-of-halloween',               'The Real History of Halloween',            'From Samhain to today — how the world''s spookiest holiday evolved.',        11, 'published'::content_status, '2026-05-14'),
-  ('halloween-safety-tips-kids',         'Halloween Safety Tips for Kids',           'Trick-or-treating safely — a parent''s guide.',                               6, 'published'::content_status, '2026-06-02'),
-  ('diy-halloween-decorations',          '25 DIY Halloween Decorations You''ll Love','Budget-friendly decor ideas anyone can make.',                              10, 'published'::content_status, '2026-06-11')
+INSERT INTO public.articles (slug, title, excerpt, read_time_min, category_id, status, published_at)
+SELECT v.slug, v.title, v.excerpt, v.read_time_min,
+       c.id AS category_id,
+       'published'::content_status, v.published_at::timestamptz
+FROM (VALUES
+  ('best-halloween-costume-ideas-2026', '50 Best Halloween Costume Ideas for 2026', 'From classic to trending — costume inspiration for every age and budget.', 9, 'ideas', '2026-07-01'),
+  ('pumpkin-carving-guide',              'The Ultimate Pumpkin Carving Guide',       'Tools, techniques, safety, and 20 free templates.',                          12, 'pumpkin', '2026-06-28'),
+  ('halloween-party-planning-checklist', 'Halloween Party Planning Checklist',       'The step-by-step guide to hosting the party of the year.',                    8, 'party', '2026-06-20'),
+  ('history-of-halloween',               'The Real History of Halloween',            'From Samhain to today — how the world''s spookiest holiday evolved.',        11, 'history', '2026-05-14'),
+  ('halloween-safety-tips-kids',         'Halloween Safety Tips for Kids',           'Trick-or-treating safely — a parent''s guide.',                               6, 'safety', '2026-06-02'),
+  ('diy-halloween-decorations',          '25 DIY Halloween Decorations You''ll Love','Budget-friendly decor ideas anyone can make.',                              10, 'design', '2026-06-11')
+) AS v(slug, title, excerpt, read_time_min, cat_slug, published_at)
+JOIN public.categories c ON c.slug = v.cat_slug
 ON CONFLICT (slug) DO NOTHING;
 
 -- Tags

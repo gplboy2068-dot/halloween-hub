@@ -118,7 +118,7 @@ export function toDbPatch(entity: EntityKind, values: Record<string, any>): Reco
         title: v.title,
         description: v.description,
         icon: v.emoji,
-        category_id: v.categoryId ?? undefined,
+        category_id: v.categoryId ? v.categoryId : null,
         featured: v.featured,
         popular: v.popular,
         is_new: v.isNew,
@@ -134,7 +134,7 @@ export function toDbPatch(entity: EntityKind, values: Record<string, any>): Reco
         excerpt: v.excerpt,
         content: v.content,
         cover_image: v.coverImage,
-        category_id: v.categoryId ?? undefined,
+        category_id: v.categoryId ? v.categoryId : null,
         read_time_min: v.readingTime,
         status,
         published_at: status === "published" ? new Date().toISOString() : undefined,
@@ -152,7 +152,7 @@ export function toDbPatch(entity: EntityKind, values: Record<string, any>): Reco
       return omitUndef({
         question: v.question,
         answer: v.answer,
-        category_id: v.categoryId ?? undefined,
+        category_id: v.categoryId ? v.categoryId : null,
         status,
       });
     case "redirects":

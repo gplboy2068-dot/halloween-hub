@@ -269,3 +269,144 @@ export const saveSiteSettings = createServerFn({ method: "POST" })
     if (error) throw new Error(error.message);
     return { ok: true };
   });
+
+export const importArticles = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator(
+    (input: {
+      articles: Array<{
+        slug: string;
+        title: string;
+        excerpt?: string;
+        content?: string;
+        coverImage?: string;
+        categorySlug?: string;
+        categoryId?: string;
+        readingTime?: number;
+        status?: "draft" | "published" | "archived";
+        publishedAt?: string;
+      }>;
+    }) =>
+      z
+        .object({
+          articles: z.array(
+            z.object({
+              slug: z.string().min(1),
+              title: z.string().min(1),
+              excerpt: z.string().optional(),
+              content: z.string().optional(),
+              coverImage: z.string().optional(),
+              categorySlug: z.string().optional(),
+              categoryId: z.string().uuid().optional(),
+              readingTime: z.number().optional(),
+              status: z.enum(["draft", "published", "archived"]).optional(),
+              publishedAt: z.string().optional(),
+            })
+          ),
+        })
+        .parse(input)
+  )
+  .handler(async ({ data, context }) => {
+    await assertAdmin(context);
+
+    // 1. Fetch existing categories to map & validate foreign keys
+    const { data: existingCats, error: catErr } = await context.supabase
+      .from("categories")
+      .select("id, slug, name");
+
+    if (catErr) throw new Error(catErr.message);
+
+    const catBySlug = new Map<string, string>();
+    const validCatIds = new Set<string>();
+
+    (existingCats ?? []).forEach((c: any) => {
+      catBySlug.set(c.slug, c.id);
+      catBySlug.set(c.name.toLowerCase(), c.id);
+      validCatIds.add(c.id);
+    });
+
+    // 2. Identify missing categories and ensure they are created first
+    const missingCategorySlugs = new Set<string>();
+    for (const art of data.articles) {
+      if (
+        art.categorySlug &&
+        !catBySlug.has(art.categorySlug) &&
+        !catBySlug.has(art.categorySlug.toLowerCase())
+      ) {
+        missingCategorySlugs.add(art.categorySlug);
+      }
+    }
+
+    if (missingCategorySlugs.size > 0) {
+      const newCatsToInsert = Array.from(missingCategorySlugs).map((slug) => ({
+        slug: slug.toLowerCase().replace(/\s+/g, "-"),
+        name: slug.charAt(0).toUpperCase() + slug.slice(1),
+        description: `${slug} articles`,
+        icon: "📚",
+      }));
+
+      const { data: insertedCats, error: insertCatErr } = await context.supabase
+        .from("categories")
+        .upsert(newCatsToInsert as never, { onConflict: "slug" })
+        .select("id, slug, name");
+
+      if (insertCatErr) {
+        throw new Error(`Failed to create missing categories: ${insertCatErr.message}`);
+      }
+
+      (insertedCats ?? []).forEach((c: any) => {
+        catBySlug.set(c.slug, c.id);
+        catBySlug.set(c.name.toLowerCase(), c.id);
+        validCatIds.add(c.id);
+      });
+    }
+
+    // 3. Map every article's category_id to an existing category ID & validate FK
+    const articlesToInsert = [];
+    for (const art of data.articles) {
+      let resolvedCatId: string | null = null;
+
+      if (art.categoryId && validCatIds.has(art.categoryId)) {
+        resolvedCatId = art.categoryId;
+      } else if (art.categorySlug) {
+        resolvedCatId =
+          catBySlug.get(art.categorySlug) ||
+          catBySlug.get(art.categorySlug.toLowerCase()) ||
+          null;
+      }
+
+      // Foreign key validation: ensure category_id exists in categories table or is null
+      if (resolvedCatId && !validCatIds.has(resolvedCatId)) {
+        resolvedCatId = null;
+      }
+
+      articlesToInsert.push({
+        slug: art.slug,
+        title: art.title,
+        excerpt: art.excerpt ?? "",
+        content: art.content ?? "",
+        cover_image: art.coverImage ?? null,
+        category_id: resolvedCatId,
+        read_time_min: art.readingTime ?? 5,
+        status: art.status ?? "published",
+        published_at:
+          art.publishedAt ??
+          (art.status === "published" ? new Date().toISOString() : null),
+      });
+    }
+
+    // 4. Import articles
+    const { data: insertedArticles, error: artErr } = await context.supabase
+      .from("articles")
+      .upsert(articlesToInsert as never, { onConflict: "slug" })
+      .select("id, slug, title, category_id");
+
+    if (artErr) throw new Error(`Article import failed: ${artErr.message}`);
+
+    return {
+      success: true,
+      importedCount: insertedArticles?.length ?? 0,
+      articles: insertedArticles,
+    };
+  });
+
