@@ -83,12 +83,23 @@ function shapeListRow(row: any): ArticleListItem {
 async function renderMarkdown(md: string, articleSlug?: string): Promise<{ html: string; toc: import("./internal-linking").TocEntry[] }> {
   if (!md?.trim()) return { html: "", toc: [] };
   const { marked } = await import("marked");
-  const DOMPurifyMod = await import("isomorphic-dompurify");
-  const DOMPurify = (DOMPurifyMod as any).default ?? DOMPurifyMod;
   const { autoLinkHtml, injectToc } = await import("./internal-linking");
   marked.setOptions({ gfm: true, breaks: false });
   const raw = await marked.parse(md);
-  const clean = DOMPurify.sanitize(raw, { ADD_ATTR: ["target", "rel", "id", "class", "title"] });
+
+  let clean = raw;
+  try {
+    if (typeof window !== "undefined") {
+      const DOMPurifyMod = await import("dompurify");
+      const DOMPurify = (DOMPurifyMod as any).default ?? DOMPurifyMod;
+      clean = DOMPurify.sanitize(raw, { ADD_ATTR: ["target", "rel", "id", "class", "title"] });
+    } else {
+      clean = raw.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, "");
+    }
+  } catch {
+    clean = raw;
+  }
+
   const linked = autoLinkHtml(clean, {
     excludeHref: articleSlug ? `/blog/${articleSlug}` : undefined,
   });
