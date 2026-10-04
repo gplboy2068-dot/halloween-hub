@@ -4,6 +4,7 @@ import { RemixBanner, ToolCommunityStrip } from "@/components/CommunityWidgets";
 import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
 import { PageShell } from "@/components/PageShell";
 import { ToolCard } from "@/components/ToolCard";
+import { LeaderboardAd } from "@/components/LeaderboardAd";
 import { TOOLS, CATEGORIES } from "@/lib/site";
 import { getToolComponent } from "@/tools/registry";
 import {
@@ -201,6 +202,9 @@ function ToolPage() {
             </div>
           );
         })()}
+
+        {/* 728x90 Leaderboard Ad */}
+        <LeaderboardAd className="my-8" />
 
         {/* Community creations made with this tool */}
         <ToolCommunityStrip toolSlug={tool.slug} />
