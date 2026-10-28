@@ -111,6 +111,15 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         src: "https://www.googletagmanager.com/gtag/js?id=G-GNYQXKH3EE",
       },
       {
+        // Ad network scripts (site-wide, added 2026-10-28)
+        src: "https://afders.org/1/71717959bcc65c9bc5400576f6e2c451",
+        "data-cfasync": "false",
+      },
+      {
+        src: "https://bicea.org/14/c9116327bacbc3614a45f570db34e19d",
+        "data-cfasync": "false",
+      },
+      {
         children: `window.dataLayer = window.dataLayer || [];
 function gtag(){dataLayer.push(arguments);}
 gtag('js', new Date());
