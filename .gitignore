@@ -1,3 +1,5 @@
+# Environment — never commit real keys. Use .env.example as the template.
+.env
 # Logs
 logs
 *.log
